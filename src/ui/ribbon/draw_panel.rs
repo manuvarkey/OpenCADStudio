@@ -13,6 +13,7 @@ use super::{dropdown_backdrop, keytips, position_ribbon_dropdown, Ribbon};
 use crate::app::Message;
 use crate::modules::IconKind;
 use crate::t;
+use crate::ui::typography;
 use crate::ui::{icons, wrap_bar::PosReport};
 
 pub(super) const PANEL_ID: &str = "draw_extension";
@@ -302,7 +303,7 @@ pub(super) fn group_title<'a>(
     active_tool: Option<&str>,
 ) -> Element<'a, Message> {
     let Some(panel) = panel_for_group(title, group_ids) else {
-        return container(text(t!(title)).size(9).style(muted_text_style))
+        return container(text(t!(title)).size(typography::tiny()).style(muted_text_style))
             .padding([1, 4])
             .into();
     };
@@ -323,7 +324,7 @@ pub(super) fn group_title<'a>(
         panel.id,
         button(
             row![
-                PosReport::new(panel.title_id, text(t!(title)).size(9)),
+                PosReport::new(panel.title_id, text(t!(title)).size(typography::tiny())),
                 arrow
             ]
             .spacing(4)
@@ -417,7 +418,7 @@ fn reference_overlay<'a>(ribbon: &Ribbon, panel: Panel, win: (f32, f32)) -> Elem
     let edit = button(
         row![
             make_icon(IconKind::Svg(tool.icon), 16.0),
-            text(t!(tool.label)).size(11)
+            text(t!(tool.label)).size(typography::small())
         ]
         .spacing(6)
         .align_y(iced::Center),
@@ -457,11 +458,11 @@ fn reference_overlay<'a>(ribbon: &Ribbon, panel: Panel, win: (f32, f32)) -> Elem
     );
     let fading = row![
         switch,
-        text(t!("Xref fading")).size(11),
+        text(t!("Xref fading")).size(typography::small()),
         iced::widget::slider(0..=90u8, amount, Message::XrefFadeSlide)
             .on_release(Message::XrefFadeCommit)
             .width(Fill),
-        text(amount.to_string()).size(11).width(22),
+        text(amount.to_string()).size(typography::small()).width(22),
     ]
     .spacing(6)
     .align_y(iced::Center);
@@ -502,7 +503,7 @@ pub(super) fn overlay<'a>(ribbon: &Ribbon, id: &str, win: (f32, f32)) -> Element
             tool.options
                 .iter()
                 .map(|&(cmd, label)| {
-                    let item = button(text(t!(label)).size(11))
+                    let item = button(text(t!(label)).size(typography::small()))
                         .on_press(Message::DropdownSelectItem {
                             dropdown_id: tool.command,
                             cmd,

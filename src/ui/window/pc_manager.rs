@@ -211,7 +211,7 @@ fn tree_row<'a>(
         None => Space::new().width(14).into(),
     };
     let enabled = switch.is_some();
-    let label = text(label).size(12).width(Fill);
+    let label = text(label).size(typography::body()).width(Fill);
     let label = if enabled {
         label
     } else {
@@ -268,7 +268,7 @@ fn fold_button<'a>(
         .on_press(msg(message))
         .style(button::subtle)
         .padding([2, 4]);
-    tooltip(b, text(tip).size(10), tooltip::Position::Bottom)
+    tooltip(b, text(tip).size(typography::caption()), tooltip::Position::Bottom)
         .gap(4)
         .into()
 }
@@ -375,7 +375,7 @@ pub fn view<'a>(
     }
 
     let heading = text(crate::t!("REGIONS AND SCANS").into_owned())
-        .size(11)
+        .size(typography::small())
         .font(typography::bold_italic())
         .style(|theme: &Theme| text::Style {
             color: Some(theme.palette().primary.base.color),
@@ -411,7 +411,7 @@ pub fn view<'a>(
     let search = text_input(&crate::t!("Search"), &state.search)
         .on_input(|v| msg(PcManagerMsg::Search(v)))
         .padding([4, 8])
-        .size(12);
+        .size(typography::body());
 
     crate::ui::dock::frame(title_bar, column![card, search].spacing(6), width)
 }

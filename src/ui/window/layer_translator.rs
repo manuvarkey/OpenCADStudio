@@ -13,6 +13,7 @@ use crate::app::Message;
 use crate::modules::draw::layers::laytrans::{Mapping, TargetLayer};
 use crate::t;
 use crate::ui::style::form::{dialog_button, dialog_button_styled_opt};
+use crate::ui::typography;
 
 /// The dialog's working state: what was loaded, what is selected, and the
 /// mappings built so far. None of it touches the drawing until Translate.
@@ -36,7 +37,7 @@ fn muted(theme: &Theme) -> iced::widget::text::Style {
 }
 
 fn list_row<'a>(label: String, selected: bool, message: Message) -> Element<'a, Message> {
-    button(text(label).size(12).width(Fill))
+    button(text(label).size(typography::body()).width(Fill))
         .on_press(message)
         .style(move |theme: &Theme, status| {
             let palette = theme.palette();
@@ -62,7 +63,7 @@ fn pane<'a>(
     sizing: crate::ui::modal::ModalSizing,
 ) -> Element<'a, Message> {
     let body: Element<'_, Message> = if rows.is_empty() {
-        container(text(t!("(none)")).size(11).style(muted))
+        container(text(t!("(none)")).size(typography::small()).style(muted))
             .padding(8)
             .into()
     } else {
@@ -70,7 +71,7 @@ fn pane<'a>(
             .height(sizing.height)
             .into()
     };
-    container(column![text(title).size(11).style(muted), body].spacing(4))
+    container(column![text(title).size(typography::small()).style(muted), body].spacing(4))
         .padding(6)
         .width(sizing.width)
         .height(sizing.height)
@@ -122,9 +123,9 @@ pub fn view_window<'a>(
         .map(|mapping| {
             row![
                 text(format!("{}  →  {}", mapping.from, mapping.to))
-                    .size(12)
+                    .size(typography::body())
                     .width(Fill),
-                button(text(t!("Remove")).size(11))
+                button(text(t!("Remove")).size(typography::small()))
                     .on_press(Message::LayerTranslatorUnmap(mapping.from.clone()))
                     .style(button::text)
                     .padding([2, 6]),
@@ -136,20 +137,20 @@ pub fn view_window<'a>(
         .collect();
 
     let loaded: Element<'_, Message> = if state.source_file.is_empty() {
-        text(t!("No standard loaded.")).size(11).style(muted).into()
+        text(t!("No standard loaded.")).size(typography::small()).style(muted).into()
     } else {
-        text(state.source_file.clone()).size(11).style(muted).into()
+        text(state.source_file.clone()).size(typography::small()).style(muted).into()
     };
 
     let can_map = state.selected_from.is_some() && state.selected_to.is_some();
     let controls = row![
-        button(text(t!("Load…")).size(12))
+        button(text(t!("Load…")).size(typography::body()))
             .on_press(Message::LayerTranslatorLoad)
             .padding([4, 10]),
-        button(text(t!("Map")).size(12))
+        button(text(t!("Map")).size(typography::body()))
             .on_press_maybe(can_map.then_some(Message::LayerTranslatorMap))
             .padding([4, 10]),
-        button(text(t!("Map same")).size(12))
+        button(text(t!("Map same")).size(typography::body()))
             .on_press_maybe((!state.targets.is_empty()).then_some(Message::LayerTranslatorMapSame))
             .padding([4, 10]),
         Space::new().width(Fill),
@@ -162,23 +163,23 @@ pub fn view_window<'a>(
         checkbox(state.force_bylayer)
             .on_toggle(Message::LayerTranslatorForceByLayer)
             .size(14),
-        text(t!("Force objects to ByLayer")).size(11),
+        text(t!("Force objects to ByLayer")).size(typography::small()),
         Space::new().width(Length::Fixed(10.0)),
         checkbox(state.write_log)
             .on_toggle(Message::LayerTranslatorWriteLog)
             .size(14),
-        text(t!("Write translation log")).size(11),
+        text(t!("Write translation log")).size(typography::small()),
     ]
     .spacing(6)
     .align_y(iced::Center);
 
     let actions = row![
-        button(text(t!("Save mappings…")).size(12))
+        button(text(t!("Save mappings…")).size(typography::body()))
             .on_press_maybe(
                 (!state.mappings.is_empty()).then_some(Message::LayerTranslatorSaveMappings)
             )
             .padding([4, 10]),
-        button(text(t!("Load mappings…")).size(12))
+        button(text(t!("Load mappings…")).size(typography::body()))
             .on_press(Message::LayerTranslatorLoadMappings)
             .padding([4, 10]),
         Space::new().width(Fill),

@@ -908,10 +908,22 @@ struct KeyTipOverlay<'b> {
     layer: &'b KeyTipLayer,
 }
 
-const PILL_H: f32 = 16.0;
-const PILL_TEXT: f32 = 11.0;
-const BAR_H: f32 = 24.0;
-const BAR_TEXT: f32 = 12.0;
+// Key-tip text follows the UI typography; the pill and bar grow with it.
+fn pill_h() -> f32 {
+    typography::grow(16.0)
+}
+
+fn pill_text() -> f32 {
+    typography::small()
+}
+
+fn bar_h() -> f32 {
+    typography::grow(24.0)
+}
+
+fn bar_text() -> f32 {
+    typography::body()
+}
 
 fn text_width(content: &str, size: f32, font: iced::Font) -> f32 {
     <Renderer as advanced_text::Renderer>::Paragraph::with_text(advanced_text::Text {
@@ -1007,7 +1019,7 @@ impl overlay::Overlay<Message, Theme, Renderer> for KeyTipOverlay<'_> {
                 let Some(b) = fresh_bounds(anchor) else {
                     continue;
                 };
-                let width = text_width(code, PILL_TEXT, font) + 10.0;
+                let width = text_width(code, pill_text(), font) + 10.0;
                 let top_row = anchor.starts_with("tab:")
                     || anchor.starts_with("qa:")
                     || anchor == super::widgets::UNDO_HISTORY_ID
@@ -1024,21 +1036,21 @@ impl overlay::Overlay<Message, Theme, Renderer> for KeyTipOverlay<'_> {
                     Point::new(b.center_x(), b.y + b.height - 2.0)
                 } else if b.height >= 40.0 {
                     // Large buttons: over the label.
-                    Point::new(b.center_x(), b.y + b.height - PILL_H / 2.0 - 2.0)
+                    Point::new(b.center_x(), b.y + b.height - pill_h() / 2.0 - 2.0)
                 } else {
                     // Small buttons: at the lower left, over the icon.
-                    Point::new(b.x + width / 2.0, b.y + b.height - PILL_H / 2.0 + 3.0)
+                    Point::new(b.x + width / 2.0, b.y + b.height - pill_h() / 2.0 + 3.0)
                 };
                 let x = (center.x - width / 2.0).clamp(window.x, (window.width - width).max(window.x));
-                let y = (center.y - PILL_H / 2.0).clamp(window.y, (window.height - PILL_H).max(window.y));
-                let pill = Rectangle::new(Point::new(x, y), Size::new(width, PILL_H));
+                let y = (center.y - pill_h() / 2.0).clamp(window.y, (window.height - pill_h()).max(window.y));
+                let pill = Rectangle::new(Point::new(x, y), Size::new(width, pill_h()));
                 renderer.fill_quad(
                     renderer::Quad {
                         bounds: pill,
                         border: Border {
                             color: edge,
                             width: 1.0,
-                            radius: (PILL_H / 2.0).into(),
+                            radius: (pill_h() / 2.0).into(),
                         },
                         shadow: Shadow {
                             color: Color::BLACK.scale_alpha(0.6),
@@ -1055,17 +1067,17 @@ impl overlay::Overlay<Message, Theme, Renderer> for KeyTipOverlay<'_> {
                     .nth(self.layer.typed)
                     .map_or(code.len(), |(at, _)| at);
                 let (done, rest) = code.split_at(split);
-                let done_w = text_width(done, PILL_TEXT, font);
-                let rest_w = text_width(rest, PILL_TEXT, font);
+                let done_w = text_width(done, pill_text(), font);
+                let rest_w = text_width(rest, pill_text(), font);
                 let left = pill.center_x() - (done_w + rest_w) / 2.0;
                 let clip = Rectangle {
                     width: pill.width + 2.0,
                     ..pill
                 };
                 if !done.is_empty() {
-                    draw_text(renderer, done, Point::new(left, pill.center_y() - 0.5), PILL_TEXT, font, ink.scale_alpha(0.45), false, clip);
+                    draw_text(renderer, done, Point::new(left, pill.center_y() - 0.5), pill_text(), font, ink.scale_alpha(0.45), false, clip);
                 }
-                draw_text(renderer, rest, Point::new(left + done_w, pill.center_y() - 0.5), PILL_TEXT, font, ink, false, clip);
+                draw_text(renderer, rest, Point::new(left + done_w, pill.center_y() - 0.5), pill_text(), font, ink, false, clip);
                 shown.push(anchor.clone());
             }
         });
@@ -1083,7 +1095,7 @@ fn draw_bar(renderer: &mut Renderer, theme: &Theme, parts: &[String; 3]) {
     let font = typography::semibold();
     let bar = Rectangle::new(
         Point::new(ribbon.x, ribbon.y + ribbon.height),
-        Size::new(ribbon.width, BAR_H),
+        Size::new(ribbon.width, bar_h()),
     );
     renderer.fill_quad(
         renderer::Quad {
@@ -1112,8 +1124,8 @@ fn draw_bar(renderer: &mut Renderer, theme: &Theme, parts: &[String; 3]) {
             1 => (regular, ink),
             _ => (regular, ink.scale_alpha(0.6)),
         };
-        draw_text(renderer, part, Point::new(x, y), BAR_TEXT, part_font, color, false, bar);
-        x += text_width(part, BAR_TEXT, part_font) + 18.0;
+        draw_text(renderer, part, Point::new(x, y), bar_text(), part_font, color, false, bar);
+        x += text_width(part, bar_text(), part_font) + 18.0;
     }
 }
 

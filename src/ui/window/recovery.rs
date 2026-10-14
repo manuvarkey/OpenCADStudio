@@ -1,6 +1,7 @@
 use crate::app::Message;
 use crate::io::recovery::{RecoveryReport, RecoveryStatus};
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{button, column, container, row, scrollable, text, Space};
 use iced::{Background, Border, Element, Fill, Length, Shrink, Theme};
 
@@ -16,8 +17,8 @@ fn status_style(status: RecoveryStatus) -> impl Fn(&Theme) -> iced::widget::text
 fn metric<'a>(label: String, value: String) -> Element<'a, Message> {
     container(
         column![
-            text(label).size(10).style(muted_style),
-            text(value).size(18),
+            text(label).size(typography::caption()).style(muted_style),
+            text(value).size(typography::title()),
         ]
         .spacing(3),
     )
@@ -82,7 +83,7 @@ pub fn view_window<'a>(
                 crate::tr!("recovery", "referenced-entities-removed"),
                 report.referenced_entities_removed
             ))
-            .size(11),
+            .size(typography::small()),
         );
     }
     if report.references_missing > 0 || report.references_failed > 0 {
@@ -94,14 +95,14 @@ pub fn view_window<'a>(
                     .references_missing
                     .saturating_add(report.references_failed)
             ))
-            .size(11),
+            .size(typography::small()),
         );
     }
     if let Some(error) = &report.error {
-        details = details.push(text(error).size(11));
+        details = details.push(text(error).size(typography::small()));
     }
     for (kind, message) in report.diagnostics.iter().take(100) {
-        details = details.push(text(format!("[{kind}] {message}")).size(10));
+        details = details.push(text(format!("[{kind}] {message}")).size(typography::caption()));
     }
     if let Some(path) = &report.log_path {
         details = details.push(
@@ -110,7 +111,7 @@ pub fn view_window<'a>(
                 crate::tr!("recovery", "log-path"),
                 path.display()
             ))
-            .size(10)
+            .size(typography::caption())
             .style(muted_style),
         );
     } else if let Some(error) = &report.log_error {
@@ -119,13 +120,13 @@ pub fn view_window<'a>(
                 "{}: {error}",
                 crate::tr!("recovery", "log-write-failed")
             ))
-            .size(10)
+            .size(typography::caption())
             .style(status_style(RecoveryStatus::Failed)),
         );
     } else if cfg!(target_arch = "wasm32") {
         details = details.push(
             text(crate::tr!("recovery", "log-download-ready"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted_style),
         );
     }
@@ -139,7 +140,7 @@ pub fn view_window<'a>(
     let mut actions = row![Space::new().width(Fill)].spacing(8);
     if recovered && report.save_as_required && allow_save_copy {
         actions = actions.push(
-            button(text(crate::tr!("recovery", "save-copy")).size(12))
+            button(text(crate::tr!("recovery", "save-copy")).size(typography::body()))
                 .on_press(Message::RecoverySaveAs)
                 .style(button::primary)
                 .padding([6, 14]),
@@ -147,14 +148,14 @@ pub fn view_window<'a>(
     }
     if report.log_path.is_some() || cfg!(target_arch = "wasm32") {
         actions = actions.push(
-            button(text(crate::tr!("recovery", "show-log")).size(12))
+            button(text(crate::tr!("recovery", "show-log")).size(typography::body()))
                 .on_press(Message::RecoveryShowLog)
                 .style(button::secondary)
                 .padding([6, 14]),
         );
     }
     actions = actions.push(
-        button(text(crate::tr!("action", "close")).size(12))
+        button(text(crate::tr!("action", "close")).size(typography::body()))
             .on_press(Message::RecoveryClose)
             .style(button::secondary)
             .padding([6, 14]),
@@ -162,9 +163,9 @@ pub fn view_window<'a>(
 
     container(
         column![
-            text(heading).size(20).style(status_style(status)),
-            text(&report.file_name).size(13),
-            text(description).size(11).style(muted_style),
+            text(heading).size(typography::title_large()).style(status_style(status)),
+            text(&report.file_name).size(typography::body_large()),
+            text(description).size(typography::small()).style(muted_style),
             Space::new().height(4),
             metrics,
             detail_panel,
@@ -197,11 +198,11 @@ pub fn view_prompt<'a>(
     };
     let actions = row![
         Space::new().width(content_width),
-        button(text(crate::tr!("recovery", "decline")).size(12))
+        button(text(crate::tr!("recovery", "decline")).size(typography::body()))
             .on_press(Message::RecoveryDecline)
             .style(button::secondary)
             .padding([6, 14]),
-        button(text(crate::tr!("recovery", "attempt")).size(12))
+        button(text(crate::tr!("recovery", "attempt")).size(typography::body()))
             .on_press(Message::RecoveryAttempt)
             .style(button::primary)
             .padding([6, 14]),
@@ -210,12 +211,12 @@ pub fn view_prompt<'a>(
 
     container(
         column![
-            text(crate::tr!("recovery", "prompt-heading")).size(20),
-            text(file_name).size(13),
+            text(crate::tr!("recovery", "prompt-heading")).size(typography::title_large()),
+            text(file_name).size(typography::body_large()),
             text(crate::tr!("recovery", "prompt-description"))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
-            container(scrollable(text(error).size(10)).height(content_height))
+            container(scrollable(text(error).size(typography::caption())).height(content_height))
                 .padding([10, 12])
                 .width(content_width)
                 .height(content_height)

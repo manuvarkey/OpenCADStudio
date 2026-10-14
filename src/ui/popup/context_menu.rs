@@ -21,7 +21,10 @@ use crate::t;
 
 /// Fixed row height used by the renderer, so `ContextMenu::default_row_y`
 /// (which anchors the default row under the cursor) agrees with the layout.
-pub const MENU_ROW_H: f32 = 22.0;
+/// It grows with the UI text size.
+pub fn menu_row_h() -> f32 {
+    crate::ui::typography::grow(22.0)
+}
 /// Height of a separator row (1 px line plus its vertical padding).
 pub const MENU_SEP_H: f32 = 7.0;
 /// Vertical padding inside the menu panel above the first row.
@@ -306,17 +309,17 @@ impl ContextMenu {
                     if item.default {
                         return y;
                     }
-                    y += MENU_ROW_H;
+                    y += menu_row_h();
                 }
                 MenuRow::Separator => y += MENU_SEP_H,
                 MenuRow::Submenu { items, open, .. } => {
-                    y += MENU_ROW_H;
+                    y += menu_row_h();
                     if *open {
                         for item in items {
                             if item.default {
                                 return y;
                             }
-                            y += MENU_ROW_H;
+                            y += menu_row_h();
                         }
                     }
                 }
@@ -330,12 +333,12 @@ impl ContextMenu {
         let mut h = MENU_PAD_TOP * 2.0;
         for row in &self.rows {
             match row {
-                MenuRow::Item(_) => h += MENU_ROW_H,
+                MenuRow::Item(_) => h += menu_row_h(),
                 MenuRow::Separator => h += MENU_SEP_H,
                 MenuRow::Submenu { items, open, .. } => {
-                    h += MENU_ROW_H;
+                    h += menu_row_h();
                     if *open {
-                        h += items.len() as f32 * MENU_ROW_H;
+                        h += items.len() as f32 * menu_row_h();
                     }
                 }
             }
@@ -1114,7 +1117,7 @@ mod tests {
         let menu = build_context_menu(&idle_ctx(false), None);
         assert_eq!(menu.default_row_y(), MENU_PAD_TOP);
         // 11 items + 3 submenu headers + 6 separators, plus panel padding.
-        let expected = MENU_PAD_TOP * 2.0 + 14.0 * MENU_ROW_H + 6.0 * MENU_SEP_H;
+        let expected = MENU_PAD_TOP * 2.0 + 14.0 * menu_row_h() + 6.0 * MENU_SEP_H;
         assert_eq!(menu.height(), expected);
     }
 

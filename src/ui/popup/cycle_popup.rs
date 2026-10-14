@@ -8,6 +8,7 @@ use iced::widget::{button, column, container, mouse_area, opaque, row, rule, spa
 use iced::{border::Radius, color, Element, Fill, Length, Theme};
 
 use crate::app::Message;
+use crate::ui::typography;
 
 /// Row content for one overlapping candidate.
 pub struct CycleCandidate {
@@ -88,13 +89,13 @@ fn item_row(
 
     let content = row![
         swatch,
-        container(text(type_name).size(11))
+        container(text(type_name).size(typography::small()))
             .width(Length::Fixed(type_w))
             .align_y(iced::alignment::Vertical::Center),
         container(rule::vertical(1)).height(Length::Fixed(12.0)),
         container(
             text(layer)
-                .size(10)
+                .size(typography::caption())
                 .align_x(Horizontal::Right)
                 .style(|theme: &Theme| iced::widget::text::Style {
                     color: Some(theme.palette().background.base.text.scale_alpha(0.72)),

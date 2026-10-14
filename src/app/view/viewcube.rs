@@ -1,5 +1,6 @@
 use super::super::Message;
 use crate::scene::{VIEWCUBE_PX, VIEWCUBE_REGION_PX};
+use crate::ui::typography;
 use iced::widget::{button, container, mouse_area, stack, Space};
 use iced::{Background, Border, Element, Theme};
 
@@ -168,7 +169,7 @@ pub(super) fn viewcube_ucs_picker<'a>(
     };
     iced::widget::pick_list(Some(selected), options, |value| value.to_string())
         .on_select(Message::SetViewcubeUcs)
-        .text_size(11)
+        .text_size(typography::small())
         .padding([2, 6])
         // Fixed width so the caller can centre it under the cube centre with a
         // simple half-width offset (content-sized width would drift off-centre).

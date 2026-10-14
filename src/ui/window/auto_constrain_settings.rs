@@ -1,6 +1,7 @@
 use crate::app::settings::AutoConstrainSettings;
 use crate::app::Message;
 use crate::ui::style::form::dialog_button;
+use crate::ui::typography;
 use iced::widget::{button, checkbox, column, container, row, scrollable, text, text_input, Space};
 use iced::{Element, Fill};
 
@@ -90,7 +91,7 @@ pub fn view_window<'a>(
     .spacing(8);
 
     let tolerances = column![
-        text(crate::t!("Tolerances")).size(14),
+        text(crate::t!("Tolerances")).size(typography::subheading()),
         row![
             text(crate::t!("Distance")).width(130),
             text_input("0.05", distance_input)
@@ -120,7 +121,7 @@ pub fn view_window<'a>(
 
     container(
         column![
-            text(crate::t!("Auto Constrain")).size(16),
+            text(crate::t!("Auto Constrain")).size(typography::heading_large()),
             types,
             conditions,
             tolerances,

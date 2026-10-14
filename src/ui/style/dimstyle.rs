@@ -5,6 +5,7 @@ use crate::scene::convert::tessellate::{arrow_from_block_name, ArrowKind};
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::hdivider;
+use crate::ui::typography;
 use iced::widget::{
     button, canvas, checkbox, column, container, row, scrollable, text, text_input, Space,
 };
@@ -423,38 +424,38 @@ pub fn view_window<'a>(
 ) -> Element<'a, Message> {
     // ── Tab bar ───────────────────────────────────────────────────────────
     let tabs = row![
-        button(text(t!("Lines")).size(11))
+        button(text(t!("Lines")).size(typography::small()))
             .on_press(Message::DimStyleDialogTab(0))
             .style(tab_btn_style(tab == 0))
             .padding([4, 10]),
-        button(text(t!("Symbols and Arrows")).size(11))
+        button(text(t!("Symbols and Arrows")).size(typography::small()))
             .on_press(Message::DimStyleDialogTab(1))
             .style(tab_btn_style(tab == 1))
             .padding([4, 10]),
-        button(text(t!("Text")).size(11))
+        button(text(t!("Text")).size(typography::small()))
             .on_press(Message::DimStyleDialogTab(2))
             .style(tab_btn_style(tab == 2))
             .padding([4, 10]),
-        button(text(t!("Fit")).size(11))
+        button(text(t!("Fit")).size(typography::small()))
             .on_press(Message::DimStyleDialogTab(3))
             .style(tab_btn_style(tab == 3))
             .padding([4, 10]),
-        button(text(t!("Primary Units")).size(11))
+        button(text(t!("Primary Units")).size(typography::small()))
             .on_press(Message::DimStyleDialogTab(4))
             .style(tab_btn_style(tab == 4))
             .padding([4, 10]),
-        button(text(t!("Alternate Units")).size(11))
+        button(text(t!("Alternate Units")).size(typography::small()))
             .on_press(Message::DimStyleDialogTab(5))
             .style(tab_btn_style(tab == 5))
             .padding([4, 10]),
-        button(text(t!("Tolerances")).size(11))
+        button(text(t!("Tolerances")).size(typography::small()))
             .on_press(Message::DimStyleDialogTab(6))
             .style(tab_btn_style(tab == 6))
             .padding([4, 10]),
     ]
     .spacing(2);
 
-    let lbl = |s: Cow<'static, str>| text(s).size(11).style(muted_style).width(180);
+    let lbl = |s: Cow<'static, str>| text(s).size(typography::small()).style(muted_style).width(180);
 
     let mk_field = |fld: DsField, val: &'a str| -> Element<'a, Message> {
         if vals.read_only {
@@ -463,7 +464,7 @@ pub fn view_window<'a>(
             text_input("", val)
                 .on_input(move |s| Message::DsEdit(fld.clone(), s))
                 .style(field_style)
-                .size(11)
+                .size(typography::small())
                 .width(100)
                 .into()
         }
@@ -474,7 +475,7 @@ pub fn view_window<'a>(
             text_input("", val)
                 .on_input(move |value| Message::DsEdit(fld.clone(), value))
                 .style(field_style)
-                .size(11)
+                .size(typography::small())
                 .width(100)
                 .into()
         } else {
@@ -483,7 +484,7 @@ pub fn view_window<'a>(
     };
 
     let chk = |label: Cow<'static, str>, val: bool, fld: DsField| -> Element<'a, Message> {
-        let item = checkbox(val).label(label).size(14).text_size(11);
+        let item = checkbox(val).label(label).size(14).text_size(typography::small());
         if vals.read_only {
             item.into()
         } else {
@@ -519,7 +520,7 @@ pub fn view_window<'a>(
         } else {
             iced::widget::pick_list(Some(cur), options, |value| value.to_string())
                 .on_select(move |chosen: DimEnumChoice| Message::DsEdit(fld.clone(), chosen.code))
-                .text_size(11)
+                .text_size(typography::small())
                 .width(150)
                 .into()
         };
@@ -629,7 +630,7 @@ pub fn view_window<'a>(
             let list = iced::widget::pick_list(Some(feet_current.clone()), feet_modes, |choice| {
                 choice.to_string()
             })
-            .text_size(11)
+            .text_size(typography::small())
             .width(210);
             let list: Element<'a, Message> = if enabled && !vals.read_only {
                 let target = field.clone();
@@ -654,11 +655,11 @@ pub fn view_window<'a>(
         let leading = checkbox(raw & 4 != 0)
             .label(t!("Suppress leading zeros"))
             .size(14)
-            .text_size(11);
+            .text_size(typography::small());
         let trailing = checkbox(raw & 8 != 0)
             .label(t!("Suppress trailing zeros"))
             .size(14)
-            .text_size(11);
+            .text_size(typography::small());
         let leading: Element<'a, Message> = if enabled && !vals.read_only {
             let target = field.clone();
             leading
@@ -729,7 +730,7 @@ pub fn view_window<'a>(
         } else {
             iced::widget::pick_list(Some(selected), options, |value| value.to_string())
                 .on_select(move |value| Message::DsSetHandle { field, value })
-                .text_size(11)
+                .text_size(typography::small())
                 .width(150)
                 .into()
         };
@@ -747,7 +748,7 @@ pub fn view_window<'a>(
           -> Element<'a, Message> {
         let list =
             iced::widget::pick_list(Some(selected.clone()), options, |value| value.to_string())
-                .text_size(11)
+                .text_size(typography::small())
                 .width(150);
         let list: Element<'a, Message> = if enabled && !vals.read_only {
             list.on_select(move |value| Message::DsSetHandle { field, value })
@@ -770,7 +771,7 @@ pub fn view_window<'a>(
             |value| value.to_string(),
         )
         .on_select(|value| Message::DsEdit(DsField::Dimtxsty, value))
-        .text_size(11)
+        .text_size(typography::small())
         .width(150)
         .into()
     };
@@ -780,7 +781,7 @@ pub fn view_window<'a>(
             "The selected text style fixes the height at %{height}.",
             height = height
         ))
-        .size(10)
+        .size(typography::caption())
         .style(muted_style)
         .into()
     } else {
@@ -820,7 +821,7 @@ pub fn view_window<'a>(
             choice.to_string()
         })
         .on_select(|choice| Message::DsCenterMarkMode(choice.code))
-        .text_size(11)
+        .text_size(typography::small())
         .width(150)
         .into()
     };
@@ -868,14 +869,14 @@ pub fn view_window<'a>(
             choice.to_string()
         })
         .on_select(|choice| Message::DsToleranceMode(choice.code))
-        .text_size(11)
+        .text_size(typography::small())
         .width(150)
         .into()
     };
 
     let tab_content: Element<'_, Message> = match tab {
         0 => column![
-            text(t!("Dimension Line")).size(11).style(primary_style),
+            text(t!("Dimension Line")).size(typography::small()).style(primary_style),
             row![
                 lbl(t!("Extend beyond ticks")),
                 mk_field(DsField::Dimdle, vals.dimdle)
@@ -896,7 +897,7 @@ pub fn view_window<'a>(
             .align_y(iced::Center),
             chk(t!("Suppress first dimension line"), vals.dimsd1, DsField::Dimsd1),
             chk(t!("Suppress second dimension line"), vals.dimsd2, DsField::Dimsd2),
-            text(t!("Extension Line")).size(11).style(primary_style),
+            text(t!("Extension Line")).size(typography::small()).style(primary_style),
             row![
                 lbl(t!("Extend beyond dimension line")),
                 mk_field(DsField::Dimexe, vals.dimexe)
@@ -948,7 +949,7 @@ pub fn view_window<'a>(
         .spacing(7)
         .into(),
         1 => column![
-            text(t!("Arrowheads")).size(11).style(primary_style),
+            text(t!("Arrowheads")).size(typography::small()).style(primary_style),
             hrow_enabled(
                 t!("Both arrowheads"),
                 vals.block_opts.clone(),
@@ -1018,7 +1019,7 @@ pub fn view_window<'a>(
         .spacing(7)
         .into(),
         2 => column![
-            text(t!("Text")).size(11).style(primary_style),
+            text(t!("Text")).size(typography::small()).style(primary_style),
             row![
                 lbl(t!("Text height")),
                 mk_field_enabled(DsField::Dimtxt, vals.dimtxt, vals.text_style_fixed_height.is_none())
@@ -1078,7 +1079,7 @@ pub fn view_window<'a>(
             if vals.dimtfill.trim() == "2" {
                 color_row(t!("Background color"), DsField::Dimtfillclr, vals.dimtfillclr)
             } else {
-                row![lbl(t!("Background color")), container(text(t!("Not applicable")).size(11).style(muted_style)).padding([4, 7]).width(150)]
+                row![lbl(t!("Background color")), container(text(t!("Not applicable")).size(typography::small()).style(muted_style)).padding([4, 7]).width(150)]
                     .spacing(8).align_y(iced::Center).into()
             },
             chk(
@@ -1090,7 +1091,7 @@ pub fn view_window<'a>(
         .spacing(7)
         .into(),
         3 => column![
-            text(t!("Fit options")).size(11).style(primary_style),
+            text(t!("Fit options")).size(typography::small()).style(primary_style),
             enum_field(
                 t!("When space is limited"),
                 DsField::Dimatfit,
@@ -1104,7 +1105,7 @@ pub fn view_window<'a>(
             ),
             chk(t!("Always keep text between extension lines"), vals.dimtix, DsField::Dimtix),
             chk(t!("Suppress arrows when they do not fit"), vals.dimsoxd, DsField::Dimsoxd),
-            text(t!("Text movement")).size(11).style(primary_style),
+            text(t!("Text movement")).size(typography::small()).style(primary_style),
             enum_field(
                 t!("When text is moved"),
                 DsField::Dimtmove,
@@ -1115,12 +1116,12 @@ pub fn view_window<'a>(
                     ("2", "Move text freely"),
                 ],
             ),
-            text(t!("Scale")).size(11).style(primary_style),
+            text(t!("Scale")).size(typography::small()).style(primary_style),
             chk(t!("Annotative"), vals.annotative, DsField::Annotative),
             row![
                 lbl(t!("Overall scale")),
                 if vals.annotative {
-                    container(text(t!("Automatic")).size(11).style(muted_style))
+                    container(text(t!("Automatic")).size(typography::small()).style(muted_style))
                         .padding([4, 7])
                         .width(100)
                         .into()
@@ -1130,14 +1131,14 @@ pub fn view_window<'a>(
             ]
             .spacing(8)
             .align_y(iced::Center),
-            text(t!("Fine tuning")).size(11).style(primary_style),
+            text(t!("Fine tuning")).size(typography::small()).style(primary_style),
             chk(t!("Place text manually while creating dimensions"), vals.dimupt, DsField::Dimupt),
             chk(t!("Draw dimension line between extension lines"), vals.dimtofl, DsField::Dimtofl),
         ]
         .spacing(8)
         .into(),
         4 => column![
-            text(t!("Linear dimensions")).size(11).style(primary_style),
+            text(t!("Linear dimensions")).size(typography::small()).style(primary_style),
             enum_field(t!("Unit format"), DsField::Dimlunit, vals.dimlunit, OPT_LUNIT),
             prec_field(t!("Precision"), DsField::Dimdec, vals.dimdec, true),
             if matches!(vals.dimlunit.trim(), "4" | "5") {
@@ -1148,7 +1149,7 @@ pub fn view_window<'a>(
                     &[("0", "Horizontal"), ("1", "Diagonal"), ("2", "Not stacked")],
                 )
             } else {
-                row![lbl(t!("Fraction format")), container(text(t!("Not applicable")).size(11).style(muted_style)).padding([4, 7]).width(150)]
+                row![lbl(t!("Fraction format")), container(text(t!("Not applicable")).size(typography::small()).style(muted_style)).padding([4, 7]).width(150)]
                     .spacing(8).align_y(iced::Center).into()
             },
             if vals.dimlunit.trim() == "2" {
@@ -1159,7 +1160,7 @@ pub fn view_window<'a>(
                     &[("46", "Period"), ("44", "Comma"), ("32", "Space")],
                 )
             } else {
-                row![lbl(t!("Decimal separator")), container(text(t!("Not applicable")).size(11).style(muted_style)).padding([4, 7]).width(150)]
+                row![lbl(t!("Decimal separator")), container(text(t!("Not applicable")).size(typography::small()).style(muted_style)).padding([4, 7]).width(150)]
                     .spacing(8).align_y(iced::Center).into()
             },
             row![lbl(t!("Round off")), mk_field(DsField::Dimrnd, vals.dimrnd)]
@@ -1167,17 +1168,17 @@ pub fn view_window<'a>(
             row![lbl(t!("Measurement template")), mk_field(DsField::Dimpost, vals.dimpost)]
                 .spacing(8).align_y(iced::Center),
             text(t!("Use <> as the measured value; text before and after it becomes the prefix and suffix."))
-                .size(10).style(muted_style),
+                .size(typography::caption()).style(muted_style),
             row![lbl(t!("Measurement scale")), mk_field(DsField::Dimlfac, vals.dimlfac)]
                 .spacing(8).align_y(iced::Center),
-            text(t!("Zero suppression")).size(11).style(primary_style),
+            text(t!("Zero suppression")).size(typography::small()).style(primary_style),
             zero_controls(
                 DsField::Dimzin,
                 vals.dimzin,
                 matches!(vals.dimlunit.trim(), "3" | "4"),
                 true,
             ),
-            text(t!("Angular dimensions")).size(11).style(primary_style),
+            text(t!("Angular dimensions")).size(typography::small()).style(primary_style),
             enum_field(
                 t!("Unit format"),
                 DsField::Dimaunit,
@@ -1195,7 +1196,7 @@ pub fn view_window<'a>(
         .spacing(8)
         .into(),
         5 => column![
-            text(t!("Alternate Units")).size(11).style(primary_style),
+            text(t!("Alternate Units")).size(typography::small()).style(primary_style),
             chk(
                 t!("Display alternate units"),
                 vals.dimalt,
@@ -1211,7 +1212,7 @@ pub fn view_window<'a>(
             if vals.dimalt {
                 enum_field(t!("Unit format"), DsField::Dimaltu, vals.dimaltu, OPT_LUNIT)
             } else {
-                row![lbl(t!("Unit format")), container(text(alternate_unit_name).size(11).style(muted_style)).padding([4, 7]).width(150)]
+                row![lbl(t!("Unit format")), container(text(alternate_unit_name).size(typography::small()).style(muted_style)).padding([4, 7]).width(150)]
                     .spacing(8).align_y(iced::Center).into()
             },
             prec_field(t!("Tolerance precision"), DsField::Dimalttd, vals.dimalttd, vals.dimalt),
@@ -1227,14 +1228,14 @@ pub fn view_window<'a>(
             ]
             .spacing(8)
             .align_y(iced::Center),
-            text(t!("Zero suppression")).size(11).style(primary_style),
+            text(t!("Zero suppression")).size(typography::small()).style(primary_style),
             zero_controls(
                 DsField::Dimaltz,
                 vals.dimaltz,
                 matches!(vals.dimaltu.trim(), "3" | "4"),
                 vals.dimalt,
             ),
-            text(t!("Tolerance zero suppression")).size(11).style(primary_style),
+            text(t!("Tolerance zero suppression")).size(typography::small()).style(primary_style),
             zero_controls(
                 DsField::Dimalttz,
                 vals.dimalttz,
@@ -1245,7 +1246,7 @@ pub fn view_window<'a>(
         .spacing(7)
         .into(),
         _ => column![
-            text(t!("Tolerances")).size(11).style(primary_style),
+            text(t!("Tolerances")).size(typography::small()).style(primary_style),
             row![
                 lbl(t!("Method")),
                 tolerance_method_field
@@ -1282,7 +1283,7 @@ pub fn view_window<'a>(
                 vals.dimtolj,
                 &[("0", "Bottom"), ("1", "Middle"), ("2", "Top")],
             ),
-            text(t!("Zero suppression")).size(11).style(primary_style),
+            text(t!("Zero suppression")).size(typography::small()).style(primary_style),
             zero_controls(
                 DsField::Dimtzin,
                 vals.dimtzin,
@@ -1395,16 +1396,16 @@ pub fn view_window<'a>(
             )
         };
         row![
-            text(t!("Compare with")).size(10).style(muted_style),
+            text(t!("Compare with")).size(typography::caption()).style(muted_style),
             iced::widget::pick_list(
                 Some(vals.compare_name.clone()),
                 vals.compare_opts.clone(),
                 |value| value.to_string(),
             )
             .on_select(Message::DimStyleDialogCompare)
-            .text_size(11)
+            .text_size(typography::small())
             .width(150),
-            text(summary).size(10).style(muted_style),
+            text(summary).size(typography::caption()).style(muted_style),
         ]
         .spacing(8)
         .align_y(iced::Center)
@@ -1414,9 +1415,9 @@ pub fn view_window<'a>(
     let right_panel = container(
         column![
             row![
-                text(selected).size(13).style(primary_style),
+                text(selected).size(typography::body_large()).style(primary_style),
                 Space::new().width(Length::Fill),
-                text(status).size(10).style(muted_style),
+                text(status).size(typography::caption()).style(muted_style),
             ]
             .align_y(iced::Center),
             preview_panel,

@@ -5,6 +5,7 @@ use crate::app::config::DockSide;
 use crate::app::{ColorPickTarget, Message};
 use crate::scene::Scene;
 use crate::ui::dock::PanelId;
+use crate::ui::typography;
 use crate::ui::window::gradient_editor::{GradientEditorState, GradientMsg};
 use codec::entities::{EntityCommon, Hatch, HatchGradientPattern};
 use codec::types::{Color as AcadColor, LineWeight, Transparency};
@@ -20,7 +21,9 @@ use std::cell::RefCell;
 type DrawDepth = FxHashMap<u64, [f32; 2]>;
 
 const PALETTE_CONTROL_ICON_SIZE: f32 = 20.0;
-const COMPACT_BUTTON_HEIGHT: f32 = 22.0;
+fn compact_button_height() -> f32 {
+    typography::grow(22.0)
+}
 const TRANSPARENCY_ICON: &[u8] =
     include_bytes!("../../../assets/icons/attributes/transparency.svg");
 const LINEWEIGHT_ICON: &[u8] = include_bytes!("../../../assets/icons/attributes/lineweight.svg");
@@ -644,7 +647,7 @@ fn compact_button_content(label: &'static str) -> Element<'static, Message> {
 }
 
 fn popup_item<'a>(label: std::borrow::Cow<'a, str>, message: Message) -> Element<'a, Message> {
-    button(text(label).size(11))
+    button(text(label).size(typography::small()))
         .on_press(message)
         .style(crate::ui::color_select::list_row_style)
         .width(Fill)
@@ -703,7 +706,7 @@ fn color_control<'a>(
     // ByLayer / ByBlock show only on the L / B button; differing colours are
     // also spelled out on the swatch.
     let label: Element<'a, Message> = if info.varies {
-        container(text("*VARIES*").size(10))
+        container(text("*VARIES*").size(typography::caption()))
             .width(Fill)
             .height(Fill)
             .align_x(iced::Left)
@@ -717,7 +720,7 @@ fn color_control<'a>(
     let swatch = button(label)
         .on_press(Message::OpenColorWindow(target.clone(), info.color))
         .width(Fill)
-        .height(COMPACT_BUTTON_HEIGHT)
+        .height(compact_button_height())
         .padding(0)
         .style(move |theme: &Theme, status| button::Style {
             background: Some(Background::Color(display)),
@@ -742,7 +745,7 @@ fn color_control<'a>(
         info.mode(),
         menu,
         open_menu,
-        COMPACT_BUTTON_HEIGHT,
+        compact_button_height(),
         vec![
             ("ByLayer".into(), msg(changed(AcadColor::ByLayer))),
             ("ByBlock".into(), msg(changed(AcadColor::ByBlock))),
@@ -767,7 +770,7 @@ fn transparency_control<'a>(
     let percent = |value: u8| Transparency::from_percent(f64::from(value) / 100.0);
     let control = row![
         crate::ui::icons::semantic(TRANSPARENCY_ICON, PALETTE_CONTROL_ICON_SIZE),
-        text(value_label).size(10).width(38),
+        text(value_label).size(typography::caption()).width(38),
         slider(0..=90, i32::from(info.value), move |value| {
             msg(changed(percent(value as u8)))
         })
@@ -810,7 +813,7 @@ fn header_menu(side: DockSide, open: bool, fill_on_current_layer: bool) -> Eleme
     }
 
     let item = |label: &'static str, message| {
-        button(text(crate::t!(label)).size(11))
+        button(text(crate::t!(label)).size(typography::small()))
             .on_press(msg(message))
             .style(crate::ui::color_select::list_row_style)
             .width(Fill)
@@ -827,7 +830,7 @@ fn header_menu(side: DockSide, open: bool, fill_on_current_layer: bool) -> Eleme
                 .label(crate::t!("Create fills on the current layer"))
                 .on_toggle(|_| msg(GraphicAttributesMsg::ToggleFillOnCurrentLayer))
                 .size(12)
-                .text_size(11),
+                .text_size(typography::small()),
         )
         .padding([4, 8]),
     ])
@@ -846,7 +849,7 @@ fn fill_picker<'a>(current: GraphicAttribute, open: bool) -> Element<'a, Message
     let picker = button(
         row![
             crate::ui::icons::semantic(current.icon(), 14.0),
-            text(current.to_string()).size(11),
+            text(current.to_string()).size(typography::small()),
             Space::new().width(Fill),
             crate::ui::icons::themed_arrow_toggle(open, 9.0),
         ]
@@ -881,7 +884,7 @@ fn fill_picker<'a>(current: GraphicAttribute, open: bool) -> Element<'a, Message
         button(
             row![
                 crate::ui::icons::semantic(value.icon(), 14.0),
-                text(value.to_string()).size(11),
+                text(value.to_string()).size(typography::small()),
             ]
             .spacing(5)
             .align_y(iced::Center),
@@ -916,7 +919,7 @@ fn preview_row<'a>(
     let preview = button(preview)
         .on_press(msg(toggle.clone()))
         .width(Fill)
-        .height(COMPACT_BUTTON_HEIGHT)
+        .height(compact_button_height())
         .padding(0)
         .style(move |theme: &Theme, status| button::Style {
             background: Some(Background::Color(theme.palette().background.base.color)),
@@ -942,9 +945,9 @@ fn preview_row<'a>(
                 button::secondary(theme, status)
             }
         })
-        .height(COMPACT_BUTTON_HEIGHT)
+        .height(compact_button_height())
         .padding([1, 3]);
-    let edit = tooltip(edit, text(tooltip_label).size(10), tooltip::Position::Bottom);
+    let edit = tooltip(edit, text(tooltip_label).size(typography::caption()), tooltip::Position::Bottom);
     let edit: Element<'a, Message> = match flyout {
         Some((popup, width, height)) => {
             let mut drop_down = iced_aw::DropDown::new(edit, popup, true)
@@ -1009,7 +1012,7 @@ fn linetype_row<'a>(
         mode,
         Menu::LineLinetype,
         open_menu,
-        COMPACT_BUTTON_HEIGHT,
+        compact_button_height(),
         vec![
             ("ByLayer".into(), msg(GraphicAttributesMsg::LineLinetype("ByLayer".into()))),
             ("ByBlock".into(), msg(GraphicAttributesMsg::LineLinetype("ByBlock".into()))),
@@ -1106,7 +1109,7 @@ fn lineweight_field<'a>(
         mode,
         Menu::LineLineweight,
         open_menu,
-        COMPACT_BUTTON_HEIGHT,
+        compact_button_height(),
         vec![
             ("ByLayer".into(), msg(GraphicAttributesMsg::LineLineweight(LineWeight::ByLayer))),
             ("ByBlock".into(), msg(GraphicAttributesMsg::LineLineweight(LineWeight::ByBlock))),
@@ -1229,7 +1232,7 @@ pub fn view<'a>(
     let line_handles = line_handles(document, &selected);
     let (fill_handles, current) = state.fills(scene, &selected);
 
-    let mut body = column![text(crate::t!("Line")).size(11)].spacing(6);
+    let mut body = column![text(crate::t!("Line")).size(typography::small())].spacing(6);
     body = body.extend(line_section(
         document,
         properties,
@@ -1242,7 +1245,7 @@ pub fn view<'a>(
 
     body = body
         .push(Space::new().height(2))
-        .push(text(crate::t!("Fill")).size(11))
+        .push(text(crate::t!("Fill")).size(typography::small()))
         .push(fill_picker(current, open_menu == Some(Menu::Fill)));
     if !matches!(current, GraphicAttribute::None | GraphicAttribute::Gradient) {
         if let Some(info) = color_info(document, &fill_handles, draw_depth) {
@@ -1309,7 +1312,7 @@ pub fn view<'a>(
                 let preview = if gradients_vary(document, &fill_handles) {
                     iced::widget::stack![
                         preview,
-                        container(text("*VARIES*").size(10))
+                        container(text("*VARIES*").size(typography::caption()))
                             .width(Fill)
                             .height(Fill)
                             .align_x(iced::Left)

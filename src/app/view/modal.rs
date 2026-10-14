@@ -1,5 +1,6 @@
 use super::super::{Message, OpenCADStudio};
 use crate::t;
+use crate::ui::typography;
 use iced::widget::{button, column, container, row, text, Space};
 use iced::{Background, Element, Fill, Fit, Theme};
 use std::borrow::Cow;
@@ -1938,7 +1939,7 @@ fn hyperlink_dialog_window<'a>(
 ) -> Element<'a, Message> {
     let label = |value: Cow<'static, str>| {
         text(value)
-            .size(11)
+            .size(typography::small())
             .style(dialog_muted_text_style)
             .width(90)
     };
@@ -1946,7 +1947,7 @@ fn hyperlink_dialog_window<'a>(
     if mixed {
         items.push(
             text(t!("Selected objects have different hyperlink values."))
-                .size(11)
+                .size(typography::small())
                 .style(dialog_muted_text_style)
                 .into(),
         );
@@ -1957,7 +1958,7 @@ fn hyperlink_dialog_window<'a>(
             label(t!("URL:")),
             iced::widget::text_input("https://", url)
                 .on_input(Message::HyperlinkUrlChanged)
-                .size(13)
+                .size(typography::body_large())
                 .padding([5, 8])
                 .width(Fill),
         ]
@@ -1972,7 +1973,7 @@ fn hyperlink_dialog_window<'a>(
             label(t!("Description:")),
             iced::widget::text_input("", description)
                 .on_input(Message::HyperlinkDescriptionChanged)
-                .size(13)
+                .size(typography::body_large())
                 .padding([5, 8])
                 .width(Fill),
         ]
@@ -2016,7 +2017,7 @@ fn save_as_dialog_window<'a>(
         .iter()
         .copied()
         .find(|&s| s == format);
-    let label = |s: Cow<'static, str>| text(s).size(11).style(dialog_muted_text_style);
+    let label = |s: Cow<'static, str>| text(s).size(typography::small()).style(dialog_muted_text_style);
     let field_width = if matches!(sizing.width, iced::Length::Fill) {
         Fill
     } else {
@@ -2024,7 +2025,7 @@ fn save_as_dialog_window<'a>(
     };
 
     let mut items: Vec<Element<'a, Message>> = Vec::new();
-    items.push(text(t!("Save Drawing As")).size(14).into());
+    items.push(text(t!("Save Drawing As")).size(typography::subheading()).into());
     items.push(Space::new().height(12).into());
 
     // Web has no native file dialog, so the file name is typed here. On native
@@ -2036,7 +2037,7 @@ fn save_as_dialog_window<'a>(
                 label(t!("File name:")).width(70),
                 iced::widget::text_input("drawing.dwg", filename)
                     .on_input(Message::SaveDialogFilenameChanged)
-                    .size(13)
+                    .size(typography::body_large())
                     .padding([5, 8])
                     .width(field_width),
             ]
@@ -2103,14 +2104,14 @@ fn unsaved_changes_dialog_window(
             } else {
                 name.to_owned()
             })
-            .size(14),
+            .size(typography::subheading()),
             iced::widget::Space::new().height(4),
             text(if block_edit {
                 String::new()
             } else {
                 crate::tr!("modal", "unsaved-save-prompt")
             })
-            .size(12)
+            .size(typography::body())
             .style(dialog_muted_text_style),
             iced::widget::Space::new().height(20),
             row![
@@ -2170,14 +2171,14 @@ fn autosave_restore_dialog_window(
     let mut body = column![text(crate::tf!(
         "\"{name}\" has an autosave copy newer than the last save."
     ))
-    .size(14)]
+    .size(typography::subheading())]
     .spacing(0);
     if let Some(count) = session_drawings {
         body = body
             .push(iced::widget::Space::new().height(4))
             .push(
                 text(crate::tf!("Session had {count} open drawing(s).", count = count))
-                    .size(12)
+                    .size(typography::body())
                     .style(dialog_muted_text_style),
             );
     }
@@ -2185,7 +2186,7 @@ fn autosave_restore_dialog_window(
         .push(iced::widget::Space::new().height(4))
         .push(
             text(t!("Restore it as a recovered tab, or discard the copy."))
-                .size(12)
+                .size(typography::body())
                 .style(dialog_muted_text_style),
         )
         .push(iced::widget::Space::new().height(20));
@@ -2239,17 +2240,17 @@ fn file_in_use_dialog_window(
 
     container(
         column![
-            text(heading).size(14),
+            text(heading).size(typography::subheading()),
             Space::new().height(8),
             text(t!(
                 "The file is open or being used by another application. Close it there and retry, or save this drawing under a different name."
             ))
-            .size(13)
+            .size(typography::body_large())
             .width(Fit),
             Space::new().height(12),
-            text(path_line).size(11).style(dialog_muted_text_style).width(Fit),
+            text(path_line).size(typography::small()).style(dialog_muted_text_style).width(Fit),
             Space::new().height(4),
-            text(details).size(11).style(dialog_muted_text_style).width(Fit),
+            text(details).size(typography::small()).style(dialog_muted_text_style).width(Fit),
             Space::new().height(18),
             row![
                 dialog_button(
@@ -2297,15 +2298,15 @@ fn external_change_dialog_window(
 
     container(
         column![
-            text(heading).size(14),
+            text(heading).size(typography::subheading()),
             Space::new().height(8),
             text(t!(
                 "Saving now could destroy those external changes. Reload the disk copy, save your local work elsewhere, or explicitly overwrite it."
             ))
-            .size(13)
+            .size(typography::body_large())
             .width(Fit),
             Space::new().height(12),
-            text(path_line).size(11).style(dialog_muted_text_style).width(Fit),
+            text(path_line).size(typography::small()).style(dialog_muted_text_style).width(Fit),
             Space::new().height(18),
             row![
                 dialog_button(
@@ -2361,7 +2362,7 @@ fn aec_drop_dialog_window(
 
     container(
         column![
-            text(body_text).size(13),
+            text(body_text).size(typography::body_large()),
             iced::widget::Space::new().height(20),
             row![
                 dialog_button(
@@ -2424,7 +2425,7 @@ fn layer_delete_warning_window(
 
     container(
         column![
-            text(body_text).size(13),
+            text(body_text).size(typography::body_large()),
             iced::widget::Space::new().height(20),
             row![
                 dialog_button(
@@ -2463,13 +2464,13 @@ fn gpu_warning_window(
         ),
         _ => (crate::tr!("gpu", "no-renderer-headline"), None),
     };
-    let mut body = column![text(headline).size(13)].spacing(8);
+    let mut body = column![text(headline).size(typography::body_large())].spacing(8);
     if let Some(consequences) = consequences {
-        body = body.push(text(consequences).size(13));
+        body = body.push(text(consequences).size(typography::body_large()));
     }
     body = body.push(
         text(crate::app::startup::gpu_platform_hint())
-            .size(13)
+            .size(typography::body_large())
             .style(dialog_muted_text_style),
     );
 
@@ -2499,9 +2500,9 @@ fn gpu_warning_window(
 fn donation_dialog_window(sizing: crate::ui::modal::ModalSizing) -> Element<'static, Message> {
     container(
         column![
-            text(crate::tr!("donation", "heading")).size(18),
+            text(crate::tr!("donation", "heading")).size(typography::title()),
             row![
-                text(crate::tr!("donation", "body")).size(14).width(Fill),
+                text(crate::tr!("donation", "body")).size(typography::subheading()).width(Fill),
                 crate::ui::icons::themed(crate::ui::icons::HEART, 52.0),
             ]
             .spacing(20)
@@ -2535,10 +2536,10 @@ fn default_assoc_dialog_window(sizing: crate::ui::modal::ModalSizing) -> Element
     container(
         column![
             text(t!("Make Open CAD Studio your default CAD app?"))
-                .size(15),
+                .size(typography::heading()),
             iced::widget::Space::new().height(10),
             text(t!("Open .dwg and .dxf drawings in Open CAD Studio by default. You can change this later in your system settings."))
-                .size(12)
+                .size(typography::body())
                 .style(dialog_muted_text_style),
             iced::widget::Space::new().height(22),
             row![

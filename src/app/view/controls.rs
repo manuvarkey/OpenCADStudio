@@ -1,3 +1,4 @@
+use crate::ui::typography;
 use super::super::document::{DynComponent, DynFieldEntry};
 use super::super::Message;
 use super::*;
@@ -99,7 +100,7 @@ pub(super) fn viewport_controls<'a>(
     // flyout keeps the current style unchanged while hovering; a click commits.
     let picker_head = button(
         row![
-            text(style_name.unwrap_or_else(|| RenderModeChoice(render_mode).to_string())).size(11),
+            text(style_name.unwrap_or_else(|| RenderModeChoice(render_mode).to_string())).size(typography::small()),
             crate::ui::icons::themed_arrow_toggle(render_mode_menu_open, 9.0),
         ]
         .spacing(6)
@@ -146,7 +147,7 @@ pub(super) fn viewport_controls<'a>(
         let selected = choice.0 == render_mode;
         let checkmark = crate::ui::icons::themed_check_cell(selected);
         let label = text(choice.to_string())
-            .size(11)
+            .size(typography::small())
             .wrapping(iced::advanced::text::Wrapping::None);
         let row_content = row![checkmark, label]
             .spacing(6)

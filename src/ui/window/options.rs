@@ -6,6 +6,7 @@ use crate::app::settings;
 use crate::app::settings::{CursorType, RightClickMode};
 use crate::app::Message;
 use crate::ui::style::form::{dialog_button, dialog_button_styled_opt};
+use crate::ui::typography;
 use iced::widget::{button, column, container, row, scrollable, slider, text, text_input, Space};
 use iced::{Background, Border, Element, Fill, Theme};
 use std::fmt;
@@ -329,7 +330,7 @@ pub fn view_window<'a>(
             });
         color_controls = color_controls.push(
             row![
-                text(label).size(12).width(110),
+                text(label).size(typography::body()).width(110),
                 swatch,
                 text_input("#RRGGBB", theme_color_inputs[index].as_str())
                     .on_input(move |value| Message::OptionsThemeColorChanged(index, value))
@@ -355,11 +356,11 @@ pub fn view_window<'a>(
     let close = dialog_button(crate::tr!("action", "close"), Message::OptionsClose, false);
 
     let general = column![
-        text(crate::tr!("options", "language-section")).size(15),
+        text(crate::tr!("options", "language-section")).size(typography::heading()),
         Space::new().height(10),
         row![
             text(crate::tr!("options", "language-label"))
-                .size(12)
+                .size(typography::body())
                 .width(150),
             iced::widget::pick_list(selected_language, language_options, |choice| choice
                 .label
@@ -370,13 +371,13 @@ pub fn view_window<'a>(
         .spacing(12)
         .align_y(iced::Center),
         Space::new().height(24),
-        text(crate::t!("Applications")).size(15),
+        text(crate::t!("Applications")).size(typography::heading()),
         Space::new().height(10),
         row![
             text(crate::t!("Installed plugins and their sources"))
-                .size(12)
+                .size(typography::body())
                 .width(Fill),
-            button(text(crate::t!("Plugins…")).size(11))
+            button(text(crate::t!("Plugins…")).size(typography::small()))
                 .on_press(Message::PluginManagerOpen)
                 .padding([4, 10])
                 .style(button::secondary),
@@ -385,8 +386,8 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(10),
         row![
-            text(crate::t!("Keyboard shortcuts")).size(12).width(Fill),
-            button(text(crate::t!("Keyboard Shortcuts…")).size(11))
+            text(crate::t!("Keyboard shortcuts")).size(typography::body()).width(Fill),
+            button(text(crate::t!("Keyboard Shortcuts…")).size(typography::small()))
                 .on_press(Message::ShortcutsPanelOpen)
                 .padding([4, 10])
                 .style(button::secondary),
@@ -395,8 +396,8 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(10),
         row![
-            text(crate::t!("Command aliases")).size(12).width(Fill),
-            button(text(crate::t!("Command Aliases…")).size(11))
+            text(crate::t!("Command aliases")).size(typography::body()).width(Fill),
+            button(text(crate::t!("Command Aliases…")).size(typography::small()))
                 .on_press(Message::AliasEditorOpen)
                 .padding([4, 10])
                 .style(button::secondary),
@@ -404,13 +405,13 @@ pub fn view_window<'a>(
         .spacing(10)
         .align_y(iced::Center),
         Space::new().height(22),
-        text(crate::t!("Plotting")).size(15),
+        text(crate::t!("Plotting")).size(typography::heading()),
         Space::new().height(10),
         row![
             text(crate::t!("Plot device, paper, scale and plot styles"))
-                .size(12)
+                .size(typography::body())
                 .width(Fill),
-            button(text(crate::t!("Plot and Page Setup…")).size(11))
+            button(text(crate::t!("Plot and Page Setup…")).size(typography::small()))
                 .on_press(Message::PlotDialogOpen)
                 .padding([4, 10])
                 .style(button::secondary),
@@ -422,7 +423,7 @@ pub fn view_window<'a>(
             iced::widget::checkbox(prefs.page_setup_on_new_layout)
                 .on_toggle(Message::PageSetupOnNewLayoutChanged)
                 .size(15),
-            text(crate::t!("Show the page setup for new layouts")).size(12),
+            text(crate::t!("Show the page setup for new layouts")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -435,12 +436,12 @@ pub fn view_window<'a>(
     // controls; the autosave interval and the backup toggle have existed since
     // #205 with no control at all.
     let open_and_save = column![
-        text(crate::t!("Open and Save")).size(15),
+        text(crate::t!("Open and Save")).size(typography::heading()),
         Space::new().height(10),
         Space::new().height(10),
         row![
             text(crate::tr!("options", "default-save-format-label"))
-                .size(12)
+                .size(typography::body())
                 .width(150),
             iced::widget::pick_list(
                 selected_format,
@@ -455,14 +456,14 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(8),
         text(crate::tr!("options", "default-save-format-help"))
-            .size(11)
+            .size(typography::small())
             .width(sizing.width),
         Space::new().height(14),
         row![
             iced::widget::checkbox(file_assoc_enabled)
                 .on_toggle(Message::FileAssocChanged)
                 .size(15),
-            text(crate::t!("Open .dwg and .dxf files with Open CAD Studio")).size(12),
+            text(crate::t!("Open .dwg and .dxf files with Open CAD Studio")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -470,7 +471,7 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Also installs the application and file-type icons the desktop shows."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(14),
         row![
@@ -480,7 +481,7 @@ pub fn view_window<'a>(
             text(crate::t!(
                 "Show values and parameter names on constraint markers"
             ))
-            .size(12),
+            .size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -490,13 +491,13 @@ pub fn view_window<'a>(
              enough to see that a constraint is present — without the driven value or named \
              parameter text covering nearby geometry."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(22),
-        text(crate::t!("File Safety")).size(15),
+        text(crate::t!("File Safety")).size(typography::heading()),
         Space::new().height(10),
         row![
-            text(crate::t!("Automatic save")).size(12).width(150),
+            text(crate::t!("Automatic save")).size(typography::body()).width(150),
             slider(
                 0..=120,
                 prefs.savetime_min.clamp(0, 120),
@@ -509,7 +510,7 @@ pub fn view_window<'a>(
             } else {
                 format!("{} min", prefs.savetime_min)
             })
-            .size(11)
+            .size(typography::small())
             .width(52),
         ]
         .spacing(10)
@@ -518,7 +519,7 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Minutes between recovery saves to a .sv$ file; 0 turns it off (SAVETIME)."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(14),
         row![
@@ -528,7 +529,7 @@ pub fn view_window<'a>(
             text(crate::t!(
                 "Keep a .bak copy when overwriting a drawing (ISAVEBAK)"
             ))
-            .size(12),
+            .size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -688,11 +689,11 @@ pub fn view_window<'a>(
         });
 
     let mut display = column![
-        text(crate::tr!("options", "theme-section")).size(15),
+        text(crate::tr!("options", "theme-section")).size(typography::heading()),
         Space::new().height(10),
         row![
             text(crate::tr!("options", "theme-label"))
-                .size(12)
+                .size(typography::body())
                 .width(150),
             iced::widget::pick_list(selected_theme, theme_options, |choice| choice.label.clone(),)
                 .on_select(|choice| Message::OptionsThemeChanged(choice.value))
@@ -702,7 +703,7 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(8),
         text(crate::tr!("options", "theme-help"))
-            .size(11)
+            .size(typography::small())
             .width(sizing.width),
         Space::new().height(12),
         color_controls,
@@ -710,7 +711,7 @@ pub fn view_window<'a>(
         // A list, not a slider: the dialog rescales under the cursor as the
         // value changes, which would drag a slider along with it.
         row![
-            text(crate::t!("Interface scale")).size(12).width(150),
+            text(crate::t!("Interface scale")).size(typography::body()).width(150),
             iced::widget::pick_list(
                 Some(format!("{}%", prefs.ui_scale_percent)),
                 [75u16, 100, 125, 150, 175, 200]
@@ -727,9 +728,9 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(24),
         row![
-            text(crate::t!("Model Space Appearance")).size(15),
+            text(crate::t!("Model Space Appearance")).size(typography::heading()),
             Space::new().width(Fill),
-            button(text(crate::t!("Restore Defaults")).size(11))
+            button(text(crate::t!("Restore Defaults")).size(typography::small()))
                 .on_press(Message::RestoreModelSpaceDisplayDefaults)
                 .padding([4, 10])
                 .style(button::secondary),
@@ -737,7 +738,7 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(10),
         row![
-            text(crate::t!("Canvas mode")).size(12).width(140),
+            text(crate::t!("Canvas mode")).size(typography::body()).width(140),
             iced::widget::pick_list(selected_mode, mode_options, |choice| choice.label.clone(),)
                 .on_select(|choice| Message::ModelSpaceModeChanged(choice.value))
                 .width(Fill),
@@ -749,7 +750,7 @@ pub fn view_window<'a>(
     if model_space.mode == crate::app::config::ModelSpaceMode::Custom {
         display = display.push(Space::new().height(10)).push(
             row![
-                text(crate::t!("Model background")).size(12).width(140),
+                text(crate::t!("Model background")).size(typography::body()).width(140),
                 bg_swatch_picker(crate::app::BgTarget::Model, model_bg_rgb, bg_picker),
                 text_input("#RRGGBB", model_bg_input)
                     .on_input(Message::ModelSpaceBgChanged)
@@ -762,7 +763,7 @@ pub fn view_window<'a>(
 
     display = display.push(Space::new().height(10)).push(
         row![
-            text(crate::t!("Paper background")).size(12).width(140),
+            text(crate::t!("Paper background")).size(typography::body()).width(140),
             bg_swatch_picker(crate::app::BgTarget::Paper, paper_bg_rgb, bg_picker),
             text_input("#RRGGBB", paper_bg_input)
                 .on_input(Message::PaperSpaceBgChanged)
@@ -774,7 +775,7 @@ pub fn view_window<'a>(
 
     display = display.push(Space::new().height(10)).push(
         row![
-            text(crate::t!("Desk surround")).size(12).width(140),
+            text(crate::t!("Desk surround")).size(typography::body()).width(140),
             bg_swatch_picker(crate::app::BgTarget::Desk, desk_bg_rgb, bg_picker),
             text_input("#RRGGBB", desk_bg_input)
                 .on_input(Message::DeskSpaceBgChanged)
@@ -788,12 +789,12 @@ pub fn view_window<'a>(
         .push(Space::new().height(10))
         .push(
             row![
-                text(crate::t!("Grid opacity")).size(12).width(140),
+                text(crate::t!("Grid opacity")).size(typography::body()).width(140),
                 slider(5..=100, model_space.grid_opacity.clamp(5, 100), Message::GridOpacityChanged)
                     .step(1)
                     .width(Fill),
                 text(format!("{}%", model_space.grid_opacity.clamp(5, 100)))
-                    .size(11)
+                    .size(typography::small())
                     .width(44),
             ]
             .spacing(10)
@@ -812,20 +813,20 @@ pub fn view_window<'a>(
                     crate::t!("Custom background colors set above are applied to Model and Paper space.")
                 }
             })
-            .size(11)
+            .size(typography::small())
             .width(sizing.width),
         )
         .push(Space::new().height(24))
-        .push(text(crate::t!("Crosshair")).size(15))
+        .push(text(crate::t!("Crosshair")).size(typography::heading()))
         .push(Space::new().height(10))
         .push(
             row![
-                text(crate::t!("Crosshair size")).size(12).width(140),
+                text(crate::t!("Crosshair size")).size(typography::body()).width(140),
                 slider(1..=100, cursor_size.clamp(1, 100), Message::CursorSizeChanged)
                     .step(1)
                     .width(Fill),
                 text(format!("{}%", cursor_size.clamp(1, 100)))
-                    .size(11)
+                    .size(typography::small())
                     .width(44),
             ]
             .spacing(10)
@@ -834,7 +835,7 @@ pub fn view_window<'a>(
         .push(Space::new().height(10))
         .push(
             row![
-                text(crate::t!("Cursor type")).size(12).width(140),
+                text(crate::t!("Cursor type")).size(typography::body()).width(140),
                 iced::widget::pick_list(
                     selected_cursor,
                     cursor_options,
@@ -849,7 +850,7 @@ pub fn view_window<'a>(
         .push(Space::new().height(10))
         .push(
             row![
-                text(crate::t!("Crosshair color")).size(12).width(140),
+                text(crate::t!("Crosshair color")).size(typography::body()).width(140),
                 crosshair_swatch,
                 text_input(crate::t!("#RRGGBB or blank").as_ref(), crosshair_color_input)
                     .on_input(Message::CrosshairColorChanged)
@@ -861,7 +862,7 @@ pub fn view_window<'a>(
         .push(Space::new().height(10))
         .push(
             row![
-                text(crate::t!("Snap marker color")).size(12).width(140),
+                text(crate::t!("Snap marker color")).size(typography::body()).width(140),
                 snap_swatch,
                 text_input(crate::t!("#RRGGBB or blank").as_ref(), snap_marker_color_input)
                     .on_input(Message::SnapMarkerColorChanged)
@@ -873,7 +874,7 @@ pub fn view_window<'a>(
         .push(Space::new().height(10))
         .push(
             row![
-                text(crate::t!("Command line text color")).size(12).width(140),
+                text(crate::t!("Command line text color")).size(typography::body()).width(140),
                 command_swatch,
                 text_input(crate::t!("#RRGGBB or blank").as_ref(), command_text_color_input)
                     .on_input(Message::CommandTextColorChanged)
@@ -885,15 +886,15 @@ pub fn view_window<'a>(
         .push(Space::new().height(6))
         .push(
             text(crate::t!("Leave the color blank to keep automatic viewport contrast."))
-                .size(11)
+                .size(typography::small())
                 .width(sizing.width),
         )
         .push(Space::new().height(24))
-        .push(text(crate::t!("Lineweight")).size(15))
+        .push(text(crate::t!("Lineweight")).size(typography::heading()))
         .push(Space::new().height(10))
         .push(
             row![
-                text(crate::t!("Model display scale")).size(12).width(140),
+                text(crate::t!("Model display scale")).size(typography::body()).width(140),
                 slider(
                     25..=200,
                     lineweight_display_scale.clamp(25, 200),
@@ -902,7 +903,7 @@ pub fn view_window<'a>(
                 .step(1)
                 .width(Fill),
                 text(format!("{}%", lineweight_display_scale.clamp(25, 200)))
-                    .size(11)
+                    .size(typography::small())
                     .width(44),
             ]
             .spacing(10)
@@ -911,7 +912,7 @@ pub fn view_window<'a>(
         .push(Space::new().height(6))
         .push(
             text(crate::t!("Changes the on-screen width in Model without affecting plotted output."))
-                .size(11)
+                .size(typography::small())
                 .width(sizing.width),
         )
         .push(Space::new().height(14))
@@ -920,20 +921,20 @@ pub fn view_window<'a>(
                 iced::widget::checkbox(prefs.textfill)
                     .on_toggle(Message::TextFillChanged)
                     .size(15),
-                text(crate::t!("Fill TrueType glyphs (TEXTFILL)")).size(12),
+                text(crate::t!("Fill TrueType glyphs (TEXTFILL)")).size(typography::body()),
             ]
             .spacing(8)
             .align_y(iced::Center),
         )
         .push(Space::new().height(24))
-        .push(text(crate::t!("Window Elements")).size(15))
+        .push(text(crate::t!("Window Elements")).size(typography::heading()))
         .push(Space::new().height(10))
         .push(
             row![
                 iced::widget::checkbox(prefs.show_menu_bar)
                     .on_toggle(Message::MenuBarChanged)
                     .size(15),
-                text(crate::t!("Show the menu bar (MENUBAR)")).size(12),
+                text(crate::t!("Show the menu bar (MENUBAR)")).size(typography::body()),
             ]
             .spacing(8)
             .align_y(iced::Center),
@@ -944,17 +945,17 @@ pub fn view_window<'a>(
                 iced::widget::checkbox(prefs.show_ribbon)
                     .on_toggle(Message::RibbonVisibleChanged)
                     .size(15),
-                text(crate::t!("Show the ribbon (RIBBON / RIBBONCLOSE)")).size(12),
+                text(crate::t!("Show the ribbon (RIBBON / RIBBONCLOSE)")).size(typography::body()),
             ]
             .spacing(8)
             .align_y(iced::Center),
         )
         .push(Space::new().height(24))
-        .push(text(crate::t!("Command Line")).size(15))
+        .push(text(crate::t!("Command Line")).size(typography::heading()))
         .push(Space::new().height(10))
         .push(
             row![
-                text(crate::t!("Prompt lines")).size(12).width(140),
+                text(crate::t!("Prompt lines")).size(typography::body()).width(140),
                 slider(
                     0..=50,
                     prefs.cliprompt_lines.clamp(0, 50),
@@ -963,7 +964,7 @@ pub fn view_window<'a>(
                 .step(1)
                 .width(Fill),
                 text(prefs.cliprompt_lines.clamp(0, 50).to_string())
-                    .size(11)
+                    .size(typography::small())
                     .width(44),
             ]
             .spacing(10)
@@ -974,13 +975,13 @@ pub fn view_window<'a>(
             text(crate::t!(
                 "Temporary prompt lines shown above the command window (CLIPROMPTLINES)."
             ))
-            .size(11)
+            .size(typography::small())
             .width(sizing.width),
         )
         .push(Space::new().height(12))
         .push(
             row![
-                text(crate::t!("History fade time")).size(12).width(140),
+                text(crate::t!("History fade time")).size(typography::body()).width(140),
                 slider(
                     0..=60000,
                     prefs.commandline_fade_ms.clamp(0, 60000),
@@ -993,7 +994,7 @@ pub fn view_window<'a>(
                 } else {
                     format!("{:.1} s", prefs.commandline_fade_ms as f32 / 1000.0)
                 })
-                .size(11)
+                .size(typography::small())
                 .width(44),
             ]
             .spacing(10)
@@ -1004,13 +1005,13 @@ pub fn view_window<'a>(
             text(crate::t!(
                 "How long overlay history lines stay visible; 0 means never fade (COMMANDLINEFADETIME)."
             ))
-            .size(11)
+            .size(typography::small())
             .width(sizing.width),
         )
         .push(Space::new().height(12))
         .push(
             row![
-                text(crate::t!("Command line opacity")).size(12).width(140),
+                text(crate::t!("Command line opacity")).size(typography::body()).width(140),
                 slider(
                     20..=100,
                     prefs.command_line_opacity.clamp(20, 100),
@@ -1018,7 +1019,7 @@ pub fn view_window<'a>(
                 )
                 .step(5u8)
                 .width(Fill),
-                text(format!("{}%", prefs.command_line_opacity)).size(11).width(44),
+                text(format!("{}%", prefs.command_line_opacity)).size(typography::small()).width(44),
             ]
             .spacing(10)
             .align_y(iced::Center),
@@ -1027,15 +1028,15 @@ pub fn view_window<'a>(
     let display_element = display.spacing(0).width(sizing.width);
 
     let selection = column![
-        text(crate::t!("Selection")).size(15),
+        text(crate::t!("Selection")).size(typography::heading()),
         Space::new().height(10),
         row![
-            text(crate::t!("Pick box size")).size(12).width(140),
+            text(crate::t!("Pick box size")).size(typography::body()).width(140),
             slider(0..=50, selection.pick_box.clamp(0, 50), Message::PickBoxChanged)
                 .step(1)
                 .width(Fill),
             text(selection.pick_box.clamp(0, 50).to_string())
-                .size(11)
+                .size(typography::small())
                 .width(44),
         ]
         .spacing(10)
@@ -1044,17 +1045,17 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Controls both the visible selection box and the click aperture."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(24),
-        text(crate::t!("Selection Modes")).size(15),
+        text(crate::t!("Selection Modes")).size(typography::heading()),
         Space::new().height(10),
         row![
             // Checked is the inverse of PICKADD: plain clicks replace and Shift adds.
             iced::widget::checkbox(!selection.pick_add)
                 .on_toggle(Message::ShiftToAddToggled)
                 .size(15),
-            text(crate::t!("Use Shift to add to selection (PICKADD)")).size(12),
+            text(crate::t!("Use Shift to add to selection (PICKADD)")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1066,7 +1067,7 @@ pub fn view_window<'a>(
             text(crate::t!(
                 "Press and drag draws a rectangle instead of a lasso (PICKDRAG)"
             ))
-            .size(12),
+            .size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1075,15 +1076,15 @@ pub fn view_window<'a>(
             iced::widget::checkbox(selection.selection_cycling)
                 .on_toggle(Message::SelectionCyclingChanged)
                 .size(15),
-            text(crate::t!("Clicking overlapping objects opens a picker")).size(12),
+            text(crate::t!("Clicking overlapping objects opens a picker")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
         Space::new().height(24),
         row![
-            text(crate::t!("Visual Effect Settings")).size(15),
+            text(crate::t!("Visual Effect Settings")).size(typography::heading()),
             Space::new().width(Fill),
-            button(text(crate::t!("Restore Defaults")).size(11))
+            button(text(crate::t!("Restore Defaults")).size(typography::small()))
                 .on_press(Message::RestoreSelectionVisualDefaults)
                 .padding([4, 10])
                 .style(button::secondary),
@@ -1095,13 +1096,13 @@ pub fn view_window<'a>(
                 .on_toggle(Message::SelectionAreaToggled)
                 .size(15),
             text(crate::t!("Indicate selection area with transparent fill (SELECTIONAREA)"))
-                .size(12),
+                .size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
         Space::new().height(10),
         row![
-            text(crate::t!("Selection area opacity")).size(12).width(140),
+            text(crate::t!("Selection area opacity")).size(typography::body()).width(140),
             slider(
                 0..=100,
                 model_space.selection_opacity.clamp(0, 100),
@@ -1110,7 +1111,7 @@ pub fn view_window<'a>(
             .step(1)
             .width(Fill),
             text(format!("{}%", model_space.selection_opacity.clamp(0, 100)))
-                .size(11)
+                .size(typography::small())
                 .width(44),
         ]
         .spacing(10)
@@ -1119,11 +1120,11 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Transparency of the window and crossing selection areas (SELECTIONAREAOPACITY)."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(10),
         row![
-            text(crate::t!("Window selection color")).size(12).width(140),
+            text(crate::t!("Window selection color")).size(typography::body()).width(140),
             iced::widget::pick_list(
                 Some(selected_window_color),
                 color_choice_options.clone(),
@@ -1136,7 +1137,7 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(10),
         row![
-            text(crate::t!("Crossing selection color")).size(12).width(140),
+            text(crate::t!("Crossing selection color")).size(typography::body()).width(140),
             iced::widget::pick_list(
                 Some(selected_crossing_color),
                 color_choice_options.clone(),
@@ -1152,13 +1153,13 @@ pub fn view_window<'a>(
             iced::widget::checkbox(model_space.selection_effect)
                 .on_toggle(Message::SelectionEffectToggled)
                 .size(15),
-            text(crate::t!("Show selection effect (SELECTIONEFFECT)")).size(12),
+            text(crate::t!("Show selection effect (SELECTIONEFFECT)")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
         Space::new().height(10),
         row![
-            text(crate::t!("Selection highlight color")).size(12).width(140),
+            text(crate::t!("Selection highlight color")).size(typography::body()).width(140),
             iced::widget::pick_list(
                 Some(selected_highlight_color),
                 color_choice_options.clone(),
@@ -1170,7 +1171,7 @@ pub fn view_window<'a>(
         .spacing(10)
         .align_y(iced::Center),
         Space::new().height(24),
-        text(crate::t!("Preview")).size(15),
+        text(crate::t!("Preview")).size(typography::heading()),
         Space::new().height(10),
         row![
             // SELECTIONPREVIEW is a bitmask; bit 1 is the idle rollover and
@@ -1178,7 +1179,7 @@ pub fn view_window<'a>(
             iced::widget::checkbox(model_space.selection_preview & 1 != 0)
                 .on_toggle(Message::SelectionPreviewIdleToggled)
                 .size(15),
-            text(crate::t!("Preview selection when no command is active")).size(12),
+            text(crate::t!("Preview selection when no command is active")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1187,7 +1188,7 @@ pub fn view_window<'a>(
             iced::widget::checkbox(model_space.selection_preview & 2 != 0)
                 .on_toggle(Message::SelectionPreviewCommandToggled)
                 .size(15),
-            text(crate::t!("Preview selection during a command")).size(12),
+            text(crate::t!("Preview selection during a command")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1195,13 +1196,13 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Highlights the object under the cursor before it is picked (SELECTIONPREVIEW)."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(24),
-        text(crate::t!("Grip Settings")).size(15),
+        text(crate::t!("Grip Settings")).size(typography::heading()),
         Space::new().height(10),
         row![
-            text(crate::t!("Grip size")).size(12).width(140),
+            text(crate::t!("Grip size")).size(typography::body()).width(140),
             slider(
                 1..=25,
                 model_space.grip_size.clamp(1, 25),
@@ -1210,14 +1211,14 @@ pub fn view_window<'a>(
             .step(1)
             .width(Fill),
             text(format!("{} px", model_space.grip_size.clamp(1, 25)))
-                .size(11)
+                .size(typography::small())
                 .width(44),
         ]
         .spacing(10)
         .align_y(iced::Center),
         Space::new().height(10),
         row![
-            text(crate::t!("Object limit for grips")).size(12).width(140),
+            text(crate::t!("Object limit for grips")).size(typography::body()).width(140),
             // Values above the slider range remain available through SETVAR.
             slider(
                 0..=1000,
@@ -1231,7 +1232,7 @@ pub fn view_window<'a>(
             } else {
                 selection.grip_object_limit.to_string()
             })
-            .size(11)
+            .size(typography::small())
             .width(44),
         ]
         .spacing(10)
@@ -1240,11 +1241,11 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Past this many selected objects no grips are drawn; 0 removes the limit (GRIPOBJLIMIT)."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(10),
         row![
-            text(crate::t!("Unselected grip color")).size(12).width(140),
+            text(crate::t!("Unselected grip color")).size(typography::body()).width(140),
             iced::widget::pick_list(
                 Some(selected_grip_color),
                 color_choice_options.clone(),
@@ -1257,7 +1258,7 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(10),
         row![
-            text(crate::t!("Selected/hot grip color")).size(12).width(140),
+            text(crate::t!("Selected/hot grip color")).size(typography::body()).width(140),
             iced::widget::pick_list(
                 Some(selected_grip_hot),
                 color_choice_options.clone(),
@@ -1270,7 +1271,7 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(10),
         row![
-            text(crate::t!("Hover grip color")).size(12).width(140),
+            text(crate::t!("Hover grip color")).size(typography::body()).width(140),
             iced::widget::pick_list(
                 Some(selected_grip_hover),
                 color_choice_options,
@@ -1321,17 +1322,17 @@ pub fn view_window<'a>(
         .cloned();
 
     let user_prefs = column![
-        text(crate::t!("User Preferences")).size(15),
+        text(crate::t!("User Preferences")).size(typography::heading()),
         Space::new().height(10),
         spacemouse,
         Space::new().height(12),
-        text(crate::t!("Zoom")).size(15),
+        text(crate::t!("Zoom")).size(typography::heading()),
         Space::new().height(10),
         row![
             iced::widget::checkbox(prefs.zoom_wheel_reversed)
                 .on_toggle(Message::ZoomWheelReversedChanged)
                 .size(15),
-            text(crate::t!("Reverse mouse wheel zoom (ZOOMWHEEL)")).size(12),
+            text(crate::t!("Reverse mouse wheel zoom (ZOOMWHEEL)")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1340,13 +1341,13 @@ pub fn view_window<'a>(
             iced::widget::checkbox(prefs.touchpad_pan)
                 .on_toggle(Message::TouchpadPanChanged)
                 .size(15),
-            text(crate::t!("Touchpad: scroll pans, Ctrl+scroll or pinch zooms")).size(12),
+            text(crate::t!("Touchpad: scroll pans, Ctrl+scroll or pinch zooms")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
         Space::new().height(12),
         row![
-            text(crate::t!("Zoom factor")).size(12).width(150),
+            text(crate::t!("Zoom factor")).size(typography::body()).width(150),
             slider(
                 settings::ZOOM_FACTOR_MIN..=settings::ZOOM_FACTOR_SYSVAR_MAX,
                 prefs
@@ -1363,14 +1364,14 @@ pub fn view_window<'a>(
                 "{:.1}% a notch",
                 settings::zoom_notch_percent(prefs.zoom_factor)
             ))
-            .size(11)
+            .size(typography::small())
             .width(76),
         ]
         .spacing(10)
         .align_y(iced::Center),
         Space::new().height(6),
         text(crate::t!("How far one wheel notch zooms (ZOOMFACTOR)."))
-            .size(11)
+            .size(typography::small())
             .width(sizing.width),
         Space::new().height(4),
         text(crate::tf!(
@@ -1379,16 +1380,16 @@ pub fn view_window<'a>(
             settings::ZOOM_FACTOR_SYSVAR_MAX,
             settings::ZOOM_FACTOR_MAX
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(24),
-        text(crate::t!("Text and Dimensions")).size(15),
+        text(crate::t!("Text and Dimensions")).size(typography::heading()),
         Space::new().height(10),
         row![
             iced::widget::checkbox(prefs.texteditmode)
                 .on_toggle(Message::TextEditModeChanged)
                 .size(15),
-            text(crate::t!("TEXTEDIT edits one object and ends (TEXTEDITMODE)")).size(12),
+            text(crate::t!("TEXTEDIT edits one object and ends (TEXTEDITMODE)")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1400,13 +1401,13 @@ pub fn view_window<'a>(
             text(crate::t!(
                 "Continued dimensions inherit the base dimension's layer and style (DIMCONTINUEMODE)"
             ))
-            .size(12),
+            .size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
         Space::new().height(12),
         row![
-            text(crate::t!("QDIM origin priority")).size(12).width(150),
+            text(crate::t!("QDIM origin priority")).size(typography::body()).width(150),
             iced::widget::pick_list(selected_qdim, qdim_options, |choice| choice.label.clone())
                 .on_select(|choice| Message::QdimSnapPriorityChanged(choice.value))
                 .width(Fill),
@@ -1417,13 +1418,13 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Which points QDIM measures from. Also settable inside the command."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(24),
-        text(crate::t!("Annotation")).size(15),
+        text(crate::t!("Annotation")).size(typography::heading()),
         Space::new().height(10),
         row![
-            text(crate::t!("Add scales automatically")).size(12).width(150),
+            text(crate::t!("Add scales automatically")).size(typography::body()).width(150),
             iced::widget::pick_list(selected_auto_scale, auto_scale_options, |choice| {
                 choice.label.clone()
             })
@@ -1436,13 +1437,13 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Which annotative objects pick up a newly set annotation scale (ANNOAUTOSCALE)."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(24),
-        text(crate::t!("Right-click Customization")).size(15),
+        text(crate::t!("Right-click Customization")).size(typography::heading()),
         Space::new().height(10),
         row![
-            text(crate::t!("Right-click in drawing area")).size(12).width(150),
+            text(crate::t!("Right-click in drawing area")).size(typography::body()).width(150),
             iced::widget::pick_list(
                 selected_right_click,
                 right_click_options,
@@ -1455,7 +1456,7 @@ pub fn view_window<'a>(
         .align_y(iced::Center),
         Space::new().height(12),
         row![
-            text(crate::t!("Hold duration")).size(12).width(150),
+            text(crate::t!("Hold duration")).size(typography::body()).width(150),
             slider(
                 100..=1000,
                 prefs.right_click_hold_ms.clamp(100, 1000),
@@ -1464,7 +1465,7 @@ pub fn view_window<'a>(
             .step(50)
             .width(Fill),
             text(format!("{} ms", prefs.right_click_hold_ms.clamp(100, 1000)))
-                .size(11)
+                .size(typography::small())
                 .width(52),
         ]
         .spacing(10)
@@ -1473,16 +1474,16 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Shortcut menu: right-click always opens the menu. Time-sensitive: a quick click is Enter, holding longer opens the menu (SHORTCUTMENUDURATION)."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(24),
-        text(crate::t!("Block Edit")).size(15),
+        text(crate::t!("Block Edit")).size(typography::heading()),
         Space::new().height(10),
         row![
             iced::widget::checkbox(double_click_block_refedit)
                 .on_toggle(Message::DoubleClickBlockRefeditChanged)
                 .size(15),
-            text(crate::t!("Double-click to edit block in-place (REFEDIT)")).size(12),
+            text(crate::t!("Double-click to edit block in-place (REFEDIT)")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1491,18 +1492,18 @@ pub fn view_window<'a>(
             iced::widget::checkbox(double_click_block_attedit)
                 .on_toggle(Message::DoubleClickBlockAtteditChanged)
                 .size(15),
-            text(crate::t!("Double-click attributed blocks to edit attributes (ATTEDIT)")).size(12),
+            text(crate::t!("Double-click attributed blocks to edit attributes (ATTEDIT)")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
         Space::new().height(24),
-        text(crate::t!("Drawing Units")).size(15),
+        text(crate::t!("Drawing Units")).size(typography::heading()),
         Space::new().height(10),
         row![
             text(crate::t!("Length, angle and insertion units"))
-                .size(12)
+                .size(typography::body())
                 .width(Fill),
-            button(text(crate::t!("Drawing Units…")).size(11))
+            button(text(crate::t!("Drawing Units…")).size(typography::small()))
                 .on_press(Message::OpenDrawingUnits)
                 .padding([4, 10])
                 .style(button::secondary),
@@ -1510,13 +1511,13 @@ pub fn view_window<'a>(
         .spacing(10)
         .align_y(iced::Center),
         Space::new().height(24),
-        text(crate::t!("Hatch")).size(15),
+        text(crate::t!("Hatch")).size(typography::heading()),
         Space::new().height(10),
         row![
             iced::widget::checkbox(prefs.hatch_associative)
                 .on_toggle(Message::HatchAssociativeChanged)
                 .size(15),
-            text(crate::t!("New hatches follow their boundaries (HPASSOC)")).size(12),
+            text(crate::t!("New hatches follow their boundaries (HPASSOC)")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1548,14 +1549,14 @@ pub fn view_window<'a>(
         });
 
     let drafting = column![
-        text(crate::t!("Drafting")).size(15),
+        text(crate::t!("Drafting")).size(typography::heading()),
         Space::new().height(10),
         row![
-            text(crate::t!("Drafting rotation")).size(12).width(150),
+            text(crate::t!("Drafting rotation")).size(typography::body()).width(150),
             text_input("0", snap_angle_input)
                 .on_input(Message::SnapAngleInputChanged)
                 .width(110),
-            text(crate::t!("degrees")).size(11),
+            text(crate::t!("degrees")).size(typography::small()),
         ]
         .spacing(10)
         .align_y(iced::Center),
@@ -1563,12 +1564,12 @@ pub fn view_window<'a>(
         text(crate::t!(
             "Rotates the crosshair and the snap grid in the active UCS (SNAPANG)."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(14),
         row![
             text(crate::t!("Polar tracking increment"))
-                .size(12)
+                .size(typography::body())
                 .width(150),
             iced::widget::pick_list(Some(selected_polar), polar_options, |choice| {
                 choice.label.clone()
@@ -1579,13 +1580,13 @@ pub fn view_window<'a>(
         .spacing(10)
         .align_y(iced::Center),
         Space::new().height(24),
-        text(crate::t!("Snap and Grid")).size(15),
+        text(crate::t!("Snap and Grid")).size(typography::heading()),
         Space::new().height(10),
         row![
             text(crate::t!("Snap modes, grid spacing and object snap"))
-                .size(12)
+                .size(typography::body())
                 .width(Fill),
-            button(text(crate::t!("Drafting Settings…")).size(11))
+            button(text(crate::t!("Drafting Settings…")).size(typography::small()))
                 .on_press(Message::ToggleSnapPopup)
                 .padding([4, 10])
                 .style(button::secondary),
@@ -1625,15 +1626,15 @@ pub fn view_window<'a>(
         .cloned();
 
     let mut modeling = column![
-        text(crate::t!("3D Modeling")).size(15),
+        text(crate::t!("3D Modeling")).size(typography::heading()),
         Space::new().height(10),
-        text(crate::t!("Display Tools")).size(15),
+        text(crate::t!("Display Tools")).size(typography::heading()),
         Space::new().height(10),
         row![
             iced::widget::checkbox(prefs.show_viewcube)
                 .on_toggle(Message::ShowViewCubeChanged)
                 .size(15),
-            text(crate::t!("Show the navigation cube (NAVVCUBE)")).size(12),
+            text(crate::t!("Show the navigation cube (NAVVCUBE)")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1642,7 +1643,7 @@ pub fn view_window<'a>(
             iced::widget::checkbox(prefs.show_ucs_icon)
                 .on_toggle(Message::ShowUcsIconChanged)
                 .size(15),
-            text(crate::t!("Show the UCS icon (UCSICON)")).size(12),
+            text(crate::t!("Show the UCS icon (UCSICON)")).size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1654,7 +1655,7 @@ pub fn view_window<'a>(
             text(crate::t!(
                 "Place the UCS icon at the origin (UCSICON ORigin)"
             ))
-            .size(12),
+            .size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -1665,16 +1666,16 @@ pub fn view_window<'a>(
             .push(Space::new().height(24))
             .push(
                 row![
-                    text(crate::t!("Display Resolution")).size(15),
+                    text(crate::t!("Display Resolution")).size(typography::heading()),
                     Space::new().width(10),
-                    text(crate::t!("applies to the current drawing")).size(11),
+                    text(crate::t!("applies to the current drawing")).size(typography::small()),
                 ]
                 .align_y(iced::Center),
             )
             .push(Space::new().height(10))
             .push(
                 row![
-                    text(crate::t!("Isolines per surface")).size(12).width(150),
+                    text(crate::t!("Isolines per surface")).size(typography::body()).width(150),
                     // Retessellate once when dragging ends.
                     slider(
                         0..=64,
@@ -1685,7 +1686,7 @@ pub fn view_window<'a>(
                     .on_release(Message::IsolinesReleased)
                     .width(Fill),
                     text(drawing_prefs.isolines.clamp(0, 64).to_string())
-                        .size(11)
+                        .size(typography::small())
                         .width(44),
                 ]
                 .spacing(10)
@@ -1697,7 +1698,7 @@ pub fn view_window<'a>(
                     iced::widget::checkbox(drawing_prefs.display_silhouette)
                         .on_toggle(Message::DispSilhChanged)
                         .size(15),
-                    text(crate::t!("Show silhouette edges on solids (DISPSILH)")).size(12),
+                    text(crate::t!("Show silhouette edges on solids (DISPSILH)")).size(typography::body()),
                 ]
                 .spacing(8)
                 .align_y(iced::Center),
@@ -1705,7 +1706,7 @@ pub fn view_window<'a>(
             .push(Space::new().height(10))
             .push(
                 row![
-                    text(crate::t!("Surface density U")).size(12).width(150),
+                    text(crate::t!("Surface density U")).size(typography::body()).width(150),
                     slider(
                         0..=200,
                         drawing_prefs.surface_u.clamp(0, 200),
@@ -1714,7 +1715,7 @@ pub fn view_window<'a>(
                     .step(1i16)
                     .width(Fill),
                     text(drawing_prefs.surface_u.clamp(0, 200).to_string())
-                        .size(11)
+                        .size(typography::small())
                         .width(44),
                 ]
                 .spacing(10)
@@ -1723,7 +1724,7 @@ pub fn view_window<'a>(
             .push(Space::new().height(10))
             .push(
                 row![
-                    text(crate::t!("Surface density V")).size(12).width(150),
+                    text(crate::t!("Surface density V")).size(typography::body()).width(150),
                     slider(
                         0..=200,
                         drawing_prefs.surface_v.clamp(0, 200),
@@ -1732,7 +1733,7 @@ pub fn view_window<'a>(
                     .step(1i16)
                     .width(Fill),
                     text(drawing_prefs.surface_v.clamp(0, 200).to_string())
-                        .size(11)
+                        .size(typography::small())
                         .width(44),
                 ]
                 .spacing(10)
@@ -1741,7 +1742,7 @@ pub fn view_window<'a>(
             .push(Space::new().height(10))
             .push(
                 row![
-                    text(crate::t!("Surface type")).size(12).width(150),
+                    text(crate::t!("Surface type")).size(typography::body()).width(150),
                     iced::widget::pick_list(
                         selected_surface_type,
                         surface_type_options,
@@ -1756,9 +1757,9 @@ pub fn view_window<'a>(
             .push(Space::new().height(24))
             .push(
                 row![
-                    text(crate::t!("Solid History")).size(15),
+                    text(crate::t!("Solid History")).size(typography::heading()),
                     Space::new().width(10),
-                    text(crate::t!("applies to the current drawing")).size(11),
+                    text(crate::t!("applies to the current drawing")).size(typography::small()),
                 ]
                 .align_y(iced::Center),
             )
@@ -1771,7 +1772,7 @@ pub fn view_window<'a>(
                     text(crate::t!(
                         "Record the history of composite solids (SOLIDHIST)"
                     ))
-                    .size(12),
+                    .size(typography::body()),
                 ]
                 .spacing(8)
                 .align_y(iced::Center),
@@ -1779,7 +1780,7 @@ pub fn view_window<'a>(
             .push(Space::new().height(10))
             .push(
                 row![
-                    text(crate::t!("Show solid history")).size(12).width(150),
+                    text(crate::t!("Show solid history")).size(typography::body()).width(150),
                     iced::widget::pick_list(
                         selected_show_history,
                         show_history_options,
@@ -1803,14 +1804,14 @@ pub fn view_window<'a>(
         let shown = path
             .clone()
             .unwrap_or_else(|| crate::t!("Not available").into_owned());
-        let mut open = button(text(crate::t!("Open folder")).size(11))
+        let mut open = button(text(crate::t!("Open folder")).size(typography::small()))
             .padding([4, 10])
             .style(button::secondary);
         if let Some(path) = path {
             open = open.on_press(Message::OpenFolder(path));
         }
         row![
-            column![text(label).size(12), text(shown).size(11),]
+            column![text(label).size(typography::body()), text(shown).size(typography::small()),]
                 .spacing(2)
                 .width(Fill),
             open,
@@ -1820,12 +1821,12 @@ pub fn view_window<'a>(
     };
 
     let files = column![
-        text(crate::t!("Files")).size(15),
+        text(crate::t!("Files")).size(typography::heading()),
         Space::new().height(6),
         text(crate::t!(
             "Where the application keeps its own files. These locations are fixed."
         ))
-        .size(11)
+        .size(typography::small())
         .width(sizing.width),
         Space::new().height(16),
         folder_row(crate::t!("Configuration"), folders.config.clone()),
@@ -1838,14 +1839,14 @@ pub fn view_window<'a>(
         Space::new().height(12),
         folder_row(crate::t!("Fonts"), folders.fonts.clone()),
         Space::new().height(16),
-        text(crate::t!("Default template for new drawings")).size(12),
+        text(crate::t!("Default template for new drawings")).size(typography::body()),
         Space::new().height(4),
         row![
             text_input(crate::t!("Blank drawing").as_ref(), qnew_template)
                 .on_input(Message::QnewTemplateChanged)
-                .size(11)
+                .size(typography::small())
                 .width(Fill),
-            button(text(crate::t!("Browse...")).size(11))
+            button(text(crate::t!("Browse...")).size(typography::small()))
                 .padding([4, 10])
                 .style(button::secondary)
                 .on_press(Message::QnewTemplateBrowse),
@@ -1873,7 +1874,7 @@ pub fn view_window<'a>(
     // before the list of pages is complete.
     let tab_button = |label, tab| {
         let selected = active_tab == tab;
-        button(text(label).size(12.5))
+        button(text(label).size(typography::body()))
             .on_press(Message::OptionsTabChanged(tab))
             .padding([7, 12])
             .width(Fill)

@@ -17,6 +17,7 @@ use crate::modules::insert::pdf_import::{ImportLayers, PdfImportSettings};
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{button_style, dialog_button, field_style};
+use crate::ui::typography;
 
 /// One edit in any of the PDF dialogs.
 #[derive(Debug, Clone)]
@@ -315,7 +316,7 @@ pub(crate) fn well_style(theme: &Theme) -> container::Style {
 pub(crate) fn card<'a>(title: String, content: impl Into<Element<'a, Message>>) -> Element<'a, Message> {
     container(
         column![
-            text(title.to_uppercase()).size(10).style(accent_text),
+            text(title.to_uppercase()).size(typography::caption()).style(accent_text),
             content.into()
         ]
         .spacing(8),
@@ -333,7 +334,7 @@ fn segmented<'a, T: Copy + PartialEq + 'a>(
     on: fn(T) -> PdfDialogMsg,
 ) -> Element<'a, Message> {
     let buttons = options.into_iter().map(|(value, label)| {
-        button(text(label).size(11).width(Fill).align_x(iced::Center))
+        button(text(label).size(typography::small()).width(Fill).align_x(iced::Center))
             .on_press(msg(on(value)))
             .style(button_style(value == current))
             .padding([5, 6])
@@ -361,7 +362,7 @@ fn chip<'a>(label: String, on: bool, message: Message) -> Element<'a, Message> {
                 }),
         );
     }
-    button(content.push(text(label).size(11)))
+    button(content.push(text(label).size(typography::small())))
         .on_press(message)
         .style(button_style(on))
         .padding([4, 10])
@@ -377,7 +378,7 @@ fn field<'a>(
     on_input: impl Fn(String) -> Message + 'a,
 ) -> Element<'a, Message> {
     let mut input = text_input("", value)
-        .size(11)
+        .size(typography::small())
         .padding([4, 8])
         .width(Fill)
         .style(field_style);
@@ -386,7 +387,7 @@ fn field<'a>(
     }
     row![
         text(label)
-            .size(11)
+            .size(typography::small())
             .style(muted_style)
             .width(Length::Fixed(label_width)),
         input
@@ -410,11 +411,11 @@ fn info_line<'a>(label: String, value: &'a str) -> Element<'a, Message> {
     };
     row![
         text(label)
-            .size(11)
+            .size(typography::small())
             .style(muted_style)
             .width(Length::Fixed(96.0)),
         text(shown)
-            .size(11)
+            .size(typography::small())
             .width(Fill)
             .wrapping(iced::advanced::text::Wrapping::None),
     ]
@@ -429,7 +430,7 @@ fn footer<'a>(
     action: std::borrow::Cow<'static, str>,
     ok: PdfDialogMsg,
 ) -> Element<'a, Message> {
-    let mut left = row![button(text("?").size(12))
+    let mut left = row![button(text("?").size(typography::body()))
         .on_press(msg(PdfDialogMsg::Help(help)))
         .style(button_style(false))
         .padding([5, 11])]
@@ -485,7 +486,7 @@ fn page_tiles<'a>(
                 row![
                     tick,
                     text(page.label.clone())
-                        .size(11)
+                        .size(typography::small())
                         .style(move |theme: &Theme| text::Style {
                             color: Some(if chosen {
                                 theme.palette().primary.base.color
@@ -642,7 +643,7 @@ pub fn view_attach<'a>(
         (!state.name.is_empty()).then_some(&state.name),
         |chosen: String| msg(PdfDialogMsg::AttachName(chosen)),
     )
-    .size(12)
+    .size(typography::body())
     .padding([5, 8])
     .width(Fill);
     use codec::entities::UnderlayType;
@@ -651,13 +652,13 @@ pub fn view_attach<'a>(
         UnderlayType::Dwf => crate::tf!("{count} sheets", count = state.pages.len()),
         UnderlayType::Dgn => crate::tf!("{count} models", count = state.pages.len()),
     };
-    let count = container(text(count_text).size(11).style(accent_text))
+    let count = container(text(count_text).size(typography::small()).style(accent_text))
         .padding([4, 10])
         .style(well_style);
     let file = row![
         name_combo,
         count,
-        button(text(t!("Browse...")).size(11))
+        button(text(t!("Browse...")).size(typography::small()))
             .on_press(msg(PdfDialogMsg::AttachBrowse))
             .style(button_style(false))
             .padding([5, 12]),
@@ -696,7 +697,7 @@ pub fn view_attach<'a>(
             .height(Length::Fixed(226.0))
             .width(Fill)
             .style(well_style),
-            text(chosen_text).size(11).style(muted_style),
+            text(chosen_text).size(typography::small()).style(muted_style),
         ]
         .spacing(6),
     );
@@ -719,7 +720,7 @@ pub fn view_attach<'a>(
     .spacing(8);
     let heading = |label: std::borrow::Cow<'static, str>, on: bool, message: Message| {
         row![
-            text(label).size(11).width(Fill),
+            text(label).size(typography::small()).width(Fill),
             chip(on_screen.clone(), on, message)
         ]
         .align_y(iced::Center)
@@ -805,7 +806,7 @@ pub fn view_attach<'a>(
                     "Sub units make the default scale {scale}",
                     scale = 1.0 / state.sub_per_master.max(1e-12)
                 ))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
             ]
             .spacing(6),
@@ -863,7 +864,7 @@ pub struct PointCloudAttachState {
 
 /// A switch that cannot be used here: dimmed, not pressable.
 fn off_chip<'a>(label: String) -> Element<'a, Message> {
-    container(text(label).size(11).style(muted_style))
+    container(text(label).size(typography::small()).style(muted_style))
         .padding([4, 10])
         .into()
 }
@@ -874,14 +875,14 @@ pub fn view_point_cloud_attach<'a>(
 ) -> Element<'a, Message> {
     let file = row![
         text_input("", &state.name)
-            .size(12)
+            .size(typography::body())
             .padding([5, 8])
             .width(Fill)
             .style(field_style),
-        container(text(state.summary.clone()).size(11).style(accent_text))
+        container(text(state.summary.clone()).size(typography::small()).style(accent_text))
             .padding([4, 10])
             .style(well_style),
-        button(text(t!("Browse...")).size(11))
+        button(text(t!("Browse...")).size(typography::small()))
             .on_press(msg(PdfDialogMsg::CloudBrowse))
             .style(button_style(false))
             .padding([5, 12]),
@@ -918,7 +919,7 @@ pub fn view_point_cloud_attach<'a>(
     let on_screen = t!("On screen").into_owned();
     let heading = |label: std::borrow::Cow<'static, str>, on: bool, message: Message| {
         row![
-            text(label).size(11).width(Fill),
+            text(label).size(typography::small()).width(Fill),
             chip(on_screen.clone(), on, message)
         ]
         .align_y(iced::Center)
@@ -1057,12 +1058,12 @@ pub fn view_layers<'a>(
     } else {
         underlay
     }
-    .text_size(12)
+    .text_size(typography::body())
     .padding([5, 8])
     .width(Fill);
     let search = text_input(t!("Search for layer").as_ref(), &state.search)
         .on_input(|s| msg(PdfDialogMsg::LayersSearch(s)))
-        .size(11)
+        .size(typography::small())
         .padding([5, 8])
         .width(Fill)
         .style(field_style);
@@ -1073,7 +1074,7 @@ pub fn view_layers<'a>(
         count = total,
         hidden = hidden
     ))
-    .size(11)
+    .size(typography::small())
     .style(muted_style);
 
     // Each layer: its name and an On / Off switch.
@@ -1088,7 +1089,7 @@ pub fn view_layers<'a>(
                     let on = !t.hidden.contains(name);
                     let switch = button(
                         text(if on { t!("On") } else { t!("Off") })
-                            .size(11)
+                            .size(typography::small())
                             .width(Fill)
                             .align_x(iced::Center),
                     )
@@ -1097,7 +1098,7 @@ pub fn view_layers<'a>(
                     .padding([3, 6])
                     .width(Length::Fixed(64.0));
                     container(
-                        row![text(name.clone()).size(12).width(Fill), switch].align_y(iced::Center),
+                        row![text(name.clone()).size(typography::body()).width(Fill), switch].align_y(iced::Center),
                     )
                     .padding([5, 10])
                     .style(well_style)
@@ -1109,7 +1110,7 @@ pub fn view_layers<'a>(
         }
         _ => container(
             text(t!("This file does not contain any layers"))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
         )
         .width(Fill)
@@ -1237,7 +1238,7 @@ pub fn view_import_settings<'a>(
     sizing: crate::ui::modal::ModalSizing,
 ) -> Element<'a, Message> {
     let (content, layers, options) = settings_cards(settings);
-    let more = button(text(t!("Options...")).size(11))
+    let more = button(text(t!("Options...")).size(typography::small()))
         .on_press(msg(PdfDialogMsg::Options))
         .style(button_style(false))
         .padding([5, 12]);
@@ -1281,11 +1282,11 @@ pub fn view_import_file<'a>(
         .map(|n| n.to_string_lossy().into_owned())
         .unwrap_or_default();
     let file = row![
-        container(text(file_name).size(12))
+        container(text(file_name).size(typography::body()))
             .padding([6, 10])
             .width(Fill)
             .style(well_style),
-        button(text(t!("Browse...")).size(11))
+        button(text(t!("Browse...")).size(typography::small()))
             .on_press(msg(PdfDialogMsg::ImportBrowse))
             .style(button_style(false))
             .padding([5, 12]),
@@ -1317,11 +1318,11 @@ pub fn view_import_file<'a>(
         Space::new().width(Fill),
         text_input("", &state.page_text)
             .on_input(|s| msg(PdfDialogMsg::ImportPageText(s)))
-            .size(11)
+            .size(typography::small())
             .padding([3, 6])
             .width(Length::Fixed(48.0))
             .style(field_style),
-        text(format!("/ {count}")).size(11).style(muted_style),
+        text(format!("/ {count}")).size(typography::small()).style(muted_style),
         Space::new().width(Fill),
         step(
             crate::ui::icons::themed_arrow_right(12.0),
@@ -1352,14 +1353,14 @@ pub fn view_import_file<'a>(
                     "Page size: {size}",
                     size = state.page_size.clone()
                 ))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
                 Space::new().width(Fill),
                 text(crate::tf!(
                     "PDF scale: {scale}:1",
                     scale = state.scale.trim()
                 ))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
             ],
         ]
@@ -1370,7 +1371,7 @@ pub fn view_import_file<'a>(
         t!("Placement").into_owned(),
         column![
             row![
-                text(t!("Insertion point")).size(11).width(Fill),
+                text(t!("Insertion point")).size(typography::small()).width(Fill),
                 chip(
                     t!("On screen").into_owned(),
                     state.insert_on_screen,
@@ -1383,7 +1384,7 @@ pub fn view_import_file<'a>(
             )),
             row![
                 text(t!("Rotation"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted_style)
                     .width(Length::Fixed(60.0)),
                 segmented(
@@ -1409,7 +1410,7 @@ pub fn view_import_file<'a>(
     .spacing(10)
     .height(Length::Fixed(420.0));
 
-    let more = button(text(t!("Options...")).size(11))
+    let more = button(text(t!("Options...")).size(typography::small()))
         .on_press(msg(PdfDialogMsg::Options))
         .style(button_style(false))
         .padding([5, 12]);
@@ -1635,7 +1636,7 @@ fn ramp_bar<'a>(
             let top = (mark * f64::from(HEIGHT) - 7.0).clamp(0.0, f64::from(HEIGHT) - 14.0);
             labels = labels
                 .push(Space::new().height((top - used).max(0.0) as f32))
-                .push(text(label).size(10).height(14.0));
+                .push(text(label).size(typography::caption()).height(14.0));
             used = top.max(used) + 14.0;
         }
     }
@@ -1652,7 +1653,7 @@ pub fn view_point_cloud_color_map<'a>(
                on: bool,
                message: Option<Message>|
      -> Element<'a, Message> {
-        let mut b = button(text(label).size(11).width(Fill).align_x(iced::Center))
+        let mut b = button(text(label).size(typography::small()).width(Fill).align_x(iced::Center))
             .style(button_style(on))
             .padding([5, 6])
             .width(Length::Fixed(118.0));
@@ -1698,11 +1699,11 @@ pub fn view_point_cloud_color_map<'a>(
     names.sort_by_key(|n| n.to_lowercase());
     let scheme = pick_list(ramp.map(|r| r.name.clone()), names, |n: &String| n.clone())
         .on_select(|n| msg(PdfDialogMsg::MapScheme(n)))
-        .text_size(12)
+        .text_size(typography::body())
         .padding([5, 8])
         .width(Fill);
     let small = |label: std::borrow::Cow<'static, str>, message: PdfDialogMsg| {
-        button(text(label).size(11).width(Fill).align_x(iced::Center))
+        button(text(label).size(typography::small()).width(Fill).align_x(iced::Center))
             .on_press(msg(message))
             .style(button_style(false))
             .padding([5, 8])
@@ -1711,7 +1712,7 @@ pub fn view_point_cloud_color_map<'a>(
     let counts: Vec<usize> = (2..=25).collect();
     let count = pick_list(Some(colors.len().max(2)), counts, |n: &usize| n.to_string())
         .on_select(|n| msg(PdfDialogMsg::MapCount(n)))
-        .text_size(12)
+        .text_size(typography::body())
         .padding([4, 8])
         .width(Length::Fixed(70.0));
     // Blend: a strip from the first colour to the last.
@@ -1740,7 +1741,7 @@ pub fn view_point_cloud_color_map<'a>(
             .align_y(iced::Center),
         row![
             text(t!("Number of colors"))
-                .size(11)
+                .size(typography::small())
                 .width(Length::Fixed(110.0)),
             count,
             even,
@@ -1766,13 +1767,13 @@ pub fn view_point_cloud_color_map<'a>(
         scheme_rows = scheme_rows.push(
             row![
                 text(t!("Scheme name"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted_style)
                     .width(Length::Fixed(110.0)),
                 text_input("", name)
                     .on_input(|v| msg(PdfDialogMsg::MapNameInput(v)))
                     .on_submit(msg(PdfDialogMsg::MapNameOk))
-                    .size(11)
+                    .size(typography::small())
                     .padding([4, 8])
                     .width(Fill)
                     .style(field_style),
@@ -1801,7 +1802,7 @@ pub fn view_point_cloud_color_map<'a>(
             OutOfRange::ALL.to_vec(),
             |o: &OutOfRange| o.to_string(),
         )
-        .text_size(12)
+        .text_size(typography::body())
         .padding([4, 8])
         .width(Fill);
         let list = if editable {
@@ -1811,7 +1812,7 @@ pub fn view_point_cloud_color_map<'a>(
         };
         row![
             text(t!("Out of range points"))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style)
                 .width(Length::Fixed(150.0)),
             list
@@ -1897,7 +1898,7 @@ pub fn view_point_cloud_color_map<'a>(
     ]
     .spacing(10);
 
-    let mut left = row![button(text("?").size(12))
+    let mut left = row![button(text("?").size(typography::body()))
         .on_press(msg(PdfDialogMsg::Help("pointcloudcolormap")))
         .style(button_style(false))
         .padding([5, 11])]
@@ -2014,7 +2015,7 @@ pub fn view_pc_section<'a>(
                 .width(Fill),
                 text_input("", &state.max_points)
                     .on_input(|v| msg(PdfDialogMsg::SecMaxPoints(v)))
-                    .size(11)
+                    .size(typography::small())
                     .padding([4, 8])
                     .width(Length::Fixed(90.0))
                     .style(field_style),
@@ -2022,15 +2023,15 @@ pub fn view_pc_section<'a>(
             .spacing(8)
             .align_y(iced::Center),
             row![
-                text(t!("Faster")).size(10).style(muted_style),
+                text(t!("Faster")).size(typography::caption()).style(muted_style),
                 Space::new().width(Fill),
-                text(t!("More accurate")).size(10).style(muted_style),
+                text(t!("More accurate")).size(typography::caption()).style(muted_style),
                 Space::new().width(Fill),
                 text(crate::tf!(
                     "Estimated time: {count} minutes",
                     count = minutes
                 ))
-                .size(10)
+                .size(typography::caption())
                 .style(muted_style),
             ],
         ]
@@ -2042,7 +2043,7 @@ pub fn view_pc_section<'a>(
         |n: &String| n.clone(),
     )
     .on_select(|n| msg(PdfDialogMsg::SecLayer(n)))
-    .text_size(12)
+    .text_size(typography::body())
     .padding([4, 8])
     .width(Fill);
     let color = pick_list(
@@ -2051,7 +2052,7 @@ pub fn view_pc_section<'a>(
         |c: &LineColor| c.to_string(),
     )
     .on_select(|c| msg(PdfDialogMsg::SecColor(c)))
-    .text_size(12)
+    .text_size(typography::body())
     .padding([4, 8])
     .width(Fill);
     let labelled = |label: std::borrow::Cow<'static, str>,
@@ -2059,7 +2060,7 @@ pub fn view_pc_section<'a>(
      -> Element<'a, Message> {
         row![
             text(label)
-                .size(11)
+                .size(typography::small())
                 .style(muted_style)
                 .width(Length::Fixed(70.0)),
             control
@@ -2092,7 +2093,7 @@ pub fn view_pc_section<'a>(
         .spacing(8),
     );
     let pick = |connect: bool| {
-        button(text("⌖").size(12))
+        button(text("⌖").size(typography::body()))
             .on_press(msg(PdfDialogMsg::SecPick(connect)))
             .style(button_style(false))
             .padding([4, 8])
@@ -2132,7 +2133,7 @@ pub fn view_pc_section<'a>(
                     170.0,
                     |v| msg(PdfDialogMsg::SecAngle(v))
                 ),
-                text("0–10°").size(10).style(muted_style)
+                text("0–10°").size(typography::caption()).style(muted_style)
             ]
             .spacing(6)
             .align_y(iced::Center),
@@ -2145,7 +2146,7 @@ pub fn view_pc_section<'a>(
     ]
     .spacing(10);
     let footer = row![
-        button(text("?").size(12))
+        button(text("?").size(typography::body()))
             .on_press(msg(PdfDialogMsg::Help("pcsection")))
             .style(button_style(false))
             .padding([5, 11]),
@@ -2292,7 +2293,7 @@ pub fn view_background<'a>(
             ..Default::default()
         }
     };
-    let note = |label: String| text(label).size(11).style(muted_style);
+    let note = |label: String| text(label).size(typography::small()).style(muted_style);
     let preview: Element<'a, Message> = match state.kind {
         BgKind::None => container(note(crate::tr!("view-background", "canvas")))
             .center(Fill)
@@ -2409,7 +2410,7 @@ pub fn view_background<'a>(
     );
     let label = |value: String, enabled: bool| {
         text(value)
-            .size(11)
+            .size(typography::small())
             .style(move |theme: &Theme| {
                 if enabled {
                     muted_style(theme)
@@ -2422,7 +2423,7 @@ pub fn view_background<'a>(
             .width(Length::Fixed(92.0))
     };
     let color_row = |name: String, slot: u8, color: [u8; 3], enabled: bool| -> Element<'a, Message> {
-        let mut pick = button(text(crate::tr!("view-background", "select")).size(11))
+        let mut pick = button(text(crate::tr!("view-background", "select")).size(typography::small()))
             .style(button_style(false))
             .padding([4, 10]);
         if enabled {
@@ -2432,7 +2433,7 @@ pub fn view_background<'a>(
             label(name, enabled),
             swatch(color, 64.0, 22.0),
             text(format!("{},{},{}", color[0], color[1], color[2]))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
             Space::new().width(Fill),
             pick,
@@ -2461,11 +2462,11 @@ pub fn view_background<'a>(
                     ),
                     Space::new().width(Fill),
                     text(crate::tr!("view-background", "rotation"))
-                        .size(11)
+                        .size(typography::small())
                         .style(muted_style),
                     text_input("", &state.rotation)
                         .on_input(|v| msg(PdfDialogMsg::BgRotation(v)))
-                        .size(11)
+                        .size(typography::small())
                         .padding([4, 8])
                         .width(Length::Fixed(64.0))
                         .style(field_style),
@@ -2484,11 +2485,11 @@ pub fn view_background<'a>(
                 row![
                     text_input("", &state.image)
                         .on_input(|v| msg(PdfDialogMsg::BgImage(v)))
-                        .size(11)
+                        .size(typography::small())
                         .padding([4, 8])
                         .width(Fill)
                         .style(field_style),
-                    button(text(crate::tr!("view-background", "browse")).size(11))
+                    button(text(crate::tr!("view-background", "browse")).size(typography::small()))
                         .on_press(msg(PdfDialogMsg::BgBrowse))
                         .style(button_style(false))
                         .padding([4, 10]),
@@ -2501,7 +2502,7 @@ pub fn view_background<'a>(
                         p.to_string()
                     })
                     .on_select(|p| msg(PdfDialogMsg::BgPosition(p)))
-                    .text_size(12)
+                    .text_size(typography::body())
                     .padding([4, 8])
                     .width(Fill),
                 ]
@@ -2551,7 +2552,7 @@ fn adjust_card<'a>(state: &'a ViewBackgroundState) -> Element<'a, Message> {
     let spin = |field: u8| -> Element<'a, Message> {
         let value = if field < 2 { &state.offset[field as usize] } else { &state.scale[field as usize - 2] };
         let mut input = text_input("", value)
-            .size(11)
+            .size(typography::small())
             .padding([4, 8])
             .width(Length::Fixed(64.0))
             .style(move |theme: &Theme, status| {
@@ -2585,10 +2586,10 @@ fn adjust_card<'a>(state: &'a ViewBackgroundState) -> Element<'a, Message> {
         };
         row![input, column![arrow(true), arrow(false)].spacing(1)].spacing(2).align_y(iced::Center).into()
     };
-    let axis = |name: &'static str| text(name).size(11).style(dim);
+    let axis = |name: &'static str| text(name).size(typography::small()).style(dim);
     let line = |label: String, a: u8, b: u8, unit: bool| -> Element<'a, Message> {
         let mut r = row![
-            text(label).size(11).style(dim).width(Length::Fixed(72.0)),
+            text(label).size(typography::small()).style(dim).width(Length::Fixed(72.0)),
             axis("X"),
             spin(a),
             axis("Y"),
@@ -2597,11 +2598,11 @@ fn adjust_card<'a>(state: &'a ViewBackgroundState) -> Element<'a, Message> {
         .spacing(6)
         .align_y(iced::Center);
         if unit {
-            r = r.push(text(crate::tr!("view-background", "pixels")).size(11).style(dim));
+            r = r.push(text(crate::tr!("view-background", "pixels")).size(typography::small()).style(dim));
         }
         r.into()
     };
-    let mut reset = button(text(crate::tr!("view-background", "reset")).size(11))
+    let mut reset = button(text(crate::tr!("view-background", "reset")).size(typography::small()))
         .style(button_style(false))
         .padding([3, 10]);
     if enabled {
@@ -2610,7 +2611,7 @@ fn adjust_card<'a>(state: &'a ViewBackgroundState) -> Element<'a, Message> {
     container(
         column![
             row![
-                text(crate::tr!("view-background", "adjust").to_uppercase()).size(10).style(move |theme: &Theme| {
+                text(crate::tr!("view-background", "adjust").to_uppercase()).size(typography::caption()).style(move |theme: &Theme| {
                     if enabled { accent_text(theme) } else { dim(theme) }
                 }),
                 Space::new().width(Fill),
@@ -2713,7 +2714,7 @@ pub fn image_adjust<'a>(
     sizing: crate::ui::modal::ModalSizing,
 ) -> Element<'a, Message> {
     let badge = |label: String, accent: bool| {
-        container(text(label).size(10))
+        container(text(label).size(typography::caption()))
             .padding([2, 8])
             .style(move |theme: &Theme| container::Style {
                 background: Some(Background::Color(if accent {
@@ -2741,7 +2742,7 @@ pub fn image_adjust<'a>(
             .width(Fill)
             .height(Fill)
             .into(),
-        None => container(text(crate::tr!("image-adjust", "no-preview")).size(11).style(muted_style))
+        None => container(text(crate::tr!("image-adjust", "no-preview")).size(typography::small()).style(muted_style))
             .center(Fill)
             .into(),
     };
@@ -2814,20 +2815,20 @@ pub fn image_adjust<'a>(
                 },
             });
         let step = |dir: i8| {
-            button(text(if dir < 0 { "\u{2212}" } else { "+" }).size(12))
+            button(text(if dir < 0 { "\u{2212}" } else { "+" }).size(typography::body()))
                 .on_press(msg(PdfDialogMsg::IaStep(row, dir)))
                 .style(button_style(false))
                 .padding([2, 8])
         };
         let value = text_input("", &state.texts[k])
             .on_input(move |v| msg(PdfDialogMsg::IaText(row, v)))
-            .size(11)
+            .size(typography::small())
             .padding([3, 4])
             .width(Length::Fixed(40.0))
             .align_x(iced::alignment::Horizontal::Right)
             .style(field_style);
         row![
-            text(label).size(11).width(Length::Fixed(72.0)),
+            text(label).size(typography::small()).width(Length::Fixed(72.0)),
             iced::widget::Stack::new().width(Fill).push(bar).push(slide),
             container(row![step(-1), value, step(1)].spacing(2).align_y(iced::Center))
                 .padding(2)
@@ -2843,11 +2844,11 @@ pub fn image_adjust<'a>(
             line(0, crate::tr!("image-adjust", "brightness")),
             line(1, crate::tr!("image-adjust", "contrast")),
             line(2, crate::tr!("image-adjust", "fade")),
-            text(crate::tr!("image-adjust", "hint")).size(10).style(muted_style),
+            text(crate::tr!("image-adjust", "hint")).size(typography::caption()).style(muted_style),
         ]
         .spacing(10),
     );
-    let reset = button(text(crate::tr!("image-adjust", "reset")).size(11).style(accent_text))
+    let reset = button(text(crate::tr!("image-adjust", "reset")).size(typography::small()).style(accent_text))
         .on_press(msg(PdfDialogMsg::IaReset))
         .style(button::text)
         .padding([5, 4]);

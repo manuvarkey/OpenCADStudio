@@ -14,6 +14,7 @@ use crate::app::{
     Message, OpenProgress, OPEN_PHASE_CACHING, OPEN_PHASE_FINALIZING, OPEN_PHASE_PARSING,
     OPEN_PHASE_READING, OPEN_PHASE_XREF,
 };
+use crate::ui::typography;
 
 const CARD_WIDTH: f32 = 420.0;
 const BAR_TRACK_WIDTH: f32 = 380.0;
@@ -103,14 +104,14 @@ pub fn view<'a>(progress: &'a OpenProgress, _now: Instant) -> Element<'a, Messag
     .into();
 
     // ── Card body ────────────────────────────────────────────────────────
-    let title = text(t!("Opening file")).size(15);
+    let title = text(t!("Opening file")).size(typography::heading());
 
     let name_line = text(format!(
         "{}  ({})",
         progress.name,
         format_size(progress.size_bytes)
     ))
-    .size(13)
+    .size(typography::body_large())
     .style(|theme: &Theme| iced::widget::text::Style {
         color: Some(theme.palette().background.base.text.scale_alpha(0.82)),
     });
@@ -120,12 +121,12 @@ pub fn view<'a>(progress: &'a OpenProgress, _now: Instant) -> Element<'a, Messag
         phase_label(phase),
         basis_points as f32 / 100.0
     ))
-    .size(12)
+    .size(typography::body())
     .style(|theme: &Theme| iced::widget::text::Style {
         color: Some(theme.palette().primary.base.color),
     });
 
-    let cancel_btn: Element<'_, Message> = button(text(t!("Cancel")).size(12))
+    let cancel_btn: Element<'_, Message> = button(text(t!("Cancel")).size(typography::body()))
         .on_press(Message::OpenCancel)
         .style(button::danger)
         .padding([4, 14])

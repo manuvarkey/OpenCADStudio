@@ -2,6 +2,7 @@ use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::dialog_button;
+use crate::ui::typography;
 use iced::widget::{column, container, row, svg, text, Space};
 use iced::{Background, Border, Element, Fill, Length, Shrink, Theme};
 
@@ -30,8 +31,8 @@ fn info_card<'a>(
 ) -> Element<'a, Message> {
     container(
         column![
-            text(label).size(10).style(muted_style),
-            text(value).size(14),
+            text(label).size(typography::caption()).style(muted_style),
+            text(value).size(typography::subheading()),
         ]
         .spacing(5),
     )
@@ -52,10 +53,10 @@ fn info_row<'a>(
     container(
         row![
             text(label)
-                .size(11)
+                .size(typography::small())
                 .style(muted_style)
                 .width(Length::Fixed(110.0)),
-            text(value).size(13).width(Fill),
+            text(value).size(typography::body_large()).width(Fill),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -195,11 +196,11 @@ pub fn view_window(sizing: crate::ui::modal::ModalSizing) -> Element<'static, Me
         row![
             logo,
             column![
-                text("Open CAD Studio").size(28).style(primary_style),
+                text("Open CAD Studio").size(typography::display(28.0)).style(primary_style),
                 text(t!("CAD application for Architecture & Engineering"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted_style),
-                text(version.clone()).size(13),
+                text(version.clone()).size(typography::body_large()),
             ]
             .spacing(5),
         ]

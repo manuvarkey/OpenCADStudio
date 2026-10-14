@@ -10,6 +10,7 @@ use crate::app::Message;
 use crate::plugin::external::{ExternalPlugin, RegistryEntry, ReleaseInfo};
 use crate::t;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{
     button, column, container, markdown, row, rule, scrollable, text, text_input, Space,
 };
@@ -56,7 +57,7 @@ fn primary_style(theme: &Theme) -> iced::widget::text::Style {
 }
 
 fn badge<'a>(label: String) -> Element<'a, Message> {
-    container(text(label).size(11))
+    container(text(label).size(typography::small()))
         .padding([2, 8])
         .style(|theme: &Theme| {
             let pair = theme.palette().primary.weak;
@@ -82,7 +83,7 @@ fn toggle_button<'a>(id: &str, disabled: bool) -> Element<'a, Message> {
     };
     let want_enabled = disabled; // clicking flips the state
     let id_owned = id.to_string();
-    button(text(label).size(12))
+    button(text(label).size(typography::body()))
         .padding([3, 12])
         .on_press(Message::SetPluginEnabled(id_owned, want_enabled))
         .style(if disabled {
@@ -103,7 +104,7 @@ enum StatusKind {
 
 /// Coloured status pill for a discovered external package.
 fn status_badge<'a>(label: Cow<'static, str>, kind: StatusKind) -> Element<'a, Message> {
-    container(text(label).size(11))
+    container(text(label).size(typography::small()))
         .padding([2, 8])
         .style(move |theme: &Theme| {
             let palette = theme.palette();
@@ -239,7 +240,7 @@ fn external_card<'a>(
         (t!("Restart to load"), StatusKind::Warning)
     };
     let header = row![
-        text(p.name.clone()).size(15),
+        text(p.name.clone()).size(typography::heading()),
         Space::new().width(8),
         badge(format!("v{}", p.version)),
         Space::new().width(8),
@@ -249,10 +250,10 @@ fn external_card<'a>(
     ]
     .align_y(iced::Center);
 
-    let id_line = text(p.id.clone()).size(11).style(muted_style);
+    let id_line = text(p.id.clone()).size(typography::small()).style(muted_style);
     let mut info_body = column![header, id_line].spacing(5);
     if !p.description.is_empty() {
-        info_body = info_body.push(text(p.description.clone()).size(12).style(muted_style));
+        info_body = info_body.push(text(p.description.clone()).size(typography::body()).style(muted_style));
     }
     if !p.command_prefixes.is_empty() {
         info_body = info_body.push(
@@ -260,7 +261,7 @@ fn external_card<'a>(
                 "Commands:  %{cmds}",
                 cmds = p.command_prefixes.join(", ")
             ))
-            .size(11)
+            .size(typography::small())
             .style(muted_style),
         );
     }
@@ -274,7 +275,7 @@ fn external_card<'a>(
         } else {
             t!("Load failed:  %{error}", error = error)
         };
-        info_body = info_body.push(text(detail).size(11).width(Fill).style(|theme: &Theme| {
+        info_body = info_body.push(text(detail).size(typography::small()).width(Fill).style(|theme: &Theme| {
             iced::widget::text::Style {
                 color: Some(theme.palette().danger.base.color),
             }
@@ -309,7 +310,7 @@ fn external_card<'a>(
     if p.bundled {
         actions = actions.push(
             text(t!("Bundled with Open CAD Studio"))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
         );
     } else {
@@ -331,7 +332,7 @@ fn pill_button<'a>(
     msg: Message,
     style: fn(&Theme, button::Status) -> button::Style,
 ) -> Element<'a, Message> {
-    button(text(label.into()).size(12))
+    button(text(label.into()).size(typography::body()))
         .padding([4, 12])
         .on_press(msg)
         .style(style)
@@ -367,12 +368,12 @@ fn install_controls<'a>(
         .as_ref()
         .and_then(|selected| releases.iter().find(|release| release.tag == *selected));
     let picker: Element<'_, Message> = if tags.is_empty() {
-        text(t!("no releases")).size(11).style(muted_style).into()
+        text(t!("no releases")).size(typography::small()).style(muted_style).into()
     } else {
         let r = repo_s.clone();
         iced::widget::pick_list(selected, tags, |value| value.to_string())
             .on_select(move |tag| Message::PluginReleaseSelect(r.clone(), tag))
-            .text_size(12)
+            .text_size(typography::body())
             .into()
     };
     let action = match selected_release {
@@ -441,7 +442,7 @@ fn add_repository_card<'a>(m: &MarketView) -> Element<'a, Message> {
         text_input(t!("GitHub URL or owner/repository").as_ref(), m.input)
             .on_input(Message::PluginRepoInput)
             .on_submit(Message::PluginRepoAdd)
-            .size(13)
+            .size(typography::body_large())
             .width(Fill),
         Space::new().width(8),
         pill_button(
@@ -454,11 +455,11 @@ fn add_repository_card<'a>(m: &MarketView) -> Element<'a, Message> {
 
     market_card(
         column![
-            text(t!("Add from GitHub")).size(14),
+            text(t!("Add from GitHub")).size(typography::subheading()),
             text(t!(
                 "Paste a public repository URL. Compatible releases and the README are detected automatically."
             ))
-            .size(11)
+            .size(typography::small())
             .style(muted_style),
             Space::new().height(3),
             form,
@@ -521,15 +522,15 @@ fn registry_notice<'a>(m: &MarketView) -> Option<Element<'a, Message>> {
         ]
         .align_y(iced::Center);
         let mut body = column![
-            text(title).size(13),
-            text(message).size(11).style(muted_style),
+            text(title).size(typography::body_large()),
+            text(message).size(typography::small()).style(muted_style),
             Space::new().height(3),
             actions,
         ]
         .spacing(5);
         if m.registry_error_details_open {
             body = body.push(
-                container(text(error.to_string()).size(10).width(Fill))
+                container(text(error.to_string()).size(typography::caption()).width(Fill))
                     .padding(8)
                     .width(Fill)
                     .style(container::bordered_box),
@@ -557,11 +558,11 @@ fn registry_notice<'a>(m: &MarketView) -> Option<Element<'a, Message>> {
     (m.registry_loading && m.registry.is_empty()).then(|| {
         container(
             column![
-                text(t!("Loading plugin catalog…")).size(13),
+                text(t!("Loading plugin catalog…")).size(typography::body_large()),
                 text(t!(
                     "Connecting securely using your system certificate settings."
                 ))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
             ]
             .spacing(5)
@@ -574,7 +575,7 @@ fn registry_notice<'a>(m: &MarketView) -> Option<Element<'a, Message>> {
 }
 
 fn marketplace_section<'a>(m: &MarketView, externals: &[ExternalPlugin]) -> Element<'a, Message> {
-    let mut col = column![text(t!("Available plugins")).size(13).style(primary_style)].spacing(6);
+    let mut col = column![text(t!("Available plugins")).size(typography::body_large()).style(primary_style)].spacing(6);
     let mut visible = 0usize;
     if let Some(notice) = registry_notice(m) {
         col = col.push(notice);
@@ -590,9 +591,9 @@ fn marketplace_section<'a>(m: &MarketView, externals: &[ExternalPlugin]) -> Elem
         visible += 1;
         let tags = m.release_tags.get(&e.repo).cloned().unwrap_or_default();
         let selected = m.selected_tag.get(&e.repo).cloned();
-        let mut info = column![text(e.name.clone()).size(14)].spacing(4);
+        let mut info = column![text(e.name.clone()).size(typography::subheading())].spacing(4);
         if !e.description.is_empty() {
-            info = info.push(text(e.description.clone()).size(12).style(muted_style));
+            info = info.push(text(e.description.clone()).size(typography::body()).style(muted_style));
         }
         let info = button(info.width(Fill))
             .width(Fill)
@@ -627,8 +628,8 @@ fn marketplace_section<'a>(m: &MarketView, externals: &[ExternalPlugin]) -> Elem
         let selected = m.selected_tag.get(repo).cloned();
         let info = button(
             column![
-                text(display_name).size(14),
-                text(t!("Added from GitHub")).size(11).style(muted_style),
+                text(display_name).size(typography::subheading()),
+                text(t!("Added from GitHub")).size(typography::small()).style(muted_style),
             ]
             .spacing(4)
             .width(Fill),
@@ -655,13 +656,13 @@ fn marketplace_section<'a>(m: &MarketView, externals: &[ExternalPlugin]) -> Elem
         } else {
             t!("No available plugins match your search.")
         };
-        col = col.push(text(message).size(12).style(muted_style));
+        col = col.push(text(message).size(typography::body()).style(muted_style));
     }
 
     col = col.push(Space::new().height(8));
     col = col.push(add_repository_card(m));
     if !m.status.is_empty() {
-        col = col.push(text(m.status.to_string()).size(11).style(muted_style));
+        col = col.push(text(m.status.to_string()).size(typography::small()).style(muted_style));
     }
     col.into()
 }
@@ -690,9 +691,9 @@ fn readme_panel<'a>(
     let Some(repo) = market.selected_repo else {
         return container(
             column![
-                text(t!("Plugin details")).size(16),
+                text(t!("Plugin details")).size(typography::heading_large()),
                 text(t!("Select a plugin to read its GitHub README."))
-                    .size(12)
+                    .size(typography::body())
                     .style(muted_style),
             ]
             .spacing(8),
@@ -712,8 +713,8 @@ fn readme_panel<'a>(
         .to_string();
     let header = row![
         column![
-            text(name).size(16),
-            text(repo.to_string()).size(11).style(primary_style),
+            text(name).size(typography::heading_large()),
+            text(repo.to_string()).size(typography::small()).style(primary_style),
         ]
         .spacing(3)
         .width(width),
@@ -728,9 +729,9 @@ fn readme_panel<'a>(
     let content: Element<'a, Message> = if market.readme_loading.contains(repo) {
         container(
             column![
-                text(t!("Loading README…")).size(13),
+                text(t!("Loading README…")).size(typography::body_large()),
                 text(t!("Fetching the default branch from GitHub."))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted_style),
             ]
             .spacing(6),
@@ -746,14 +747,14 @@ fn readme_panel<'a>(
                 let source_repo = repo.to_string();
                 markdown::view(
                     readme.items(),
-                    markdown::Settings::with_text_size(13, theme),
+                    markdown::Settings::with_text_size(typography::body_large(), theme),
                 )
                 .map(move |uri| Message::OpenUrl(resolve_readme_link(&source_repo, &uri)))
             }
             Some(Err(error)) => container(
                 column![
-                    text(t!("README could not be loaded")).size(14),
-                    text(error.clone()).size(11).style(muted_style),
+                    text(t!("README could not be loaded")).size(typography::subheading()),
+                    text(error.clone()).size(typography::small()).style(muted_style),
                     Space::new().height(4),
                     pill_button(
                         t!("Retry"),
@@ -770,7 +771,7 @@ fn readme_panel<'a>(
             .into(),
             None => container(
                 text(t!("Select the plugin again to load its README."))
-                    .size(12)
+                    .size(typography::body())
                     .style(muted_style),
             )
             .center_x(width)
@@ -815,11 +816,11 @@ pub fn view_window<'a>(
 ) -> Element<'a, Message> {
     let width = sizing.width;
     let height = sizing.height;
-    let title = text(t!("Plugins")).size(20);
+    let title = text(t!("Plugins")).size(typography::title_large());
     let subtitle = text(t!(
         "Browse, install, and manage add-ons. Select one to view its README."
     ))
-    .size(12)
+    .size(typography::body())
     .style(muted_style);
 
     let mut list = column![].spacing(10);
@@ -827,7 +828,7 @@ pub fn view_window<'a>(
     if externals.is_empty() {
         list = list.push(
             text(t!("No plugins installed yet."))
-                .size(13)
+                .size(typography::body_large())
                 .style(muted_style),
         );
     } else {
@@ -838,7 +839,7 @@ pub fn view_window<'a>(
                 continue;
             }
             if visible_installed == 0 {
-                list = list.push(text(t!("Installed")).size(13).style(primary_style));
+                list = list.push(text(t!("Installed")).size(typography::body_large()).style(primary_style));
             }
             visible_installed += 1;
             let selected = repository.as_deref() == market.selected_repo;
@@ -859,7 +860,7 @@ pub fn view_window<'a>(
         if visible_installed == 0 && !market.search.trim().is_empty() {
             list = list.push(
                 text(t!("No installed plugins match your search."))
-                    .size(12)
+                    .size(typography::body())
                     .style(muted_style),
             );
         }
@@ -878,7 +879,7 @@ pub fn view_window<'a>(
         .width(Fill);
     let search = text_input(t!("Search plugins…").as_ref(), market.search)
         .on_input(Message::PluginSearchInput)
-        .size(13)
+        .size(typography::body_large())
         .padding([7, 10])
         .width(Fill);
     let catalog_pane = column![search, catalog]
@@ -915,7 +916,7 @@ pub fn view_window<'a>(
 /// Browser replacement for the native Plugin Manager.
 #[cfg(target_arch = "wasm32")]
 pub fn view_web_notice<'a>() -> Element<'a, Message> {
-    let download = button(text(t!("Download desktop app")).size(13))
+    let download = button(text(t!("Download desktop app")).size(typography::body_large()))
         .on_press(Message::OpenUrl(DESKTOP_DOWNLOAD_URL.to_string()))
         .padding([9, 18])
         .style(|theme: &Theme, status| {
@@ -942,13 +943,13 @@ pub fn view_web_notice<'a>() -> Element<'a, Message> {
         column![
             icon,
             text(t!("Plugins are available in the desktop app"))
-                .size(20)
+                .size(typography::title_large())
                 .width(Length::Fit)
                 .align_x(iced::alignment::Horizontal::Center),
             text(t!(
                 "Open CAD Studio plugins are native packages and cannot run inside a browser. Download the desktop app to browse, install, and use plugins."
             ))
-            .size(13)
+            .size(typography::body_large())
             .width(Length::Fit)
             .align_x(iced::alignment::Horizontal::Center)
             .style(muted_style),

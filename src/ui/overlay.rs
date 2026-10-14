@@ -2435,8 +2435,8 @@ impl canvas::Program<Message> for SelectionCanvas {
                         self.constraint_glyphs[index].top_left,
                         self.constraint_glyphs[index].size,
                     );
-                    let width = (label.chars().count() as f32 * 7.0 + 14.0).max(54.0);
-                    let height = 24.0;
+                    let width = (label.chars().count() as f32 * typography::body() * 0.58 + 14.0).max(54.0);
+                    let height = typography::grow(24.0);
                     let left = glyph_top_left
                         .x
                         .clamp(2.0, (bounds.width - width - 2.0).max(2.0));
@@ -2459,7 +2459,7 @@ impl canvas::Program<Message> for SelectionCanvas {
                         content: label.to_string(),
                         position: Point::new(left + width * 0.5, top + height * 0.5),
                         color: theme.palette().background.strong.text,
-                        size: iced::Pixels(12.0),
+                        size: iced::Pixels(typography::body()),
                         align_x: iced::alignment::Horizontal::Center.into(),
                         align_y: iced::alignment::Vertical::Center,
                         shaping: iced::advanced::text::Shaping::Advanced,
@@ -3550,9 +3550,18 @@ use crate::command::{DynGuide, DynRole};
 const DYN_OFFSET_X: f32 = 14.0;
 const DYN_PAD: f32 = 4.0;
 const DYN_GAP: f32 = 6.0;
-const DYN_FONT: f32 = 11.0;
-const DYN_CHAR_W: f32 = DYN_FONT * 0.62;
-const DYN_BOX_H: f32 = DYN_FONT + DYN_PAD * 2.0;
+// Box text follows the small UI role; the boxes size from it.
+fn dyn_font() -> f32 {
+    typography::small()
+}
+
+fn dyn_char_w() -> f32 {
+    dyn_font() * 0.62
+}
+
+fn dyn_box_h() -> f32 {
+    dyn_font() + DYN_PAD * 2.0
+}
 
 /// One value box in the dynamic-input overlay. Its `role` drives both the
 /// label and where the box is placed relative to the step's guide geometry.
@@ -3635,7 +3644,7 @@ impl DynInputCanvas {
     }
 
     fn box_width(b: &DynBox) -> f32 {
-        (Self::box_content(b).len() as f32 * DYN_CHAR_W) + DYN_PAD * 2.0
+        (Self::box_content(b).len() as f32 * dyn_char_w()) + DYN_PAD * 2.0
     }
 
     /// Slide a box centred at `center` straight away from the crosshair until
@@ -3645,9 +3654,9 @@ impl DynInputCanvas {
         let hits = |c: Point| {
             let r = iced::Rectangle {
                 x: c.x - w * 0.5,
-                y: c.y - DYN_BOX_H * 0.5,
+                y: c.y - dyn_box_h() * 0.5,
                 width: w,
-                height: DYN_BOX_H,
+                height: dyn_box_h(),
             };
             r.expand(KEEP).contains(cursor) || placed.iter().any(|p| p.intersects(&r))
         };
@@ -3680,12 +3689,12 @@ impl DynInputCanvas {
         let content = Self::box_content(b);
         let w = Self::box_width(b);
         let x = (center.x - w * 0.5).clamp(0.0, (bounds.width - w).max(0.0));
-        let y = (center.y - DYN_BOX_H * 0.5).clamp(0.0, (bounds.height - DYN_BOX_H).max(0.0));
+        let y = (center.y - dyn_box_h() * 0.5).clamp(0.0, (bounds.height - dyn_box_h()).max(0.0));
         let rect = canvas::Path::rectangle(
             Point { x, y },
             Size {
                 width: w,
-                height: DYN_BOX_H,
+                height: dyn_box_h(),
             },
         );
         let (fill, border, text) = Self::box_colors(b, theme);
@@ -3704,7 +3713,7 @@ impl DynInputCanvas {
                 y: y + DYN_PAD,
             },
             color: text,
-            size: iced::Pixels(DYN_FONT),
+            size: iced::Pixels(dyn_font()),
             // Force Advanced shaping: the default `Auto` uses Basic shaping for
             // ASCII-only strings, which the web (wgpu/webgl) backend fails to
             // render — so all-digit value boxes came up blank while the angle
@@ -3743,12 +3752,12 @@ impl DynInputCanvas {
             return;
         }
         let palette = theme.palette();
-        let pw = (self.prompt.len() as f32 * DYN_CHAR_W) + DYN_PAD * 2.0;
+        let pw = (self.prompt.len() as f32 * dyn_char_w()) + DYN_PAD * 2.0;
         let rect = canvas::Path::rectangle(
             pos,
             Size {
                 width: pw,
-                height: DYN_BOX_H,
+                height: dyn_box_h(),
             },
         );
         frame.fill(&rect, palette.background.strong.color);
@@ -3766,7 +3775,7 @@ impl DynInputCanvas {
                 y: pos.y + DYN_PAD,
             },
             color: palette.background.strong.text,
-            size: iced::Pixels(DYN_FONT),
+            size: iced::Pixels(dyn_font()),
             shaping: iced::advanced::text::Shaping::Advanced,
             ..Default::default()
         });
@@ -3778,13 +3787,13 @@ impl DynInputCanvas {
         };
 
         let palette = theme.palette();
-        let pw = (text.len() as f32 * DYN_CHAR_W) + DYN_PAD * 2.0;
+        let pw = (text.len() as f32 * dyn_char_w()) + DYN_PAD * 2.0;
 
         let rect = canvas::Path::rectangle(
             pos,
             Size {
                 width: pw,
-                height: DYN_BOX_H,
+                height: dyn_box_h(),
             },
         );
 
@@ -3806,7 +3815,7 @@ impl DynInputCanvas {
                 y: pos.y + DYN_PAD,
             },
             color: palette.background.strong.text,
-            size: iced::Pixels(DYN_FONT),
+            size: iced::Pixels(dyn_font()),
             shaping: iced::advanced::text::Shaping::Advanced,
             ..Default::default()
         });
@@ -3990,7 +3999,7 @@ impl DynInputCanvas {
             let center = b.center.unwrap_or_else(|| match b.role {
                 DynRole::Angle => self.label_screen.unwrap_or_else(|| {
                     let a_mid = a_ref + sweep * 0.5;
-                    let r = (len - DYN_BOX_H * 2.0).max(len * 0.5);
+                    let r = (len - dyn_box_h() * 2.0).max(len * 0.5);
                     Point {
                         x: base.x + a_mid.cos() * r - nx * 18.0,
                         y: base.y + a_mid.sin() * r - ny * 18.0,
@@ -4039,15 +4048,15 @@ impl DynInputCanvas {
             let center = Self::clear_of(center, w, cursor, &placed);
             placed.push(iced::Rectangle {
                 x: center.x - w * 0.5,
-                y: center.y - DYN_BOX_H * 0.5,
+                y: center.y - dyn_box_h() * 0.5,
                 width: w,
-                height: DYN_BOX_H,
+                height: dyn_box_h(),
             });
             Self::draw_box(frame, b, center, bounds, theme);
         }
         // Keep the tracking hint near the crosshair in guided layouts.
         if let Some(text) = self.tracking_hint.as_deref() {
-            let hw = (text.len() as f32 * DYN_CHAR_W) + DYN_PAD * 2.0;
+            let hw = (text.len() as f32 * dyn_char_w()) + DYN_PAD * 2.0;
 
             let mut hx = self.cursor_screen.x + DYN_OFFSET_X;
             let mut hy = self.cursor_screen.y + DYN_OFFSET_X;
@@ -4056,8 +4065,8 @@ impl DynInputCanvas {
                 hx = (self.cursor_screen.x - hw - 4.0).max(0.0);
             }
 
-            if hy + DYN_BOX_H > bounds.height {
-                hy = (self.cursor_screen.y - DYN_BOX_H - 4.0).max(0.0);
+            if hy + dyn_box_h() > bounds.height {
+                hy = (self.cursor_screen.y - dyn_box_h() - 4.0).max(0.0);
             }
 
             self.draw_tracking_hint(frame, Point { x: hx, y: hy }, theme);
@@ -4079,7 +4088,7 @@ impl DynInputCanvas {
             .collect();
         let widths: Vec<f32> = texts
             .iter()
-            .map(|t| (t.len() as f32 * DYN_CHAR_W) + DYN_PAD * 2.0)
+            .map(|t| (t.len() as f32 * dyn_char_w()) + DYN_PAD * 2.0)
             .collect();
         let total_w: f32 = widths.iter().sum::<f32>() + DYN_GAP * (self.boxes.len() as f32 - 1.0);
 
@@ -4088,18 +4097,18 @@ impl DynInputCanvas {
         // value boxes a further gap below the prompt.
         let pad = DYN_OFFSET_X;
         let has_prompt = !self.prompt.is_empty();
-        let prompt_w = (self.prompt.len() as f32 * DYN_CHAR_W) + DYN_PAD * 2.0;
+        let prompt_w = (self.prompt.len() as f32 * dyn_char_w()) + DYN_PAD * 2.0;
         let block_w = total_w.max(if has_prompt { prompt_w } else { 0.0 });
         let mut bx = self.cursor_screen.x + pad;
         let mut py = self.cursor_screen.y + pad;
-        let mut by = if has_prompt { py + DYN_BOX_H + pad } else { py };
+        let mut by = if has_prompt { py + dyn_box_h() + pad } else { py };
         if bx + block_w > bounds.width {
             bx = (self.cursor_screen.x - block_w - 4.0).max(0.0);
         }
-        if by + DYN_BOX_H > bounds.height {
+        if by + dyn_box_h() > bounds.height {
             // Flip the block above the cursor, keeping the same gaps.
-            by = (self.cursor_screen.y - pad - DYN_BOX_H).max(0.0);
-            py = (by - pad - DYN_BOX_H).max(0.0);
+            by = (self.cursor_screen.y - pad - dyn_box_h()).max(0.0);
+            py = (by - pad - dyn_box_h()).max(0.0);
         }
         if has_prompt {
             self.draw_prompt(frame, Point { x: bx, y: py }, theme);
@@ -4119,7 +4128,7 @@ impl DynInputCanvas {
                 Point { x, y: by },
                 Size {
                     width: w,
-                    height: DYN_BOX_H,
+                    height: dyn_box_h(),
                 },
             );
             let (fill, border, text) = Self::box_colors(b, theme);
@@ -4138,7 +4147,7 @@ impl DynInputCanvas {
                     y: by + DYN_PAD,
                 },
                 color: text,
-                size: iced::Pixels(DYN_FONT),
+                size: iced::Pixels(dyn_font()),
                 shaping: iced::advanced::text::Shaping::Advanced,
                 ..Default::default()
             });
@@ -4146,11 +4155,11 @@ impl DynInputCanvas {
         }
         // Place the tracking hint below the value row.
         if self.tracking_hint.is_some() {
-            let mut hy = by + DYN_BOX_H + 3.0;
+            let mut hy = by + dyn_box_h() + 3.0;
 
             // Move above when bottom space is insufficient.
-            if hy + DYN_BOX_H > bounds.height {
-                hy = (py - DYN_BOX_H - 3.0).max(0.0);
+            if hy + dyn_box_h() > bounds.height {
+                hy = (py - dyn_box_h() - 3.0).max(0.0);
             }
 
             self.draw_tracking_hint(frame, Point { x: bx, y: hy }, theme);
@@ -4183,19 +4192,19 @@ impl canvas::Program<Message> for DynInputCanvas {
         // No boxes — just the prompt pill near the cursor.
         if self.boxes.is_empty() {
             if !self.prompt.is_empty() {
-                let pw = (self.prompt.len() as f32 * DYN_CHAR_W) + DYN_PAD * 2.0;
+                let pw = (self.prompt.len() as f32 * dyn_char_w()) + DYN_PAD * 2.0;
                 let mut px = self.cursor_screen.x + DYN_OFFSET_X;
                 let mut py = self.cursor_screen.y + DYN_OFFSET_X;
                 if px + pw > bounds.width {
                     px = (self.cursor_screen.x - pw - 4.0).max(0.0);
                 }
-                if py + DYN_BOX_H > bounds.height {
-                    py = (self.cursor_screen.y - DYN_BOX_H - 4.0).max(0.0);
+                if py + dyn_box_h() > bounds.height {
+                    py = (self.cursor_screen.y - dyn_box_h() - 4.0).max(0.0);
                 }
                 self.draw_prompt(&mut frame, Point { x: px, y: py }, theme);
 
                 if self.tracking_hint.is_some() {
-                    let hint_y = py + DYN_BOX_H + 3.0;
+                    let hint_y = py + dyn_box_h() + 3.0;
 
                     self.draw_tracking_hint(&mut frame, Point { x: px, y: hint_y }, theme);
                 }

@@ -10,6 +10,7 @@ use iced::{Background, Element, Fill, Theme};
 
 use crate::app::Message;
 use crate::ui::statusbar::status_menu::Entry;
+use crate::ui::typography;
 
 /// - `types`: entity-type names present in the current layout.
 /// - `excluded`: types currently filtered out (unchecked).
@@ -62,7 +63,7 @@ pub fn menu_entries(types: &[String], excluded: &HashSet<String>) -> Vec<Entry<'
 fn type_row(name: String, included: bool) -> Element<'static, Message> {
     let check = crate::ui::icons::themed_check_cell(included);
 
-    let lbl = text(t!(name.as_str())).size(11);
+    let lbl = text(t!(name.as_str())).size(typography::small());
 
     let content = row![check, lbl].spacing(6).align_y(iced::Center);
 
@@ -77,7 +78,7 @@ fn type_row(name: String, included: bool) -> Element<'static, Message> {
 fn empty_row() -> Element<'static, Message> {
     container(
         text(t!("No objects"))
-            .size(11)
+            .size(typography::small())
             .style(|theme: &Theme| text::Style {
                 color: Some(theme.palette().background.base.text.scale_alpha(0.42)),
             }),
@@ -87,7 +88,7 @@ fn empty_row() -> Element<'static, Message> {
 }
 
 fn header_btn(label: &str, msg: Message, enabled: bool) -> Element<'_, Message> {
-    let b = button(text(t!(label)).size(10));
+    let b = button(text(t!(label)).size(typography::caption()));
     let b = if enabled { b.on_press(msg) } else { b };
     b.style(button::secondary).padding([3, 8]).into()
 }

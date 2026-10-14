@@ -10,6 +10,7 @@ use crate::app::Message;
 use crate::modules::draw::units;
 use crate::t;
 use crate::ui::style::form::{button_style, dialog_button, field_style, form_radio};
+use crate::ui::typography;
 
 static ICON_PICK_POINT: &[u8] = include_bytes!("../../../assets/icons/blocks/pick_point.svg");
 static ICON_SELECT_OBJECTS: &[u8] =
@@ -136,7 +137,7 @@ fn group<'a>(
     container(
         column![
             text(title.into())
-                .size(11)
+                .size(typography::small())
                 .style(|theme: &Theme| text::Style {
                     color: Some(theme.palette().background.strongest.text.scale_alpha(0.85)),
                 }),
@@ -185,7 +186,7 @@ pub fn view_window<'a>(
             |chosen: String| Message::WblockBlockSelect(chosen),
         )
         .on_input(Message::WblockBlockName)
-        .size(11)
+        .size(typography::small())
         .padding([2, 5])
         .width(Fill)
         .into()
@@ -215,7 +216,7 @@ pub fn view_window<'a>(
     // ── Source: Base Point Sub-group ──────────────────────────────────────────
     let pick_pt_icon = crate::ui::icons::semantic(ICON_PICK_POINT, 14.0);
     let mut pick_pt_btn = button(
-        row![pick_pt_icon, text(t!("Pick point")).size(11)]
+        row![pick_pt_icon, text(t!("Pick point")).size(typography::small())]
             .spacing(6)
             .align_y(iced::Center),
     )
@@ -235,7 +236,7 @@ pub fn view_window<'a>(
                 .on_input(on_input)
                 .on_submit(Message::WblockApply)
                 .style(field_style)
-                .size(11)
+                .size(typography::small())
                 .padding([2, 5])
                 .width(Fill)
                 .into()
@@ -244,7 +245,7 @@ pub fn view_window<'a>(
         };
         row![
             text(axis)
-                .size(11)
+                .size(typography::small())
                 .style(|theme: &Theme| text::Style {
                     color: Some(theme.palette().background.strongest.text.scale_alpha(0.85)),
                 })
@@ -271,7 +272,7 @@ pub fn view_window<'a>(
     // ── Source: Objects Sub-group ─────────────────────────────────────────────
     let sel_obj_icon = crate::ui::icons::semantic(ICON_SELECT_OBJECTS, 14.0);
     let mut sel_obj_btn = button(
-        row![sel_obj_icon, text(t!("Select objects")).size(11)]
+        row![sel_obj_icon, text(t!("Select objects")).size(typography::small())]
             .spacing(6)
             .align_y(iced::Center),
     )
@@ -335,7 +336,7 @@ pub fn view_window<'a>(
         row![
             crate::ui::icons::semantic(ICON_WARN, 13.0),
             text(t!("No objects selected"))
-                .size(10)
+                .size(typography::caption())
                 .style(|theme: &Theme| text::Style {
                     color: Some(theme.palette().warning.base.color),
                 }),
@@ -345,7 +346,7 @@ pub fn view_window<'a>(
         .into()
     } else {
         row![text(crate::tf!("{count} objects selected"))
-            .size(10)
+            .size(typography::caption())
             .style(|theme: &Theme| text::Style {
                 color: Some(theme.palette().primary.base.color),
             }),]
@@ -389,12 +390,12 @@ pub fn view_window<'a>(
         .on_input(Message::WblockFilePath)
         .on_submit(Message::WblockApply)
         .style(field_style)
-        .size(11)
+        .size(typography::small())
         .padding([3, 6])
         .width(Fill);
 
     let browse_btn = button(
-        container(text("...").size(11))
+        container(text("...").size(typography::small()))
             .width(Fill)
             .align_x(iced::alignment::Horizontal::Center),
     )
@@ -418,13 +419,13 @@ pub fn view_window<'a>(
 
     let unit_picker = pick_list(selected_unit, unit_options, |choice| choice.to_string())
         .on_select(|choice| Message::WblockUnit(choice.code))
-        .text_size(11)
+        .text_size(typography::small())
         .padding([2, 5])
         .width(Fill);
 
     let units_row = row![
         text(t!("Insert units:"))
-            .size(11)
+            .size(typography::small())
             .style(|theme: &Theme| text::Style {
                 color: Some(theme.palette().background.strongest.text.scale_alpha(0.85)),
             }),
@@ -439,7 +440,7 @@ pub fn view_window<'a>(
         t!("Destination").into_owned(),
         column![
             text(t!("File name and path:"))
-                .size(11)
+                .size(typography::small())
                 .style(|theme: &Theme| text::Style {
                     color: Some(theme.palette().background.strongest.text.scale_alpha(0.85)),
                 }),
@@ -472,12 +473,12 @@ pub fn view_window<'a>(
             row![
                 crate::ui::icons::semantic(ICON_WARN, 16.0),
                 text(err.clone())
-                    .size(11)
+                    .size(typography::small())
                     .style(|theme: &Theme| text::Style {
                         color: Some(theme.palette().background.strongest.text),
                     }),
                 Space::new().width(Fill),
-                button(text("×").size(12))
+                button(text("×").size(typography::body()))
                     .on_press(Message::WblockDismissError)
                     .style(button_style(false))
                     .padding([1, 6]),

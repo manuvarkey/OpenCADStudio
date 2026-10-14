@@ -7,6 +7,7 @@
 
 use crate::app::Message;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{button, container, pick_list, radio, row, text, text_input, Space};
 use iced::{Background, Border, Element, Length, Theme};
 use std::borrow::Cow;
@@ -36,7 +37,7 @@ pub fn dialog_button_styled_opt<'a>(
     on_press: Option<Message>,
     style: fn(&Theme, button::Status) -> button::Style,
 ) -> button::Button<'a, Message> {
-    button(text(label).size(12))
+    button(text(label).size(typography::body()))
         .on_press_maybe(on_press)
         .padding([6, 18])
         .style(style)
@@ -64,7 +65,7 @@ where
     radio(label, value, selected, on_click)
         .size(16)
         .spacing(6)
-        .text_size(11)
+        .text_size(typography::small())
 }
 
 /// Width of the label column in a `label : control` row.
@@ -147,12 +148,12 @@ pub fn vsep<'a>(height: Length) -> Element<'a, Message> {
 
 /// Muted section heading.
 pub fn section_label<'a>(label: Cow<'static, str>) -> Element<'a, Message> {
-    text(label).size(11).style(muted_style).into()
+    text(label).size(typography::small()).style(muted_style).into()
 }
 
 fn row_label<'a>(label: Cow<'static, str>) -> Element<'a, Message> {
     text(label)
-        .size(11)
+        .size(typography::small())
         .style(muted_style)
         .width(LABEL_WIDTH)
         .into()
@@ -171,7 +172,7 @@ where
 {
     let list = pick_list(selected, options, |value| value.to_string())
         .on_select(on_select)
-        .text_size(12)
+        .text_size(typography::body())
         .padding([3, 6])
         .width(width);
     row![row_label(label), list]
@@ -223,7 +224,7 @@ pub fn labeled_field<'a>(
         text_input("", value)
             .on_input(on_input)
             .style(field_style)
-            .size(12)
+            .size(typography::body())
             .width(width),
     ]
     .spacing(8)
@@ -261,11 +262,11 @@ pub fn labeled_field_compact<'a>(
     field_width: f32,
 ) -> Element<'a, Message> {
     row![
-        text(label).size(11).style(muted_style).width(label_width),
+        text(label).size(typography::small()).style(muted_style).width(label_width),
         text_input("", value)
             .on_input(on_input)
             .style(field_style)
-            .size(12)
+            .size(typography::body())
             .padding([3, 6])
             .width(field_width),
     ]

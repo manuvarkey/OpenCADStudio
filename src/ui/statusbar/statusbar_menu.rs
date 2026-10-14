@@ -7,6 +7,7 @@ use crate::app::Message;
 use crate::t;
 use crate::ui::statusbar::status_menu::Entry;
 use crate::ui::statusbar::statusbar_config::{StatusBarConfig, StatusPill};
+use crate::ui::typography;
 
 pub fn customization_entries(config: &StatusBarConfig) -> Vec<Entry<'static>> {
     StatusPill::ALL
@@ -29,7 +30,7 @@ pub fn layout_entries<'a>(layouts: &[String], current: &str) -> Vec<Entry<'a>> {
 }
 
 fn layout_row<'a>(name: String, is_current: bool) -> Element<'a, Message> {
-    let lbl = text(name.clone()).size(11);
+    let lbl = text(name.clone()).size(typography::small());
     button(row![lbl].align_y(iced::Center))
         .on_press(Message::LayoutSwitch(name))
         .style(move |theme: &Theme, status| {
@@ -53,7 +54,7 @@ fn menu_row(
 ) -> Element<'static, Message> {
     let check = crate::ui::icons::themed_check_cell(checked);
 
-    let lbl = text(label).size(11);
+    let lbl = text(label).size(typography::small());
 
     let content = row![check, lbl].spacing(6).align_y(iced::Center);
 

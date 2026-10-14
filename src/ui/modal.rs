@@ -6,6 +6,7 @@
 //! so both stack dialogs here — one code path for every platform.
 
 use crate::app::Message;
+use crate::ui::typography;
 use iced::advanced::layout::{self, Layout};
 use iced::advanced::widget::{self, Widget};
 use iced::advanced::{mouse, overlay, renderer, Shell};
@@ -262,14 +263,14 @@ pub fn discard_guard<'a>(
     .on_press(on_keep.clone());
     let panel = container(
         column![
-            iced::widget::text(crate::t!("Unsaved changes will be discarded.")).size(13.5),
+            iced::widget::text(crate::t!("Unsaved changes will be discarded.")).size(typography::body_large()),
             Space::new().height(12),
             row![
-                button(iced::widget::text(crate::t!("Discard & close")).size(12))
+                button(iced::widget::text(crate::t!("Discard & close")).size(typography::body()))
                     .on_press(on_discard)
                     .padding([5, 14])
                     .style(button::danger),
-                button(iced::widget::text(crate::t!("Keep editing")).size(12))
+                button(iced::widget::text(crate::t!("Keep editing")).size(typography::body()))
                     .on_press(on_keep)
                     .padding([5, 14])
                     .style(button::secondary),
@@ -326,7 +327,7 @@ pub fn modal<'a>(
     // The dialog name is centred across the content width with the ✕ overlaid
     // at the right edge. The title bar is itself an overlay: the content layer
     // below determines the intrinsic modal width before `Fill` is resolved.
-    let title_text = iced::widget::text(title).size(15);
+    let title_text = iced::widget::text(title).size(typography::heading());
     let title_surface: Element<'a, Message> = container(title_text)
         .width(Length::Fill)
         .height(Length::Fixed(24.0))

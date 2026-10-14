@@ -1,6 +1,7 @@
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::form::{dialog_button, dialog_button_styled_opt};
+use crate::ui::typography;
 use iced::widget::{button, column, row, text, text_input, Space};
 use iced::{Element, Fill, Length, Shrink};
 
@@ -22,23 +23,23 @@ pub fn view_window<'a>(
         .on_input(Message::FindReplaceSearchChanged)
         .on_submit(Message::FindReplaceNext)
         .padding([6, 8])
-        .size(13);
+        .size(typography::body_large());
     let replacement_input = text_input("", replacement)
         .on_input(Message::FindReplaceReplacementChanged)
         .padding([6, 8])
-        .size(13);
+        .size(typography::body_large());
 
     let enabled = !search.trim().is_empty();
 
     column![
         row![
-            text(t!("Find:")).size(12).width(90),
+            text(t!("Find:")).size(typography::body()).width(90),
             find_input.width(field_width),
         ]
         .spacing(8)
         .align_y(iced::Center),
         row![
-            text(t!("Replace with:")).size(12).width(90),
+            text(t!("Replace with:")).size(typography::body()).width(90),
             replacement_input.width(field_width),
         ]
         .spacing(8)
@@ -46,8 +47,8 @@ pub fn view_window<'a>(
         text(t!(
             "Searches Text, MText, Attribute Definitions, and block attribute values."
         ))
-        .size(11),
-        text(status).size(11),
+        .size(typography::small()),
+        text(status).size(typography::small()),
         row![
             Space::new().width(field_width),
             dialog_button(t!("Close"), Message::CloseModal, false),

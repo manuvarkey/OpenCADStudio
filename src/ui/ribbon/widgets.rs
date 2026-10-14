@@ -60,7 +60,10 @@ pub(super) const LARGE_W: f32 = ROW_H * 2.2;
 const LARGE_LABEL_HPAD: f32 = 8.0;
 /// Large ribbon labels use at most two lines before their button grows.
 const LARGE_LABEL_LINES: f32 = 2.0;
-const LARGE_LABEL_SIZE: f32 = 10.0;
+/// Large ribbon labels use the caption role.
+fn large_label_size() -> f32 {
+    typography::caption()
+}
 /// Width of a 1-row (small) button.
 pub(super) const SMALL_W: f32 = ROW_H;
 const LABELED_SMALL_W: f32 = ROW_H * 4.0;
@@ -70,12 +73,25 @@ pub(super) const ARROW_W: f32 = ROW_H * 0.4;
 pub(super) const LARGE_ARR: f32 = ROW_H * 0.55;
 /// Arrow size used under large dropdown tools such as Circle.
 pub(super) const LARGE_DROPDOWN_ARROW_SIZE: f32 = 9.0;
-/// Total ribbon tool-area height = 3 × ROW_H + 6 px v-padding + 12 px group-label.
-pub(super) const TOOL_BAR_H: f32 = 3.0 * ROW_H + 18.0;
+/// Extra height the ribbon text needs beyond its design size: two lines of
+/// large-button caption plus the group title line (line height 1.3 em).
+fn ribbon_text_growth(caption_lines: f32, title_lines: f32) -> f32 {
+    let design = caption_lines * 10.0 + title_lines * 9.0;
+    let current = caption_lines * typography::caption() + title_lines * typography::tiny();
+    ((current - design) * 1.3).max(0.0).ceil()
+}
+
+/// Total ribbon tool-area height = 3 × ROW_H + 6 px v-padding + 12 px group-label,
+/// grown by what larger UI text needs.
+pub(super) fn tool_bar_h() -> f32 {
+    3.0 * ROW_H + 18.0 + ribbon_text_growth(2.0, 1.0)
+}
 /// Height of a collapsed panel button's large representative face (big icon +
 /// its label). A collapsed button is this face plus the title opener, so it is
 /// shorter than a full 3-row panel — the ribbon height follows it down.
-pub(super) const COLLAPSED_FACE_H: f32 = LARGE_ICON + 20.0;
+pub(super) fn collapsed_face_h() -> f32 {
+    LARGE_ICON + 20.0 + ribbon_text_growth(2.0, 0.0)
+}
 
 /// Gap between the combo dropdown and the tool rows beneath it.
 const COMBO_ROW_SPACING: f32 = 3.0;
@@ -115,7 +131,7 @@ fn ribbon_label_bounds(
         <iced::Renderer as advanced_text::Renderer>::Paragraph::with_text(advanced_text::Text {
             content: label,
             bounds: Size::new(width, f32::INFINITY),
-            size: Pixels(LARGE_LABEL_SIZE),
+            size: Pixels(large_label_size()),
             line_height: advanced_text::LineHeight::default(),
             font: typography::font(),
             align_x: advanced_text::Alignment::Center,
@@ -135,7 +151,7 @@ fn ribbon_label_bounds(
 fn measure_large_width(label: &str) -> f32 {
     let base_inner = (LARGE_W - LARGE_LABEL_HPAD).max(1.0);
     let line_height = advanced_text::LineHeight::default()
-        .to_absolute(Pixels(LARGE_LABEL_SIZE))
+        .to_absolute(Pixels(large_label_size()))
         .0;
     let max_label_height = line_height * LARGE_LABEL_LINES + 0.5;
     let fits = |width: f32| {
@@ -486,7 +502,7 @@ pub(super) fn muted_text_style(theme: &Theme) -> iced::widget::text::Style {
 // ── Tooltip helpers ────────────────────────────────────────────────────────
 
 pub(super) fn make_tip(tip: String) -> Element<'static, Message> {
-    text(tip).size(11).into()
+    text(tip).size(typography::small()).into()
 }
 
 /// The sentence the reference shows under a tool's name, where known.
@@ -568,7 +584,7 @@ pub(super) fn render_small<'a>(
             let tip_text = tool_tip_text(&label, t.id);
             let content = row![
                 container(make_icon(t.icon, SMALL_ICON)).width(Length::Fixed(SMALL_W)),
-                text(label).size(10).wrapping(advanced_text::Wrapping::None),
+                text(label).size(typography::caption()).wrapping(advanced_text::Wrapping::None),
             ]
             .spacing(3)
             .align_y(iced::Center);
@@ -708,7 +724,7 @@ pub(super) fn render_small<'a>(
             let face = row![
                 container(make_icon(cur_icon, SMALL_ICON)).width(Length::Fixed(SMALL_W)),
                 text(localized_label.clone())
-                    .size(10)
+                    .size(typography::caption())
                     .wrapping(advanced_text::Wrapping::None),
             ]
             .spacing(3)
@@ -841,7 +857,7 @@ pub(super) fn render_large_dropdown<'a>(
                 .align_x(iced::Center)
                 .align_y(iced::Center),
             text(label.clone())
-                .size(10)
+                .size(typography::caption())
                 .width(Fill)
                 .align_x(iced::Center)
                 .wrapping(advanced_text::Wrapping::Word),
@@ -966,7 +982,7 @@ pub(super) fn render_large<'a>(item: &RibbonItem, ctx: &RenderCtx<'_>) -> Elemen
                         .align_x(iced::Center)
                         .align_y(iced::Center),
                     text(label.clone())
-                        .size(10)
+                        .size(typography::caption())
                         .width(Fill)
                         .align_x(iced::Center)
                         .wrapping(advanced_text::Wrapping::Word),
@@ -1095,7 +1111,7 @@ pub(super) fn render_large<'a>(item: &RibbonItem, ctx: &RenderCtx<'_>) -> Elemen
                     freeze_icon,
                     lock_icon,
                     swatch,
-                    container(text(active_layer_label).size(11))
+                    container(text(active_layer_label).size(typography::small()))
                         .width(name_w)
                         .clip(true),
                     icons::themed_arrow_down(9.0),
@@ -1165,7 +1181,7 @@ pub(super) fn render_large<'a>(item: &RibbonItem, ctx: &RenderCtx<'_>) -> Elemen
                 button(
                     row![
                         swatch_el,
-                        container(text(label).size(10)).width(Fill).clip(true),
+                        container(text(label).size(typography::caption())).width(Fill).clip(true),
                         if is_open {
                             icons::themed_arrow_up(8.0)
                         } else {
@@ -1234,7 +1250,7 @@ pub(super) fn render_large<'a>(item: &RibbonItem, ctx: &RenderCtx<'_>) -> Elemen
             // ── combo button ──
             let combo_btn = button(
                 row![
-                    container(text(active.clone()).size(11))
+                    container(text(active.clone()).size(typography::small()))
                         .width(Fill)
                         .clip(true),
                     if is_open {

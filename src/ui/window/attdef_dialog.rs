@@ -13,6 +13,7 @@ use crate::modules::draw::draw::attdef::{
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{button_style, dialog_button, field_style};
+use crate::ui::typography;
 use crate::ui::window::pdf_dialogs::{accent_text, card_style};
 
 /// One edit in either attribute definition dialog.
@@ -105,7 +106,7 @@ fn msg(m: AttdefDialogMsg) -> Message {
 fn card<'a>(title: String, content: impl Into<Element<'a, Message>>) -> Element<'a, Message> {
     container(
         column![
-            text(title.to_uppercase()).size(10).style(accent_text),
+            text(title.to_uppercase()).size(typography::caption()).style(accent_text),
             content.into()
         ]
         .spacing(8),
@@ -117,7 +118,7 @@ fn card<'a>(title: String, content: impl Into<Element<'a, Message>>) -> Element<
 }
 
 fn labelled<'a>(label: String, field: Element<'a, Message>, enabled: bool) -> Element<'a, Message> {
-    let label = text(label).size(12).width(Length::Fixed(118.0));
+    let label = text(label).size(typography::body()).width(Length::Fixed(118.0));
     let label = if enabled {
         label
     } else {
@@ -132,7 +133,7 @@ fn input<'a>(
     on: fn(String) -> AttdefDialogMsg,
 ) -> Element<'a, Message> {
     let mut field = text_input("", value)
-        .size(12)
+        .size(typography::body())
         .padding([5, 8])
         .width(Fill)
         .style(field_style);
@@ -158,7 +159,7 @@ fn pick<'a>(
     };
     iced::widget::tooltip(
         b,
-        text(tip).size(11),
+        text(tip).size(typography::small()),
         iced::widget::tooltip::Position::Bottom,
     )
     .into()
@@ -167,7 +168,7 @@ fn pick<'a>(
 fn mode<'a>(label: String, on: bool, bit: u8) -> Element<'a, Message> {
     checkbox(on)
         .label(label)
-        .text_size(12)
+        .text_size(typography::body())
         .size(14)
         .on_toggle(move |v| msg(AttdefDialogMsg::Mode(bit, v)))
         .into()
@@ -180,7 +181,7 @@ fn error_band<'a>(error: &Option<String>) -> Option<Element<'a, Message>> {
         container(
             row![
                 crate::ui::icons::semantic(ICON_WARN, 14.0),
-                text(error).size(11),
+                text(error).size(typography::small()),
                 Space::new().width(Fill),
                 button(crate::ui::icons::themed(crate::ui::icons::CLOSE, 10.0))
                     .on_press(msg(AttdefDialogMsg::DismissError))
@@ -215,7 +216,7 @@ static ICON_WARN: &[u8] = include_bytes!("../../../assets/icons/ui/warning_trian
 
 fn footer<'a>(action: std::borrow::Cow<'static, str>, ok: AttdefDialogMsg) -> Element<'a, Message> {
     row![
-        button(text("?").size(12))
+        button(text("?").size(typography::body()))
             .on_press(msg(AttdefDialogMsg::Help))
             .style(button_style(false))
             .padding([5, 11]),
@@ -270,14 +271,14 @@ pub fn view<'a>(
     let coords_on = !state.on_screen && !state.align_below;
     let coord = |i: usize, axis: &'static str| -> Element<'a, Message> {
         let mut field = text_input("", &state.coords[i])
-            .size(12)
+            .size(typography::body())
             .padding([5, 8])
             .width(Fill)
             .style(field_style);
         if coords_on {
             field = field.on_input(move |v| msg(AttdefDialogMsg::Coord(i, v)));
         }
-        let label = text(axis).size(12).width(Length::Fixed(14.0));
+        let label = text(axis).size(typography::body()).width(Length::Fixed(14.0));
         let label = if coords_on {
             label
         } else {
@@ -287,7 +288,7 @@ pub fn view<'a>(
     };
     let mut on_screen = checkbox(state.on_screen)
         .label(t!("Specify on-screen").into_owned())
-        .text_size(12)
+        .text_size(typography::body())
         .size(14);
     if !state.align_below {
         on_screen = on_screen.on_toggle(|v| msg(AttdefDialogMsg::OnScreen(v)));
@@ -316,13 +317,13 @@ pub fn view<'a>(
                         row![input(&state.default, true, AttdefDialogMsg::Default)].spacing(6);
                     if multiline {
                         value = value.push(pick(
-                            text("...").size(13).into(),
+                            text("...").size(typography::body_large()).into(),
                             t!("Multiline editor").into_owned(),
                             Some(AttdefDialogMsg::EditValue),
                         ));
                     }
                     value.push(pick(
-                        text("fx").size(12).into(),
+                        text("fx").size(typography::body()).into(),
                         t!("Insert field").into_owned(),
                         Some(AttdefDialogMsg::InsertField),
                     ))
@@ -342,14 +343,14 @@ pub fn view<'a>(
             |c: &JustifyChoice| c.to_string(),
         )
         .on_select(|c| msg(AttdefDialogMsg::Justify(c)))
-        .text_size(12)
+        .text_size(typography::body())
         .padding([5, 8])
         .width(Fill)
         .into()
     } else {
         container(
             text(JustifyChoice(state.justify).to_string())
-                .size(12)
+                .size(typography::body())
                 .style(muted_style),
         )
         .padding([5, 8])
@@ -363,19 +364,19 @@ pub fn view<'a>(
             |s: &String| s.clone(),
         )
         .on_select(|s| msg(AttdefDialogMsg::Style(s)))
-        .text_size(12)
+        .text_size(typography::body())
         .padding([5, 8])
         .width(Fill)
         .into()
     } else {
-        container(text(state.style.clone()).size(12).style(muted_style))
+        container(text(state.style.clone()).size(typography::body()).style(muted_style))
             .padding([5, 8])
             .width(Fill)
             .into()
     };
     let mut annotative = checkbox(state.annotative)
         .label(t!("Annotative").into_owned())
-        .text_size(12)
+        .text_size(typography::body())
         .size(14);
     if text_on {
         annotative = annotative.on_toggle(|v| msg(AttdefDialogMsg::Annotative(v)));
@@ -439,7 +440,7 @@ pub fn view<'a>(
     );
     let mut align = checkbox(state.align_below)
         .label(t!("Align below previous attribute definition").into_owned())
-        .text_size(12)
+        .text_size(typography::body())
         .size(14);
     if state.can_align_below {
         align = align.on_toggle(|v| msg(AttdefDialogMsg::AlignBelow(v)));
@@ -470,14 +471,14 @@ pub fn view_edit<'a>(
     let field =
         |label: String, value: &'a str, enabled: bool, on: fn(String) -> AttdefDialogMsg| {
             let mut input = text_input("", value)
-                .size(12)
+                .size(typography::body())
                 .padding([5, 8])
                 .width(Fill)
                 .style(field_style);
             if enabled {
                 input = input.on_input(move |v| msg(on(v)));
             }
-            let label = text(label).size(12).width(Length::Fixed(80.0));
+            let label = text(label).size(typography::body()).width(Length::Fixed(80.0));
             let label = if enabled {
                 label
             } else {
@@ -513,7 +514,7 @@ pub fn view_edit<'a>(
                     AttdefDialogMsg::EditDefault
                 ),
                 pick(
-                    text("fx").size(12).into(),
+                    text("fx").size(typography::body()).into(),
                     t!("Insert field").into_owned(),
                     Some(AttdefDialogMsg::EditInsertField)
                 ),

@@ -6,6 +6,7 @@ use crate::scene::pick::grip::{grips_to_screen, grips_to_screen_paper, grips_to_
 use crate::scene::view::viewport_pane::ViewportPane;
 use crate::scene::{VIEWCUBE_PAD, VIEWCUBE_REGION_PX};
 use crate::t;
+use crate::ui::typography;
 use crate::ui::wrap_bar::DensitySwap;
 use crate::ui::wrap_bar::WrapFlow;
 use iced::widget::{
@@ -331,7 +332,7 @@ impl OpenCADStudio {
             };
             container(
                 text(crate::tr!("viewport", "preparing-layout"))
-                    .size(15)
+                    .size(typography::heading())
                     .color(ink),
             )
             .width(Fill)
@@ -1547,7 +1548,7 @@ bg={bg_ms:.1}ms n={view_count}"
                     let mut col = column![].spacing(0).width(iced::Length::Fixed(row_w));
                     for (idx, label) in labels.into_iter().enumerate() {
                         let is_sel = idx == popup.selected;
-                        let btn = button(text(label).size(12))
+                        let btn = button(text(label).size(typography::body()))
                             .on_press(Message::GripMenuPick(idx))
                             .padding([3, 10])
                             .width(Fill)
@@ -1616,7 +1617,7 @@ bg={bg_ms:.1}ms n={view_count}"
                             Space::new().width(11).into()
                         };
                         let btn = button(
-                            row![container(mark).width(16), text(name).size(12),]
+                            row![container(mark).width(16), text(name).size(typography::body()),]
                                 .spacing(2)
                                 .align_y(iced::Center),
                         )
@@ -1802,7 +1803,7 @@ bg={bg_ms:.1}ms n={view_count}"
                 let copy_btn = button(
                     row![
                         crate::ui::icons::themed_primary(crate::ui::icons::COPY, 11.0),
-                        text(t!("Copy")).size(11),
+                        text(t!("Copy")).size(typography::small()),
                     ]
                     .spacing(4)
                     .align_y(iced::Center),
@@ -1813,7 +1814,7 @@ bg={bg_ms:.1}ms n={view_count}"
                 let clear_btn = button(
                     row![
                         crate::ui::icons::themed_danger(crate::ui::icons::TRASH, 11.0),
-                        text(t!("Clear")).size(11),
+                        text(t!("Clear")).size(typography::small()),
                     ]
                     .spacing(4)
                     .align_y(iced::Center),
@@ -1823,7 +1824,7 @@ bg={bg_ms:.1}ms n={view_count}"
                 .padding([2, 6]);
                 let header = row![
                     text(t!("PERF"))
-                        .size(12)
+                        .size(typography::body())
                         .style(|theme: &Theme| iced::widget::text::Style {
                             color: Some(theme.palette().success.base.color),
                         }),
@@ -1833,14 +1834,14 @@ bg={bg_ms:.1}ms n={view_count}"
                 ]
                 .spacing(6)
                 .align_y(iced::Center);
-                let log = scrollable(text(trace).size(11))
+                let log = scrollable(text(trace).size(typography::small()))
                     .height(iced::Length::Fixed(220.0))
                     .width(iced::Length::Fill);
                 let panel = container(
                     column![
                         header,
                         text(summary)
-                            .size(11)
+                            .size(typography::small())
                             .style(|theme: &Theme| iced::widget::text::Style {
                                 color: Some(theme.palette().success.base.color),
                             }),
@@ -2831,7 +2832,7 @@ fn doc_tab_context_menu(
     let item = |label: &'static str, msg: Option<Message>| -> Element<'static, Message> {
         let enabled = msg.is_some();
 
-        let content = container(text(t!(label)).size(12))
+        let content = container(text(t!(label)).size(typography::body()))
             .padding([4, 12])
             .width(Fill)
             .style(move |theme: &Theme| {
@@ -2906,13 +2907,13 @@ pub(super) fn doc_tab_bar<'a>(
         let title_inner: Element<'_, Message> = if tab.dirty {
             row![
                 crate::ui::icons::themed_warning(crate::ui::icons::DIRTY_DOT, 14.0),
-                text(name).size(12),
+                text(name).size(typography::body()),
             ]
             .spacing(5)
             .align_y(iced::Center)
             .into()
         } else {
-            text(name).size(12).into()
+            text(name).size(typography::body()).into()
         };
 
         let title_btn = button(title_inner)
@@ -2945,7 +2946,7 @@ pub(super) fn doc_tab_bar<'a>(
         let row_inner: Row<'_, Message> = if tab.is_start {
             row![title_btn].spacing(0).align_y(iced::Center)
         } else {
-            let close_btn = button(text("×").size(12))
+            let close_btn = button(text("×").size(typography::body()))
                 .on_press(Message::TabClose(tab.id))
                 .height(Fill)
                 .padding([5, 9])
@@ -3014,7 +3015,7 @@ pub(super) fn doc_tab_bar<'a>(
             let tab_target: Element<'_, Message> = if let Some(path) = &tab.current_path {
                 iced::widget::tooltip(
                     tab_container,
-                    container(text(path.to_string_lossy().into_owned()).size(11))
+                    container(text(path.to_string_lossy().into_owned()).size(typography::small()))
                         .style(container::bordered_box)
                         .padding([4, 8]),
                     iced::widget::tooltip::Position::Bottom,
@@ -3040,7 +3041,7 @@ pub(super) fn doc_tab_bar<'a>(
         );
     }
 
-    let new_btn = button(text("+").size(14))
+    let new_btn = button(text("+").size(typography::subheading()))
         .on_press(Message::TabNew)
         .height(iced::Length::Fixed(28.0))
         .padding([4, 8])
@@ -3202,11 +3203,11 @@ fn start_page_content<'a>(
     action_width_out: std::sync::Arc<std::sync::atomic::AtomicU32>,
     active: super::StartSection,
 ) -> Element<'a, Message> {
-    let headline = text("Open CAD Studio").size(40).style(start_primary_style);
+    let headline = text("Open CAD Studio").size(typography::display(40.0)).style(start_primary_style);
 
     // Plain outlined button (Open / New / Help / Contribute).
     let outline_btn = |label: String, msg: Message| {
-        button(text(label).size(14))
+        button(text(label).size(typography::subheading()))
             .on_press(msg)
             .padding([10, 22])
             .style(move |theme: &Theme, status| {
@@ -3233,7 +3234,7 @@ fn start_page_content<'a>(
         button(
             row![
                 crate::ui::icons::themed_danger_text(crate::ui::icons::HEART, 14.0),
-                text(crate::tr!("start", "donate")).size(14),
+                text(crate::tr!("start", "donate")).size(typography::subheading()),
             ]
             .spacing(5)
             .align_y(iced::Center),
@@ -3275,7 +3276,7 @@ fn start_page_content<'a>(
     {
         // Filled with the active theme's primary colour.
         secondary_items.push(
-            button(text(crate::t!("OCS Web")).size(14))
+            button(text(crate::t!("OCS Web")).size(typography::subheading()))
                 .on_press(Message::RibbonToolClick {
                     tool_id: "WEBVERSION".to_string(),
                     event: crate::modules::ModuleEvent::Command("WEBVERSION".to_string()),
@@ -3287,7 +3288,7 @@ fn start_page_content<'a>(
     }
     #[cfg(target_arch = "wasm32")]
     secondary_items.push(
-        button(text(crate::t!("OCS Desktop")).size(14))
+        button(text(crate::t!("OCS Desktop")).size(typography::subheading()))
             .on_press(Message::OpenUrl(
                 "https://github.com/HakanSeven12/OpenCADStudio/releases/latest".to_string(),
             ))
@@ -3307,7 +3308,7 @@ fn start_page_content<'a>(
             )))
             .width(20)
             .height(20),
-            text("r/OpenCADStudio").size(14),
+            text("r/OpenCADStudio").size(typography::subheading()),
         ]
         .spacing(7)
         .align_y(iced::Center),
@@ -3335,7 +3336,7 @@ fn start_page_content<'a>(
     });
 
     let sponsors = column![
-        text(crate::tr!("start", "sponsors")).size(15),
+        text(crate::tr!("start", "sponsors")).size(typography::heading()),
         mouse_area(
             container(
                 iced::widget::svg(iced::widget::svg::Handle::from_memory(include_bytes!(
@@ -3438,7 +3439,7 @@ fn start_page_content<'a>(
         // Derive the 16:9 cover box from the actual shared list width so the
         // whole thumbnail remains visible when that width changes.
         let thumb_h = (panel_w - VIDEO_PANEL_PADDING * 2.0 - VIDEO_SCROLL_GUTTER) * 9.0 / 16.0;
-        let mut list = column![text(crate::tr!("start", "tutorials")).size(15)]
+        let mut list = column![text(crate::tr!("start", "tutorials")).size(typography::heading())]
             .spacing(10)
             .width(Fill)
             // Keep the scrollbar off the thumbnails.
@@ -3469,7 +3470,7 @@ fn start_page_content<'a>(
                     .clip(true),
                 );
             }
-            card = card.push(text(v.title.clone()).size(12).style(start_muted_style));
+            card = card.push(text(v.title.clone()).size(typography::body()).style(start_muted_style));
             list = list.push(
                 mouse_area(card)
                     .interaction(iced::mouse::Interaction::Pointer)
@@ -3482,10 +3483,10 @@ fn start_page_content<'a>(
             } else {
                 crate::tr!("start", "videos-online")
             };
-            list = list.push(text(note).size(12).style(start_muted_style));
+            list = list.push(text(note).size(typography::body()).style(start_muted_style));
         }
         let playlist_btn = mouse_area(
-            container(text(crate::tr!("start", "open-playlist")).size(12))
+            container(text(crate::tr!("start", "open-playlist")).size(typography::body()))
                 .padding([6, 10])
                 .width(Fill)
                 .center_x(Fill)
@@ -3538,31 +3539,31 @@ fn start_page_content<'a>(
     // web builds read the CI-generated snapshot. Both sources mark pinned
     // discussions and sort them before the rest of the list.
     let discussions_panel: Element<'a, Message> = {
-        let mut list = column![text(crate::tr!("start", "discussions")).size(15)]
+        let mut list = column![text(crate::tr!("start", "discussions")).size(typography::heading())]
             .spacing(8)
             .width(Fill);
         for discussion in discussions {
             let mut meta = iced::widget::row![text(format!("#{}", discussion.number))
-                .size(10)
+                .size(typography::caption())
                 .style(start_muted_style),]
             .spacing(6)
             .align_y(iced::Center);
             if discussion.pinned {
                 meta = meta.push(
                     text(crate::tr!("start", "pinned"))
-                        .size(10)
+                        .size(typography::caption())
                         .style(start_primary_style),
                 );
             }
             if !discussion.author.is_empty() {
                 meta = meta.push(
                     text(format!("@{}", discussion.author))
-                        .size(10)
+                        .size(typography::caption())
                         .style(start_muted_style),
                 );
             }
             let card =
-                container(column![text(discussion.title.clone()).size(12), meta,].spacing(4))
+                container(column![text(discussion.title.clone()).size(typography::body()), meta,].spacing(4))
                     .padding([8, 10])
                     .width(Fill)
                     .style(|theme: &Theme| {
@@ -3591,10 +3592,10 @@ fn start_page_content<'a>(
             } else {
                 crate::tr!("start", "discussions-online")
             };
-            list = list.push(text(note).size(12).style(start_muted_style));
+            list = list.push(text(note).size(typography::body()).style(start_muted_style));
         }
         let open_btn = mouse_area(
-            container(text(crate::tr!("start", "open-discussions")).size(12))
+            container(text(crate::tr!("start", "open-discussions")).size(typography::body()))
                 .padding([6, 10])
                 .width(Fill)
                 .center_x(Fill)
@@ -3649,7 +3650,7 @@ fn start_page_content<'a>(
     // shows, so the rail always invites support.
     let supporters: Element<'a, Message> = {
         let mut list = column![
-            text(crate::tr!("start", "supporters")).size(15),
+            text(crate::tr!("start", "supporters")).size(typography::heading()),
             Space::new().height(iced::Length::Fixed(12.0)),
         ]
         .spacing(6)
@@ -3664,8 +3665,8 @@ fn start_page_content<'a>(
             let amount = format!("${:.2}", *cents as f64 / 100.0);
             list = list.push(
                 iced::widget::row![
-                    text(name).size(12).style(start_muted_style).width(Fill),
-                    text(amount).size(12).style(start_muted_style),
+                    text(name).size(typography::body()).style(start_muted_style).width(Fill),
+                    text(amount).size(typography::body()).style(start_muted_style),
                 ]
                 .spacing(6),
             );
@@ -3674,7 +3675,7 @@ fn start_page_content<'a>(
             container(
                 iced::widget::row![
                     crate::ui::icons::themed_danger_text(crate::ui::icons::HEART, 13.0),
-                    text(crate::tr!("start", "support-on-patreon")).size(12),
+                    text(crate::tr!("start", "support-on-patreon")).size(typography::body()),
                 ]
                 .spacing(6)
                 .align_y(iced::Center),
@@ -3752,7 +3753,7 @@ fn start_page_content<'a>(
         StartLayout::Compact => {
             let tab_btn = |label: String, section: super::StartSection| {
                 let is_active = active == section;
-                button(text(label).size(14))
+                button(text(label).size(typography::subheading()))
                     .on_press(Message::StartSectionSelect(section))
                     .padding([8, 18])
                     .style(move |theme: &Theme, status| {
@@ -3899,7 +3900,7 @@ fn recent_tiles<'a>(
                 },
                 ..Default::default()
             });
-        let mut label = column![text(crate::ui::text_util::elide(&name, name_chars)).size(12)];
+        let mut label = column![text(crate::ui::text_util::elide(&name, name_chars)).size(typography::body())];
         if large {
             let dir = path
                 .parent()
@@ -3907,7 +3908,7 @@ fn recent_tiles<'a>(
                 .unwrap_or_default();
             label = label.push(
                 text(crate::ui::text_util::elide(&dir, 52))
-                    .size(10)
+                    .size(typography::caption())
                     .style(start_muted_style),
             );
         }
@@ -3976,13 +3977,13 @@ pub(super) fn recent_files_panel<'a>(
                         ..Default::default()
                     }
                 }),
-            container(text(tip).size(11)).padding([2, 6]).style(container::rounded_box),
+            container(text(tip).size(typography::small())).padding([2, 6]).style(container::rounded_box),
             iced::widget::tooltip::Position::Bottom,
         )
     };
     let title = row![
         text(crate::tr!("start", "recent-documents"))
-            .size(15)
+            .size(typography::heading())
             .width(Fill),
         mode_button(
             crate::ui::icons::MENU,
@@ -4006,7 +4007,7 @@ pub(super) fn recent_files_panel<'a>(
     let body: Element<'a, Message> = if recents.is_empty() {
         container(
             text(crate::tr!("start", "no-recent-files"))
-                .size(12)
+                .size(typography::body())
                 .style(start_muted_style),
         )
         .height(Fill)
@@ -4070,9 +4071,9 @@ pub(super) fn recent_files_panel<'a>(
                 row![
                     thumb,
                     column![
-                        text(crate::ui::text_util::elide(&name, 28)).size(12),
+                        text(crate::ui::text_util::elide(&name, 28)).size(typography::body()),
                         text(crate::ui::text_util::elide(&dir, 38))
-                            .size(10)
+                            .size(typography::caption())
                             .style(start_muted_style),
                     ]
                     .spacing(2),
@@ -4149,12 +4150,12 @@ pub(super) fn recent_files_panel<'a>(
     let count_box = iced::widget::text_input("", limit_input)
         .on_input(Message::RecentLimitInput)
         .on_submit(Message::SetRecentLimit(shown))
-        .size(13)
+        .size(typography::body_large())
         .padding([2, 6])
         .width(iced::Length::Fixed(46.0));
     let limit_row = row![
         text(crate::tr!("start", "keep-recent-files"))
-            .size(11)
+            .size(typography::small())
             .style(start_muted_style)
             .width(Fill),
         button(crate::ui::icons::themed(crate::ui::icons::MINUS, 11.0))
@@ -4167,7 +4168,7 @@ pub(super) fn recent_files_panel<'a>(
             .padding([3, 6])
             .style(step_style),
         text(format!("/ {}", super::recent::RECENT_MAX))
-            .size(11)
+            .size(typography::small())
             .style(start_muted_style),
     ]
     .spacing(6)

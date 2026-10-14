@@ -12,6 +12,7 @@ use iced::{Background, Border, Element, Length, Theme};
 
 use crate::app::Message;
 use crate::modules::{IconKind, ToolDef};
+use crate::ui::typography;
 
 const ICON_SIZE: f32 = 22.0;
 const BTN_SIZE: f32 = 38.0;
@@ -31,7 +32,7 @@ fn icon_el(icon: IconKind) -> Element<'static, Message> {
 fn tip_panel(label: &'static str) -> Element<'static, Message> {
     // Ribbon labels break over two lines; a tooltip reads them on one.
     let label = crate::t!(label).replace('\n', " ");
-    container(text(label).size(11))
+    container(text(label).size(typography::small()))
         .padding([2, 6])
         .style(|theme: &Theme| {
             let palette = theme.palette();
@@ -58,7 +59,7 @@ pub fn refedit_header(name: &str, count: usize) -> Element<'static, Message> {
     } else {
         name.to_string()
     };
-    let pill = container(text(short).size(10))
+    let pill = container(text(short).size(typography::caption()))
         .padding([1, 6])
         .style(|theme: &Theme| {
             let palette = theme.palette();
@@ -72,7 +73,7 @@ pub fn refedit_header(name: &str, count: usize) -> Element<'static, Message> {
                 ..Default::default()
             }
         });
-    let tip = container(text(name.to_string()).size(11)).padding([2, 6]).style(|theme: &Theme| {
+    let tip = container(text(name.to_string()).size(typography::small())).padding([2, 6]).style(|theme: &Theme| {
         let palette = theme.palette();
         container::Style {
             background: Some(Background::Color(palette.background.strong.color)),
@@ -88,7 +89,7 @@ pub fn refedit_header(name: &str, count: usize) -> Element<'static, Message> {
     column![
         tooltip(pill, tip, tooltip::Position::Left).gap(6),
         text(format!("{} {}", count, crate::tr!("ref-edit", "toolbar-objects")))
-            .size(9)
+            .size(typography::tiny())
             .style(crate::ui::style::common::muted_style),
     ]
     .spacing(2)

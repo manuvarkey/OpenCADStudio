@@ -25,6 +25,7 @@ use std::fmt;
 use crate::ui::properties::{lw_options, LwItem};
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::hdivider;
+use crate::ui::typography;
 
 const LABEL_W: f32 = 120.0;
 
@@ -241,7 +242,7 @@ fn field_row<'a>(
     width: Length,
 ) -> Element<'a, Message> {
     row![
-        container(text(label).size(12).style(muted_style)).width(LABEL_W),
+        container(text(label).size(typography::body()).style(muted_style)).width(LABEL_W),
         widget,
     ]
     .spacing(8)
@@ -261,7 +262,7 @@ fn edit_field<'a>(
         .on_input(on_input)
         .on_submit(Message::AttrEditorApply)
         .style(field_style)
-        .size(13)
+        .size(typography::body_large())
         .padding([3, 6])
         .width(width);
     field_row(label, ti.into(), width)
@@ -277,7 +278,7 @@ fn pick_field<'a>(
 ) -> Element<'a, Message> {
     let pl = iced::widget::pick_list(selected, options, |value| value.to_string())
         .on_select(on_select)
-        .text_size(13)
+        .text_size(typography::body_large())
         .padding([3, 6])
         .width(width);
     field_row(label, pl.into(), width)
@@ -320,7 +321,7 @@ fn localized_pick_field<'a>(
     let selected = selected.map(LocalizedChoice::new);
     let pl = iced::widget::pick_list(selected, options, |value| value.to_string())
         .on_select(move |choice: LocalizedChoice| on_select(choice.raw))
-        .text_size(13)
+        .text_size(typography::body_large())
         .padding([3, 6])
         .width(width);
     field_row(label, pl.into(), width)
@@ -332,7 +333,7 @@ fn tab_button<'a>(
     active: AttrTab,
 ) -> Element<'a, Message> {
     let is_active = this == active;
-    button(text(label).size(11))
+    button(text(label).size(typography::small()))
         .padding([4, 12])
         .on_press(Message::AttrEditorTab(this))
         .style(move |theme: &Theme, status| {
@@ -376,14 +377,14 @@ pub fn view_window<'a>(
     let height = sizing.height;
     // ── Top toolbar: block name on the left, Apply on the right ───────────
     // Mirrors the style-manager windows (actions left, primary action right).
-    let apply = button(text(t!("Apply")).size(11))
+    let apply = button(text(t!("Apply")).size(typography::small()))
         .padding([4, 14])
         .on_press(Message::AttrEditorApply)
         .style(button::primary);
     let toolbar = container(
         row![
             text(t!("Block:  %{block}", block = block))
-                .size(12)
+                .size(typography::body())
                 .style(muted_style),
             Space::new().width(width),
             apply,
@@ -406,7 +407,7 @@ pub fn view_window<'a>(
 
     let body: Element<'_, Message> = if rows.is_empty() {
         text(t!("This block has no attributes."))
-            .size(13)
+            .size(typography::body_large())
             .style(muted_style)
             .into()
     } else {
@@ -448,9 +449,9 @@ fn attribute_tab<'a>(
     height: Length,
 ) -> Element<'a, Message> {
     let head = row![
-        container(text(t!("Tag")).size(11).style(muted_style)).width(130),
-        container(text(t!("Prompt")).size(11).style(muted_style)).width(width),
-        container(text(t!("Value")).size(11).style(muted_style)).width(140),
+        container(text(t!("Tag")).size(typography::small()).style(muted_style)).width(130),
+        container(text(t!("Prompt")).size(typography::small()).style(muted_style)).width(width),
+        container(text(t!("Value")).size(typography::small()).style(muted_style)).width(140),
     ]
     .spacing(6);
 
@@ -458,9 +459,9 @@ fn attribute_tab<'a>(
     for (idx, r) in rows.iter().enumerate() {
         let is_sel = idx == selected;
         let line = row![
-            container(text(r.tag.as_str()).size(12)).width(130),
-            container(text(r.prompt.as_str()).size(12).style(muted_style)).width(width),
-            container(text(r.value.as_str()).size(12)).width(140),
+            container(text(r.tag.as_str()).size(typography::body())).width(130),
+            container(text(r.prompt.as_str()).size(typography::body()).style(muted_style)).width(width),
+            container(text(r.value.as_str()).size(typography::body())).width(140),
         ]
         .spacing(6);
         let btn = button(line)
@@ -490,7 +491,7 @@ fn attribute_tab<'a>(
     let sel = selected.min(rows.len() - 1);
     let is_constant = rows[sel].is_constant;
     let mut value_box = text_input("", rows[sel].value.as_str())
-        .size(13)
+        .size(typography::body_large())
         .padding([4, 6])
         .width(width);
 
@@ -570,7 +571,7 @@ fn text_options_tab<'a>(
                 .label(t!("Backwards"))
                 .on_toggle(Message::AttrEditorBackwards)
                 .size(15)
-                .text_size(12)
+                .text_size(typography::body())
                 .into(),
             width,
         ),
@@ -580,7 +581,7 @@ fn text_options_tab<'a>(
                 .label(t!("Upside down"))
                 .on_toggle(Message::AttrEditorUpsideDown)
                 .size(15)
-                .text_size(12)
+                .text_size(typography::body())
                 .into(),
             width,
         ),
@@ -619,7 +620,7 @@ fn properties_tab<'a>(
     let lw_sel = LwItem(r.line_weight);
     let lw = iced::widget::pick_list(Some(lw_sel), lw_opts, |value| value.to_string())
         .on_select(|it: LwItem| Message::AttrEditorLineweight(it.0))
-        .text_size(13)
+        .text_size(typography::body_large())
         .padding([3, 6])
         .width(width);
 

@@ -17,6 +17,7 @@
 
 use crate::app::Message;
 use crate::ui::dock::PanelId;
+use crate::ui::typography;
 use codec::objects::SolidHistoryOperation;
 use codec::{CadDocument, EntityType, Handle};
 use iced::widget::{button, column, container, scrollable, text};
@@ -64,7 +65,7 @@ fn bodies(document: &CadDocument) -> Vec<(Handle, String)> {
 }
 
 fn section_header(label: String) -> Element<'static, Message> {
-    container(text(label).size(11))
+    container(text(label).size(typography::small()))
         .width(Fill)
         .padding([3, 6])
         .style(|theme: &Theme| container::Style {
@@ -76,7 +77,7 @@ fn section_header(label: String) -> Element<'static, Message> {
 
 /// A clickable row that runs `command`.
 fn entry_row(label: String, command: String) -> Element<'static, Message> {
-    button(text(label).size(12))
+    button(text(label).size(typography::body()))
         .on_press(Message::Command(command))
         .width(Fill)
         .padding([3, 10])
@@ -88,7 +89,7 @@ fn entry_row(label: String, command: String) -> Element<'static, Message> {
 fn note_row(label: String) -> Element<'static, Message> {
     container(
         text(label)
-            .size(11)
+            .size(typography::small())
             .style(crate::ui::style::common::muted_style),
     )
     .width(Fill)

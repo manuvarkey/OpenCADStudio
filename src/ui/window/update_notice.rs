@@ -1,6 +1,7 @@
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{button, column, container, row, scrollable, text, Space};
 use iced::{Background, Border, Element, Theme};
 use std::borrow::Cow;
@@ -23,13 +24,13 @@ fn version_card<'a>(
     container(
         column![
             text(label)
-                .size(10)
+                .size(typography::caption())
                 .style(move |theme: &Theme| if highlight {
                     primary_style(theme)
                 } else {
                     muted_style(theme)
                 }),
-            text(value).size(20),
+            text(value).size(typography::title_large()),
         ]
         .spacing(4)
         .align_x(iced::Center),
@@ -82,12 +83,12 @@ fn render_notes_line<'a>(raw: &str) -> Element<'a, Message> {
     }
     if let Some(rest) = trimmed.strip_prefix("## ") {
         return text(strip_inline_md(rest))
-            .size(13)
+            .size(typography::body_large())
             .style(primary_style)
             .into();
     }
     if let Some(rest) = trimmed.strip_prefix("### ") {
-        return text(strip_inline_md(rest)).size(12).into();
+        return text(strip_inline_md(rest)).size(typography::body()).into();
     }
     if let Some(rest) = trimmed
         .strip_prefix("- ")
@@ -99,12 +100,12 @@ fn render_notes_line<'a>(raw: &str) -> Element<'a, Message> {
                 5.0
             ))
             .width(14),
-            text(strip_inline_md(rest)).size(11),
+            text(strip_inline_md(rest)).size(typography::small()),
         ]
         .spacing(4)
         .into();
     }
-    text(strip_inline_md(trimmed)).size(11).into()
+    text(strip_inline_md(trimmed)).size(typography::small()).into()
 }
 
 /// Drop `**…**` and `` `…` `` markers without preserving emphasis (iced 0.14
@@ -133,12 +134,12 @@ pub fn view_window<'a>(
     let header = container(
         column![
             text(t!("New Release Available"))
-                .size(20)
+                .size(typography::title_large())
                 .style(primary_style),
             text(t!(
                 "A newer Open CAD Studio version is published on GitHub."
             ))
-            .size(11)
+            .size(typography::small())
             .style(muted_style),
         ]
         .spacing(4)
@@ -176,12 +177,12 @@ pub fn view_window<'a>(
         .align_y(iced::Center)
         .width(sizing.width);
 
-    let later_btn = button(text(t!("Later")).size(11))
+    let later_btn = button(text(t!("Later")).size(typography::small()))
         .on_press(Message::UpdateNoticeClose)
         .style(button::secondary)
         .padding([6, 16]);
 
-    let open_btn = button(text(t!("Open Release Page")).size(11))
+    let open_btn = button(text(t!("Open Release Page")).size(typography::small()))
         .on_press(Message::UpdateNoticeOpenRelease)
         .style(button::primary)
         .padding([6, 16]);
@@ -200,7 +201,7 @@ pub fn view_window<'a>(
     // bordered scrollable so long bodies stay contained and don't
     // explode the window. Empty body → "No release notes provided."
     let notes_heading =
-        container(text(t!("What's new")).size(11).style(muted_style)).padding(iced::Padding {
+        container(text(t!("What's new")).size(typography::small()).style(muted_style)).padding(iced::Padding {
             top: 10.0,
             right: 0.0,
             bottom: 4.0,
@@ -209,7 +210,7 @@ pub fn view_window<'a>(
 
     let notes_body: Element<'a, Message> = if body.trim().is_empty() {
         text(t!("No release notes provided."))
-            .size(11)
+            .size(typography::small())
             .style(muted_style)
             .into()
     } else {

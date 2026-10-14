@@ -13,6 +13,7 @@ use crate::io::xref_model::{
 use crate::ui::style::common::muted_style;
 use crate::ui::style::row_button::cell_button_style;
 use crate::ui::ROW_H;
+use crate::ui::typography;
 use codec::CadDocument;
 use iced::widget::{button, column, container, mouse_area, row, scrollable, text, tooltip};
 use iced::Padding;
@@ -27,7 +28,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 const IS_WASM: bool = cfg!(target_arch = "wasm32");
 
 /// Font size for table cells (mirrors `layers.rs`).
-const FONT_SZ: f32 = ROW_H * 0.42; // ≈11 px at ROW_H=26
+/// Row text uses the small UI role (ROW_H * 0.42, about 11 px, at the design size).
+fn font_sz() -> f32 {
+    typography::small()
+}
 /// Fixed table height so the details pane below keeps stable space.
 const TABLE_H: f32 = 480.0;
 /// Minimum table area height under split dragging.
@@ -68,7 +72,9 @@ fn tree_indent(depth: u32) -> iced::widget::Row<'static, crate::app::Message> {
     }
     row
 }
-const TREE_FONT_SZ: f32 = 13.0;
+fn tree_font_sz() -> f32 {
+    typography::body_large()
+}
 /// Longest edge of a preview image, in pixels.
 const PREVIEW_MAX: u32 = 256;
 
@@ -666,7 +672,7 @@ impl XrefManagerPanel {
             } else {
                 Some(Message::XrefManagerToggleTree)
             };
-            let mut b = button(text(label).size(11))
+            let mut b = button(text(label).size(typography::small()))
                 .style(move |theme: &Theme, status| {
                     let palette = theme.palette();
                     if active {
@@ -821,7 +827,7 @@ impl XrefManagerPanel {
         let table_title: Element<'_, Message> = container(
             row![
                 text(format!("{} :", crate::t!("File References").as_ref()))
-                    .size(11)
+                    .size(typography::small())
                     .width(Fill),
                 list_btn,
                 tree_btn,
@@ -852,7 +858,7 @@ impl XrefManagerPanel {
         for (i, label) in headers.into_iter().enumerate() {
             header_row = header_row.push(
                 text(label)
-                    .size(10)
+                    .size(typography::caption())
                     .style(muted_style)
                     .width(Length::Fixed(self.col_widths[i])),
             );
@@ -927,7 +933,7 @@ impl XrefManagerPanel {
         let table_rows: Element<'_, Message> = if self.entries.is_empty() {
             container(
                 text(crate::t!("XREF  No external references in this drawing."))
-                    .size(12)
+                    .size(typography::body())
                     .style(muted_style),
             )
             .center_x(Fill)
@@ -1053,9 +1059,9 @@ impl XrefManagerPanel {
                         .into(),
                         None => container(
                             column![
-                                text(e.name.as_str()).size(11),
+                                text(e.name.as_str()).size(typography::small()),
                                 text(crate::t!("Preview not available"))
-                                    .size(11)
+                                    .size(typography::small())
                                     .style(muted_style),
                             ]
                             .spacing(4)
@@ -1068,7 +1074,7 @@ impl XrefManagerPanel {
                         .into(),
                     }
                 }
-                None => container(text("—").size(11).style(muted_style))
+                None => container(text("—").size(typography::small()).style(muted_style))
                     .center_x(Fill)
                     .center_y(Fill)
                     .width(Fill)
@@ -1306,7 +1312,7 @@ fn format_date(modified: Option<SystemTime>) -> String {
 // ── Widget helpers (layers.rs conventions) ────────────────────────────────
 
 fn toolbar_btn(label: String, msg: Option<Message>, fill: bool) -> Element<'static, Message> {
-    let mut b = button(text(label).size(11))
+    let mut b = button(text(label).size(typography::small()))
         .style(|theme: &Theme, status| {
             let palette = theme.palette();
             let pair = match status {
@@ -1339,7 +1345,7 @@ fn toolbar_btn(label: String, msg: Option<Message>, fill: bool) -> Element<'stat
 fn toolbar_tip(label: String, tip: String, fill: bool) -> Element<'static, Message> {
     let b = button(
         text(label)
-            .size(11)
+            .size(typography::small())
             .style(|theme: &Theme| iced::widget::text::Style {
                 color: Some(theme.palette().background.base.text.scale_alpha(0.42)),
             }),
@@ -1359,7 +1365,7 @@ fn toolbar_tip(label: String, tip: String, fill: bool) -> Element<'static, Messa
     })
     .padding([4, 10]);
     let b = if fill { b.width(Fill) } else { b };
-    tooltip(b, text(tip).size(11), tooltip::Position::Bottom).into()
+    tooltip(b, text(tip).size(typography::small()), tooltip::Position::Bottom).into()
 }
 
 /// Split button: a default action plus a triangle that opens the rest in an
@@ -1418,7 +1424,7 @@ fn split_button(
             }
         }
     };
-    let mut main = button(text(main_label).size(11))
+    let mut main = button(text(main_label).size(typography::small()))
         .style(half_style(true))
         .padding([4, 10]);
     if let Some(m) = main_msg {
@@ -1614,7 +1620,9 @@ impl<'a> From<RightClickArea<'a>> for Element<'a, Message> {
     }
 }
 
-const MENU_ROW_H: f32 = 24.0;
+fn menu_row_h() -> f32 {
+    typography::grow(24.0)
+}
 const MENU_SEP_H: f32 = 5.0;
 const MENU_PADDING: f32 = 4.0;
 const MENU_SPACING: f32 = 1.0;
@@ -1630,9 +1638,9 @@ const MENU_SPACING: f32 = 1.0;
 /// saved state.
 fn menu_row(label: String, msg: Message) -> Element<'static, Message> {
     mouse_area(
-        container(text(label).size(12))
+        container(text(label).size(typography::body()))
             .padding([4, 12])
-            .height(Length::Fixed(MENU_ROW_H))
+            .height(Length::Fixed(menu_row_h()))
             .width(Fill),
     )
     .on_press(msg)
@@ -1645,9 +1653,9 @@ fn menu_row(label: String, msg: Message) -> Element<'static, Message> {
 /// single-`mouse_area` rule as [`menu_row`] — no nested `button`.
 fn submenu_row(label: String, msg: Message) -> Element<'static, Message> {
     mouse_area(
-        container(text(label).size(12))
+        container(text(label).size(typography::body()))
             .padding([4, 12])
-            .height(Length::Fixed(MENU_ROW_H))
+            .height(Length::Fixed(menu_row_h()))
             .width(Fill),
     )
     .on_press(msg)
@@ -1690,7 +1698,7 @@ fn row_menu_for(id: XrefRowId, change_path_open: bool) -> Element<'static, Messa
         container(
             row![
                 text(crate::t!("Change Path Type").into_owned())
-                    .size(12)
+                    .size(typography::body())
                     .width(Fill),
                 crate::ui::icons::themed_arrow_right(10.0),
             ]
@@ -1714,7 +1722,7 @@ fn row_menu_for(id: XrefRowId, change_path_open: bool) -> Element<'static, Messa
             }
         })
         .padding([4, 12])
-        .height(Length::Fixed(MENU_ROW_H))
+        .height(Length::Fixed(menu_row_h()))
         .width(Fill),
     )
     .on_enter(Message::XrefRowChangePathEnter)
@@ -1761,7 +1769,7 @@ fn row_menu_for(id: XrefRowId, change_path_open: bool) -> Element<'static, Messa
     // Top offset so the flyout top border aligns directly with the "Change Path Type" row.
     // 5 items * 24.0 + 5 * 1.0 (spacing) + 5.0 (separator) + 1.0 (spacing) + 4.0 (container padding) = 135.0
     let flyout_offset =
-        MENU_PADDING + 5.0 * MENU_ROW_H + 5.0 * MENU_SPACING + MENU_SEP_H + MENU_SPACING;
+        MENU_PADDING + 5.0 * menu_row_h() + 5.0 * MENU_SPACING + MENU_SEP_H + MENU_SPACING;
 
     // Plain container on purpose: each submenu row tracks hover itself
     // (`on_enter` keeps the flyout open, `on_exit` closes it). Wrapping the
@@ -1833,12 +1841,12 @@ fn xref_row<'a>(
             });
         name_cell = name_cell.push(arrow);
     }
-    let name_text: Element<'_, Message> = text(name).size(FONT_SZ).into();
+    let name_text: Element<'_, Message> = text(name).size(font_sz()).into();
     name_cell = name_cell.push(name_text);
     let gutter = || iced::widget::Space::new().width(Length::Fixed(COL_GUTTER));
     let status_cell: Element<'_, Message> = row![
         container(status_icon(entry.status)).align_y(iced::Center),
-        text(status_text(entry.status)).size(FONT_SZ).width(Fill),
+        text(status_text(entry.status)).size(font_sz()).width(Fill),
     ]
     .spacing(4)
     .align_y(iced::Center)
@@ -1850,19 +1858,19 @@ fn xref_row<'a>(
         status_cell,
         gutter(),
         text(format_size(entry.size_bytes))
-            .size(FONT_SZ)
+            .size(font_sz())
             .width(Length::Fixed(cw[2])),
         gutter(),
         text(type_text(entry))
-            .size(FONT_SZ)
+            .size(font_sz())
             .width(Length::Fixed(cw[3])),
         gutter(),
         text(format_date(entry.modified))
-            .size(FONT_SZ)
+            .size(font_sz())
             .width(Length::Fixed(cw[4])),
         gutter(),
         text(entry.saved_path.clone())
-            .size(FONT_SZ)
+            .size(font_sz())
             .width(Length::Fixed(cw[5])),
     ]
     .spacing(0)
@@ -1938,7 +1946,7 @@ fn tree_row(
         ))
         .align_y(iced::Center),
     );
-    cells = cells.push(text(entry.name.clone()).size(TREE_FONT_SZ));
+    cells = cells.push(text(entry.name.clone()).size(tree_font_sz()));
     let index = display.index;
     // #49: messages carry stable identity; the index stays for zebra striping only.
     let row_id = XrefRowId::of(entry.key, &entry.saved_path);
@@ -1987,7 +1995,7 @@ fn tree_host_row(display: DisplayRow, host_name: &str) -> Element<'_, Message> {
     let mut cells = row![].spacing(2).align_y(iced::Center);
     cells = cells.push(tree_indent(display.depth));
     cells = cells.push(container(crate::ui::icons::themed_home(14.0)).align_y(iced::Center));
-    cells = cells.push(text(name).size(TREE_FONT_SZ));
+    cells = cells.push(text(name).size(tree_font_sz()));
     container(cells.spacing(4).width(Fill))
         .style(|theme: &Theme| {
             let pair = theme.palette().background.base;
@@ -2029,7 +2037,7 @@ fn host_row<'a>(
             .push(iced::widget::Space::new().width(Length::Fixed(INDENT_W * display.depth as f32)));
     }
     name_cell = name_cell.push({
-        let name_text: Element<'_, Message> = text(name).size(FONT_SZ).into();
+        let name_text: Element<'_, Message> = text(name).size(font_sz()).into();
         name_text
     });
     let gutter = || iced::widget::Space::new().width(Length::Fixed(COL_GUTTER));
@@ -2037,18 +2045,18 @@ fn host_row<'a>(
         name_cell.width(Length::Fixed(cw[0])),
         gutter(),
         text(crate::t!("Opened"))
-            .size(FONT_SZ)
+            .size(font_sz())
             .width(Length::Fixed(cw[1])),
         gutter(),
-        text("—").size(FONT_SZ).width(Length::Fixed(cw[2])),
+        text("—").size(font_sz()).width(Length::Fixed(cw[2])),
         gutter(),
         text(crate::t!("Current"))
-            .size(FONT_SZ)
+            .size(font_sz())
             .width(Length::Fixed(cw[3])),
         gutter(),
-        text("—").size(FONT_SZ).width(Length::Fixed(cw[4])),
+        text("—").size(font_sz()).width(Length::Fixed(cw[4])),
         gutter(),
-        text(saved).size(FONT_SZ).width(Length::Fixed(cw[5])),
+        text(saved).size(font_sz()).width(Length::Fixed(cw[5])),
     ]
     .spacing(0)
     .width(Length::Fixed(table_w))
@@ -2079,7 +2087,7 @@ fn details_pane<'a>(
 ) -> Element<'a, Message> {
     let inner: Element<'_, Message> = match entry {
         None => text(crate::t!("Select a reference to inspect its details"))
-            .size(11)
+            .size(typography::small())
             .style(muted_style)
             .into(),
         Some(e) => {
@@ -2131,7 +2139,7 @@ fn details_pane<'a>(
     };
     container(
         column![
-            text(crate::t!("Details")).size(10).style(muted_style),
+            text(crate::t!("Details")).size(typography::caption()).style(muted_style),
             inner,
         ]
         .spacing(2),
@@ -2222,10 +2230,10 @@ fn detail_row<'a>(
     let value: std::borrow::Cow<'a, str> = value.into();
     row![
         text(label)
-            .size(11)
+            .size(typography::small())
             .style(muted_style)
             .width(Length::Fixed(84.0)),
-        text(value).size(11),
+        text(value).size(typography::small()),
     ]
     .spacing(6)
     .align_y(iced::Center)

@@ -1,5 +1,6 @@
 use crate::app::Message;
 use crate::input::spacemouse::{NavigationMode, Preferences, Status};
+use crate::ui::typography;
 use iced::widget::{button, checkbox, column, container, pick_list, row, slider, text, Space};
 use iced::{Element, Fill};
 
@@ -35,23 +36,23 @@ pub(crate) fn view(
     let mut content = column![
         row![
             crate::ui::icons::themed(ICON, 22.),
-            text(crate::t!("SpaceMouse")).size(15)
+            text(crate::t!("SpaceMouse")).size(typography::heading())
         ]
         .spacing(8)
         .align_y(iced::Center),
-        row![enabled, text(crate::t!("Enable SpaceMouse")).size(12)]
+        row![enabled, text(crate::t!("Enable SpaceMouse")).size(typography::body())]
             .spacing(8)
             .align_y(iced::Center),
         row![
-            text(crate::t!("Status")).size(12).width(150),
-            text(status_text).size(12)
+            text(crate::t!("Status")).size(typography::body()).width(150),
+            text(status_text).size(typography::body())
         ]
         .spacing(10),
-        row![text(crate::t!("Navigation")).size(12).width(150), mode]
+        row![text(crate::t!("Navigation")).size(typography::body()).width(150), mode]
             .spacing(10)
             .align_y(iced::Center),
         text(crate::t!(preferences.mode.description()).into_owned())
-            .size(11)
+            .size(typography::small())
             .width(Fill),
     ]
     .spacing(12);
@@ -61,14 +62,14 @@ pub(crate) fn view(
                 checkbox(preferences.pan_reversed)
                     .size(15)
                     .on_toggle(Message::SpaceMousePanReversed),
-                text(crate::t!("Reverse pan direction")).size(12),
+                text(crate::t!("Reverse pan direction")).size(typography::body()),
             ]
             .spacing(8)
             .align_y(iced::Center),
         );
         content = content.push(
             row![
-                text(crate::t!("Pan speed")).size(12).width(150),
+                text(crate::t!("Pan speed")).size(typography::body()).width(150),
                 slider(
                     10..=300,
                     preferences.pan_speed.clamp(10, 300),
@@ -76,7 +77,7 @@ pub(crate) fn view(
                 )
                 .step(10)
                 .width(160),
-                text(format!("{}%", preferences.pan_speed.clamp(10, 300))).size(11),
+                text(format!("{}%", preferences.pan_speed.clamp(10, 300))).size(typography::small()),
             ]
             .spacing(10)
             .align_y(iced::Center),
@@ -84,7 +85,7 @@ pub(crate) fn view(
     }
     if paused {
         content = content.push(
-            button(text(crate::t!("Resume SpaceMouse")).size(11))
+            button(text(crate::t!("Resume SpaceMouse")).size(typography::small()))
                 .on_press(Message::SpaceMousePause)
                 .style(button::secondary),
         );
@@ -96,7 +97,7 @@ pub(crate) fn view(
             } else {
                 "SpaceMouse information…"
             }))
-            .size(11),
+            .size(typography::small()),
         )
         .on_press(Message::SpaceMouseDriverSettings)
         .style(button::secondary)
@@ -106,14 +107,14 @@ pub(crate) fn view(
         text(crate::t!(
             "Configure 3D navigation, buttons, and radial menus in 3Dconnexion settings. Pan only and Pan and zoom share the push/tilt mapping and pan settings shown here."
         ))
-        .size(11)
+        .size(typography::small())
         .width(Fill),
     );
     content = content.push(
         button(
             row![
                 crate::ui::icons::themed_arrow_toggle(details, 9.),
-                text(crate::t!("Connection details")).size(11)
+                text(crate::t!("Connection details")).size(typography::small())
             ]
             .spacing(6),
         )
@@ -127,7 +128,7 @@ pub(crate) fn view(
             Status::Disconnected => "3DxWare is running. Connect a SpaceMouse; Open CAD Studio reconnects automatically.".into(),
             _ => "Uses the installed 3DxWare driver. Navigation pauses while a dialog is open. Your selected navigation mode is saved across drawings and sessions.".into(),
         };
-        content = content.push(text(crate::t!(&detail).into_owned()).size(11).width(Fill));
+        content = content.push(text(crate::t!(&detail).into_owned()).size(typography::small()).width(Fill));
     }
     container(content.push(Space::new().height(8)))
         .width(Fill)

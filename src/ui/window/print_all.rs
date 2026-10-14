@@ -1,6 +1,7 @@
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style as muted;
+use crate::ui::typography;
 use iced::widget::{button, checkbox, column, container, row, scrollable, text, Space};
 use iced::{Background, Border, Element, Length, Theme};
 
@@ -29,7 +30,7 @@ pub fn view_window<'a>(
                     .label(name.clone())
                     .on_toggle(move |_| Message::PrintAllToggle(layout.clone()))
                     .size(16)
-                    .text_size(12),
+                    .text_size(typography::body()),
             )
             .padding([6, 8])
             .width(Length::Fill)
@@ -39,7 +40,7 @@ pub fn view_window<'a>(
     let list: Element<'a, Message> = if rows.is_empty() {
         container(
             text(t!("No paper layouts are available."))
-                .size(12)
+                .size(typography::body())
                 .style(muted),
         )
         .center_x(Length::Fill)
@@ -60,10 +61,10 @@ pub fn view_window<'a>(
         format!("{selected} {}", t!("layouts selected"))
     };
 
-    let mut pdf = button(text(t!("PDF")).size(11))
+    let mut pdf = button(text(t!("PDF")).size(typography::small()))
         .style(button_style(false))
         .padding([5, 16]);
-    let mut print = button(text(t!("Print")).size(11))
+    let mut print = button(text(t!("Print")).size(typography::small()))
         .style(button_style(true))
         .padding([5, 18]);
     if selected > 0 {
@@ -90,28 +91,28 @@ pub fn view_window<'a>(
             text(t!(
                 "Select the layouts to output. Each page is printed in Layout mode."
             ))
-            .size(12),
+            .size(typography::body()),
             row![
-                button(text(t!("Select all")).size(11))
+                button(text(t!("Select all")).size(typography::small()))
                     .on_press(Message::PrintAllSelectAll)
                     .style(button_style(false))
                     .padding([4, 10]),
-                button(text(t!("Select none")).size(11))
+                button(text(t!("Select none")).size(typography::small()))
                     .on_press(Message::PrintAllSelectNone)
                     .style(button_style(false))
                     .padding([4, 10]),
                 Space::new().width(Length::Fill),
-                text(summary).size(11).style(muted),
+                text(summary).size(typography::small()).style(muted),
             ]
             .spacing(6)
             .align_y(iced::Center),
             list_panel,
             row![
                 text(format!("{}: {printer}", t!("Printer")))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted),
                 Space::new().width(Length::Fill),
-                button(text(t!("Options…")).size(11))
+                button(text(t!("Options…")).size(typography::small()))
                     .on_press(Message::PrintAllOptions)
                     .style(button_style(false))
                     .padding([5, 12]),

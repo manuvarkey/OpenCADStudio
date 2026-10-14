@@ -9,6 +9,7 @@
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{button, column, container, row, scrollable, text, text_input, Space};
 use iced::{Background, Element, Length, Theme};
 
@@ -65,11 +66,11 @@ pub fn view_window<'a>(
     close_confirm: bool,
     sizing: crate::ui::modal::ModalSizing,
 ) -> Element<'a, Message> {
-    let title = text(t!("Command Aliases")).size(15);
+    let title = text(t!("Command Aliases")).size(typography::heading());
     let hint = text(t!(
         "Click + Add alias, type the alias and command, accept the row, then Apply. Esc cancels the pending row."
     ))
-    .size(11)
+    .size(typography::small())
     .style(muted_style);
 
     // Right gutter reserved so the scrollbar has its own lane and never sits on
@@ -84,8 +85,8 @@ pub fn view_window<'a>(
 
     let head = container(
         row![
-            container(text(t!("Alias")).size(11).style(muted_style)).width(Length::Fixed(120.0)),
-            container(text(t!("Command")).size(11).style(muted_style)).width(sizing.width),
+            container(text(t!("Alias")).size(typography::small()).style(muted_style)).width(Length::Fixed(120.0)),
+            container(text(t!("Command")).size(typography::small()).style(muted_style)).width(sizing.width),
             Space::new().width(Length::Fixed(62.0)),
         ]
         .spacing(8),
@@ -102,7 +103,7 @@ pub fn view_window<'a>(
                 field: AliasField::Alias,
                 value: v,
             })
-            .size(13)
+            .size(typography::body_large())
             .padding([3, 6])
             .width(Length::Fixed(120.0));
         let alias_box = if duplicate {
@@ -117,7 +118,7 @@ pub fn view_window<'a>(
                 field: AliasField::Command,
                 value: v,
             })
-            .size(13)
+            .size(typography::body_large())
             .padding([3, 6])
             .width(sizing.width);
         let cmd_box = if unknown_command {
@@ -170,12 +171,12 @@ pub fn view_window<'a>(
     // While a draft row is pending, the add button doubles as the visible
     // cancel affordance (Esc works too).
     let add = if pending_add {
-        button(text(t!("Cancel add (Esc)")).size(12))
+        button(text(t!("Cancel add (Esc)")).size(typography::body()))
             .on_press(Message::AliasEditorDraftCancel)
             .padding([4, 10])
             .style(button::danger)
     } else {
-        button(text(t!("+ Add alias")).size(12))
+        button(text(t!("+ Add alias")).size(typography::body()))
             .on_press(Message::AliasEditorAdd)
             .padding([4, 10])
             .style(button::secondary)
@@ -186,7 +187,7 @@ pub fn view_window<'a>(
         row![Space::new().width(Length::Fixed(0.0))]
     } else {
         row![text(format!("{}: {}", t!("Number of aliases"), rows.len()))
-            .size(12)
+            .size(typography::body())
             .style(muted_style)]
     };
     // Reset asks for confirmation in place: the add/reset buttons are
@@ -197,13 +198,13 @@ pub fn view_window<'a>(
                 text(t!(
                     "Are you sure you want to reset? You will lose all your current aliases!"
                 ))
-                .size(12)
+                .size(typography::body())
                 .style(danger_text_style),
-                button(text(t!("Yes, reset")).size(12))
+                button(text(t!("Yes, reset")).size(typography::body()))
                     .on_press(Message::AliasEditorResetConfirm)
                     .padding([4, 10])
                     .style(button::danger),
-                button(text(t!("No")).size(12))
+                button(text(t!("No")).size(typography::body()))
                     .on_press(Message::AliasEditorResetDeny)
                     .padding([4, 10])
                     .style(button::secondary),
@@ -214,7 +215,7 @@ pub fn view_window<'a>(
         )
     } else {
         (
-            row![button(text(t!("Reset to default")).size(12))
+            row![button(text(t!("Reset to default")).size(typography::body()))
                 .on_press(Message::AliasEditorResetAsk)
                 .padding([4, 10])
                 .style(button::secondary)]
@@ -224,11 +225,11 @@ pub fn view_window<'a>(
         )
     };
     // Apply — primary action; commits the rows to ocad.pgp and stays open.
-    let apply = button(text(t!("Apply")).size(12))
+    let apply = button(text(t!("Apply")).size(typography::body()))
         .on_press(Message::AliasEditorApply)
         .padding([4, 16])
         .style(button::primary);
-    let apply_exit = button(text(t!("Apply & Exit")).size(12))
+    let apply_exit = button(text(t!("Apply & Exit")).size(typography::body()))
         .on_press(Message::AliasEditorApplyExit)
         .padding([4, 16])
         .style(button::primary);
@@ -249,14 +250,14 @@ pub fn view_window<'a>(
                 alias,
                 command
             ))
-            .size(12)
+            .size(typography::body())
             .style(danger_text_style),
         );
     }
     for command in unknown_commands {
         conflict_banner = conflict_banner.push(
             text(crate::tf!("Unknown command: {}", command))
-                .size(12)
+                .size(typography::body())
                 .style(danger_text_style),
         );
     }
@@ -313,14 +314,14 @@ pub fn view_window<'a>(
     .interaction(iced::mouse::Interaction::Idle);
     let panel = container(
         column![
-            text(t!("Unsaved changes will be discarded.")).size(14),
+            text(t!("Unsaved changes will be discarded.")).size(typography::subheading()),
             Space::new().height(10),
             row![
-                button(text(t!("Discard & close")).size(12))
+                button(text(t!("Discard & close")).size(typography::body()))
                     .on_press(Message::AliasEditorCloseDiscard)
                     .padding([4, 12])
                     .style(button::danger),
-                button(text(t!("Keep editing")).size(12))
+                button(text(t!("Keep editing")).size(typography::body()))
                     .on_press(Message::AliasEditorCloseKeep)
                     .padding([4, 12])
                     .style(button::secondary),

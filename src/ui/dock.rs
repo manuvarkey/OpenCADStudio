@@ -1056,6 +1056,7 @@ pub fn strip_hit(y: f32, layout: &[StripGroup]) -> StripHit {
 // ── Shared panel chrome ─────────────────────────────────────────────────
 
 use crate::app::Message;
+use crate::ui::typography;
 use iced::widget::{button, container, mouse_area, row, text, tooltip, Space};
 use iced::{Background, Border, Color, Element, Length, Theme};
 
@@ -1098,9 +1099,9 @@ pub fn title_bar_with<'a>(
     }
     // The pin and close only show while the pointer is over the bar; the
     // fixed height keeps the bar from jumping when they appear.
-    let mut bar = row![text(title).size(12), Space::new().width(Length::Fill)]
+    let mut bar = row![text(title).size(typography::body()), Space::new().width(Length::Fill)]
         .spacing(3)
-        .height(Length::Fixed(TITLE_BUTTON_H))
+        .height(Length::Fixed(title_button_h()))
         .align_y(iced::Center);
     if let Some(extra) = extra {
         bar = bar.push(extra);
@@ -1132,7 +1133,9 @@ pub fn title_bar_with<'a>(
 }
 
 /// Height of a title bar's button row.
-const TITLE_BUTTON_H: f32 = 20.0;
+fn title_button_h() -> f32 {
+    typography::grow(20.0)
+}
 
 /// The auto-hide pin. While auto-hide is on the pin is drawn tilted instead
 /// of on a coloured background.
@@ -1153,7 +1156,7 @@ pub fn pin_button<'a>(
         .on_press(Message::Dock(DockMsg::AutoCollapseToggle(id)))
         .style(button::subtle)
         .padding([3, 5]);
-    tooltip(pin, text(crate::t!("Auto-hide")).size(10), tip)
+    tooltip(pin, text(crate::t!("Auto-hide")).size(typography::caption()), tip)
         .gap(4)
         .into()
 }
@@ -1167,7 +1170,7 @@ pub fn close_button<'a>(id: PanelId, tip: tooltip::Position) -> Element<'a, Mess
     .on_press(Message::Dock(DockMsg::Close(id)))
     .style(button::subtle)
     .padding([3, 5]);
-    tooltip(close, text(crate::t!("Close")).size(10), tip)
+    tooltip(close, text(crate::t!("Close")).size(typography::caption()), tip)
         .gap(4)
         .into()
 }
@@ -1201,7 +1204,7 @@ pub fn tool_button<'a>(
             ),
             ..Default::default()
         });
-    tooltip(button, text(tip).size(10), tooltip::Position::Bottom)
+    tooltip(button, text(tip).size(typography::caption()), tooltip::Position::Bottom)
         .gap(4)
         .into()
 }

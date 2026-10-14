@@ -3,6 +3,7 @@
 //! implementation of it.
 
 use crate::app::Message;
+use crate::ui::typography;
 use iced::widget::{button, container, text};
 use iced::{Background, Border, Element, Fill, Theme};
 use iced_aw::menu::{Item, Menu, MenuBar};
@@ -218,7 +219,7 @@ pub fn view<'a>() -> Element<'a, Message> {
                 .iter()
                 .map(|&(label, command)| {
                     Item::new(
-                        button(text(crate::t!(label).into_owned()).size(12))
+                        button(text(crate::t!(label).into_owned()).size(typography::body()))
                             .on_press(Message::Command(command.to_string()))
                             .style(entry_style)
                             .padding([4, 12])
@@ -227,7 +228,7 @@ pub fn view<'a>() -> Element<'a, Message> {
                 })
                 .collect();
             Item::with_menu(
-                container(text(crate::t!(title).into_owned()).size(12)).padding([3, 8]),
+                container(text(crate::t!(title).into_owned()).size(typography::body())).padding([3, 8]),
                 Menu::new(items).width(240.0).offset(2.0),
             )
         })

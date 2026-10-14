@@ -1,34 +1,56 @@
-//! Application UI typography: the resolved system UI font.
+//! Application UI typography: the resolved system UI font and the shared
+//! text-size roles every UI widget uses.
 //!
 //! [`crate::sys::ui_font`] reads the desktop's setting; this module turns it
-//! into iced fonts and keeps the result in one process-wide store so plain
-//! widgets (through iced's default font), explicit bold/italic text and
-//! custom-drawn UI text (canvas labels, key tips, measured ribbon labels) all
-//! use the same family.
+//! into iced fonts and sizes and keeps the result in one process-wide store
+//! so plain widgets (through iced's default font), explicit bold/italic text
+//! and custom-drawn UI text (canvas labels, key tips, measured ribbon labels)
+//! all use the same family.
 //!
 //! Only application chrome reads from here. Drawing text — text styles,
 //! dimensions, document fonts, style previews and exports — keeps its own
-//! fonts.
+//! fonts and sizes.
+//!
+//! # Sizes
+//!
+//! The UI was laid out around a 12 px body (Windows' default UI font, Segoe UI
+//! 9 pt). Each role keeps its design size and is multiplied by
+//! `system body size / 12`, so the hierarchy between captions, body text and
+//! headings is preserved while the whole set follows the desktop's font size.
+//! The factor is bounded to [`MIN_SCALE`, `MAX_SCALE`]: past that, fixed-size
+//! chrome (ribbon rows, toolbars, grids) would crowd, and the application's
+//! own UI-scale setting is the control that scales everything uniformly.
+//! System sizes are logical pixels; the window scale factor (display scaling
+//! times the UI-scale setting) is applied once, by iced, on top.
 
 use crate::sys::ui_font::SystemUiFont;
 use iced::font::{Family, Font, Style, Weight};
 use iced::Pixels;
 use std::sync::{Mutex, RwLock};
 
+/// Body text size the interface was designed at.
+pub const DESIGN_BODY_PX: f32 = 12.0;
 /// iced's default text size, used by every widget without an explicit size.
-pub const DEFAULT_TEXT_PX: f32 = 16.0;
+pub const DESIGN_DEFAULT_PX: f32 = 16.0;
+/// Smallest factor the system font size may apply to UI text.
+pub const MIN_SCALE: f32 = 0.85;
+/// Largest factor the system font size may apply to UI text.
+pub const MAX_SCALE: f32 = 1.35;
 
 /// The resolved UI typography.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Typography {
     /// Regular UI font; bold and italic variants derive from it.
     pub font: Font,
+    /// The desktop's body text size in logical pixels.
+    pub base_px: f32,
 }
 
 impl Typography {
-    /// iced's built-in default: generic sans-serif.
+    /// iced's built-in default: generic sans-serif at the design size.
     pub const FALLBACK: Typography = Typography {
         font: Font::DEFAULT,
+        base_px: DESIGN_BODY_PX,
     };
 
     /// Typography for a detected system font. Families are taken as given;
@@ -54,6 +76,10 @@ impl Typography {
                 },
                 ..Font::DEFAULT
             },
+            base_px: system
+                .size_px
+                .filter(|px| px.is_finite() && *px > 0.0)
+                .unwrap_or(DESIGN_BODY_PX),
         }
     }
 
@@ -76,6 +102,32 @@ impl Typography {
                 family,
                 ..self.font
             },
+            ..self
+        }
+    }
+
+    /// Factor between the system body size and the design body size.
+    pub fn scale(&self) -> f32 {
+        (self.base_px / DESIGN_BODY_PX).clamp(MIN_SCALE, MAX_SCALE)
+    }
+
+    /// A design-time size (px at the 12 px design body) in the current
+    /// typography, rounded to half pixels so glyph rasterisation stays crisp.
+    pub fn size(&self, design_px: f32) -> f32 {
+        let scale = self.scale();
+        if scale == 1.0 {
+            return design_px;
+        }
+        (design_px * scale * 2.0).round() / 2.0
+    }
+
+    /// See [`grow`].
+    pub fn grow(&self, design_h: f32) -> f32 {
+        let scale = self.scale();
+        if scale <= 1.0 {
+            design_h
+        } else {
+            (design_h * scale).round()
         }
     }
 
@@ -106,15 +158,21 @@ impl Typography {
         }
     }
 
-    /// Write the font into iced's startup settings.
-    pub fn apply_to_settings(&self, settings: &mut iced::Settings) {
-        settings.default_font = self.font;
+    /// Size for widgets that do not set one (iced's default text size).
+    pub fn default_text_size(&self) -> Pixels {
+        Pixels(self.size(DESIGN_DEFAULT_PX))
     }
 
-    /// Replace iced's default font in the running application and relayout
-    /// every window.
+    /// Write the font and default size into iced's startup settings.
+    pub fn apply_to_settings(&self, settings: &mut iced::Settings) {
+        settings.default_font = self.font;
+        settings.default_text_size = self.default_text_size();
+    }
+
+    /// Replace iced's defaults in the running application and relayout every
+    /// window.
     pub fn set_iced_defaults<Message>(&self) -> iced::Task<Message> {
-        iced::font::set_defaults(self.font, Pixels(DEFAULT_TEXT_PX))
+        iced::font::set_defaults(self.font, self.default_text_size())
     }
 }
 
@@ -205,11 +263,12 @@ pub fn resolve_installed(families: &[String]) -> Option<Typography> {
     install(typography).then_some(typography)
 }
 
-/// Make `family` the UI font. The web build uses this once the script font
-/// for the UI language has been fetched.
+/// Make `family` the UI font while keeping the current sizes. The web build
+/// uses this once the script font for the UI language has been fetched.
 pub fn set_family(family: Family) -> Typography {
     let typography = Typography {
         font: Font::with_family(family),
+        ..current()
     };
     install(typography);
     typography
@@ -320,18 +379,85 @@ pub fn bold_italic() -> Font {
     current().bold_italic()
 }
 
+// ── Size roles ───────────────────────────────────────────────────────────
+//
+// Design sizes in px at the 12 px body. Widgets name the role, never a
+// literal, so the whole UI follows the system font size together.
+
+/// 9 px — dense annotations (grid sub-labels, badges).
+pub fn tiny() -> f32 {
+    current().size(9.0)
+}
+
+/// 10 px — captions, hints and secondary labels.
+pub fn caption() -> f32 {
+    current().size(10.0)
+}
+
+/// 11 px — compact controls: ribbon, properties, lists, command line.
+pub fn small() -> f32 {
+    current().size(11.0)
+}
+
+/// 12 px — regular dialog and menu text.
+pub fn body() -> f32 {
+    current().size(DESIGN_BODY_PX)
+}
+
+/// 13 px — emphasised body text and tree items.
+pub fn body_large() -> f32 {
+    current().size(13.0)
+}
+
+/// 14 px — section headings inside dialogs.
+pub fn subheading() -> f32 {
+    current().size(14.0)
+}
+
+/// 15 px — dialog headings.
+pub fn heading() -> f32 {
+    current().size(15.0)
+}
+
+/// 16 px — iced's default text size; prominent headings.
+pub fn heading_large() -> f32 {
+    current().size(DESIGN_DEFAULT_PX)
+}
+
+/// 18 px — page titles.
+pub fn title() -> f32 {
+    current().size(18.0)
+}
+
+/// 20 px — dialog titles.
+pub fn title_large() -> f32 {
+    current().size(20.0)
+}
+
+/// Display text (start page and About headline) at a given design size.
+pub fn display(design_px: f32) -> f32 {
+    current().size(design_px)
+}
+
+/// A fixed height laid out around design-size text (a menu row, a key-tip
+/// pill, an input box), grown in proportion when the system font is larger.
+/// Never shrunk, so the design layout is unchanged at the default size.
+pub fn grow(design_h: f32) -> f32 {
+    current().grow(design_h)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::sys::ui_font::Source;
 
-    fn system(family: &str) -> SystemUiFont {
+    fn system(family: &str, size_px: Option<f32>) -> SystemUiFont {
         SystemUiFont {
             family: Some(family.into()),
             alternates: Vec::new(),
             weight: 400,
             italic: false,
-            size_px: Some(12.0),
+            size_px,
             source: Source::GnomeSettings,
         }
     }
@@ -341,19 +467,53 @@ mod tests {
         let t = Typography::from_system(None);
         assert_eq!(t, Typography::FALLBACK);
         assert_eq!(t.font, Font::DEFAULT);
+        assert_eq!(t.scale(), 1.0);
+        assert_eq!(t.default_text_size(), Pixels(16.0));
     }
 
     #[test]
-    fn detected_family_becomes_the_ui_font() {
-        let t = Typography::from_system(Some(&system("Segoe UI")));
+    fn windows_default_keeps_design_sizes() {
+        // Segoe UI 9 pt = 12 px: every role keeps its current size.
+        let t = Typography::from_system(Some(&system("Segoe UI", Some(12.0))));
         assert_eq!(t.font.family, Family::Name("Segoe UI"));
-        assert_eq!(t.font.weight, Weight::Normal);
-        assert_eq!(t.font.style, Style::Normal);
+        for design in [9.0, 10.0, 10.5, 11.0, 12.0, 13.0, 16.0, 20.0] {
+            assert_eq!(t.size(design), design);
+        }
+    }
+
+    #[test]
+    fn larger_system_font_scales_roles_proportionally() {
+        // GNOME default Cantarell 11 pt = 14.67 px.
+        let t = Typography::from_system(Some(&system("Cantarell", Some(11.0 * 96.0 / 72.0))));
+        assert!((t.scale() - 11.0 * 96.0 / 72.0 / 12.0).abs() < 1e-6);
+        assert_eq!(t.size(12.0), 14.5);
+        assert_eq!(t.size(11.0), 13.5);
+        assert_eq!(t.size(10.0), 12.0);
+        // Hierarchy is preserved: strictly increasing roles stay so.
+        let roles = [9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 18.0, 20.0];
+        assert!(roles.windows(2).all(|w| t.size(w[0]) < t.size(w[1])));
+    }
+
+    #[test]
+    fn scale_is_bounded() {
+        let huge = Typography::from_system(Some(&system("X", Some(40.0))));
+        assert_eq!(huge.scale(), MAX_SCALE);
+        let tiny = Typography::from_system(Some(&system("X", Some(4.0))));
+        assert_eq!(tiny.scale(), MIN_SCALE);
+        let bogus = Typography::from_system(Some(&system("X", Some(f32::NAN))));
+        assert_eq!(bogus.base_px, DESIGN_BODY_PX);
+    }
+
+    #[test]
+    fn missing_size_keeps_design_base() {
+        let t = Typography::from_system(Some(&system("Inter", None)));
+        assert_eq!(t.base_px, DESIGN_BODY_PX);
+        assert_eq!(t.font.family, Family::Name("Inter"));
     }
 
     #[test]
     fn variants_derive_from_the_ui_family() {
-        let t = Typography::from_system(Some(&system("Inter")));
+        let t = Typography::from_system(Some(&system("Inter", Some(12.0))));
         assert_eq!(t.bold().family, Family::Name("Inter"));
         assert_eq!(t.bold().weight, Weight::Bold);
         assert_eq!(t.italic().style, Style::Italic);
@@ -368,7 +528,7 @@ mod tests {
 
     #[test]
     fn emphasis_stays_visible_on_heavy_ui_fonts() {
-        let mut s = system("Inter");
+        let mut s = system("Inter", Some(12.0));
         s.weight = 700;
         let t = Typography::from_system(Some(&s));
         assert_eq!(t.font.weight, Weight::Bold);
@@ -377,7 +537,7 @@ mod tests {
 
     #[test]
     fn resolve_family_prefers_installed_candidates() {
-        let mut s = system(".AppleSystemUIFont");
+        let mut s = system(".AppleSystemUIFont", Some(13.0));
         s.alternates = vec![".SF NS".into(), "Helvetica Neue".into()];
         let base = Typography::from_system(Some(&s));
         let installed = vec!["Helvetica Neue".to_string(), ".SF NS".to_string()];
@@ -391,9 +551,9 @@ mod tests {
             Family::SansSerif
         );
         let case = vec!["Segoe UI".to_string()];
-        let w = Typography::from_system(Some(&system("segoe ui")));
+        let w = Typography::from_system(Some(&system("segoe ui", None)));
         assert_eq!(
-            w.resolve_family(&system("segoe ui"), &case)
+            w.resolve_family(&system("segoe ui", None), &case)
                 .font
                 .family,
             Family::Name("Segoe UI")
@@ -406,11 +566,24 @@ mod tests {
     }
 
     #[test]
-    fn settings_receive_the_font_only() {
-        let t = Typography::from_system(Some(&system("Inter")));
+    fn fixed_heights_only_grow() {
+        let default = Typography::FALLBACK;
+        assert_eq!(default.grow(22.0), 22.0);
+        let large = Typography::from_system(Some(&system("X", Some(15.0))));
+        assert_eq!(large.grow(22.0), 28.0);
+        let small = Typography::from_system(Some(&system("X", Some(10.5))));
+        assert_eq!(small.grow(22.0), 22.0);
+        // Text at the largest scale still fits the grown box.
+        let max = Typography::from_system(Some(&system("X", Some(40.0))));
+        assert!(max.size(11.0) <= max.grow(16.0));
+    }
+
+    #[test]
+    fn settings_receive_font_and_size() {
+        let t = Typography::from_system(Some(&system("Inter", Some(15.0))));
         let mut settings = iced::Settings::default();
         t.apply_to_settings(&mut settings);
         assert_eq!(settings.default_font, t.font);
-        assert_eq!(settings.default_text_size, Pixels(DEFAULT_TEXT_PX));
+        assert_eq!(settings.default_text_size, Pixels(20.0));
     }
 }

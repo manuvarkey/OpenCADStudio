@@ -2,6 +2,7 @@
 
 use crate::app::Message;
 use crate::scene::model::hatch_model::GradientKind;
+use crate::ui::typography;
 use crate::ui::window::graphic_attributes::GraphicAttributesMsg;
 use codec::types::Color as AcadColor;
 use iced::widget::{
@@ -265,7 +266,7 @@ fn icon(kind: GradientKind, inverted: bool) -> &'static [u8] {
 pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
     let segment = |label, mode| {
         let selected = state.color_mode == mode;
-        button(text(label).size(11))
+        button(text(label).size(typography::small()))
             .on_press(msg(GradientMsg::ColorMode(mode)))
             .width(Fill)
             .style(move |theme: &Theme, status| {
@@ -282,7 +283,7 @@ pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
         let picker = button(
             row![
                 crate::ui::color_select::swatch(background),
-                text(value).size(10),
+                text(value).size(typography::caption()),
                 Space::new().width(Fill),
             ]
             .spacing(5)
@@ -314,7 +315,7 @@ pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
         .height(crate::ui::ROW_H)
         .padding([3, 6])
         .width(Fill);
-        row![text(label).size(11).width(43), picker]
+        row![text(label).size(typography::small()).width(43), picker]
             .spacing(4)
             .align_y(iced::Center)
             .width(Fill)
@@ -335,7 +336,7 @@ pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
                     icon(kind, state.inverted && kind != GradientKind::Linear),
                     25.0
                 ),
-                text(label).size(9)
+                text(label).size(typography::tiny())
             ]
             .align_x(iced::Center),
         )
@@ -352,12 +353,12 @@ pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
         });
         type_row = type_row.push(tooltip(
             b,
-            text(kind.choice_label(false)).size(10),
+            text(kind.choice_label(false)).size(typography::caption()),
             tooltip::Position::Bottom,
         ));
     }
     let invert_selected = state.inverted && state.kind != GradientKind::Linear;
-    let invert = button(column![text("⇄").size(18), text(crate::t!("Invert")).size(9)].align_x(iced::Center))
+    let invert = button(column![text("⇄").size(typography::title()), text(crate::t!("Invert")).size(typography::tiny())].align_x(iced::Center))
         .on_press_maybe(
             (state.kind != GradientKind::Linear).then(|| msg(GradientMsg::InvertToggled)),
         )
@@ -378,7 +379,7 @@ pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
         });
     type_row = type_row.push(separator).push(tooltip(
         invert,
-        text(crate::t!("Invert gradient")).size(10),
+        text(crate::t!("Invert gradient")).size(typography::caption()),
         tooltip::Position::Bottom,
     ));
     let colors: Element<'_, Message> = if state.color_mode == GradientColorMode::Two {
@@ -392,7 +393,7 @@ pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
         row![
             color_field(crate::t!("Color 1"), 1, state.color_1),
             row![
-                text(crate::t!("Tone")).size(11).width(43),
+                text(crate::t!("Tone")).size(typography::small()).width(43),
                 slider(0..=100, (state.shade_tint * 100.0) as i32, |v| {
                     msg(GradientMsg::ShadeTint(v as f32 / 100.0))
                 })
@@ -408,10 +409,10 @@ pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
         .into()
     };
     let angle = row![
-        text(crate::t!("Angle")).size(11).width(43),
+        text(crate::t!("Angle")).size(typography::small()).width(43),
         text_input("0.0°", &state.angle)
             .on_input(|value| msg(GradientMsg::Angle(value)))
-            .size(11)
+            .size(typography::small())
             .width(Length::Fixed(92.0)),
         tooltip(
             button(crate::ui::icons::themed_undo(11.0, true))
@@ -420,7 +421,7 @@ pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
                 .padding(3)
                 .width(24)
                 .height(crate::ui::ROW_H),
-            text(crate::t!("Reset angle")).size(10),
+            text(crate::t!("Reset angle")).size(typography::caption()),
             tooltip::Position::Bottom,
         ),
         Space::new().width(Fill),
@@ -428,20 +429,20 @@ pub fn view(state: &GradientEditorState, dimmed: bool) -> Element<'_, Message> {
             .label(crate::t!("Centered"))
             .on_toggle(|value| msg(GradientMsg::Centered(value)))
             .size(14)
-            .text_size(11)
+            .text_size(typography::small())
     ]
     .spacing(6)
     .align_y(iced::Center);
-    let types = row![text(crate::t!("Type")).size(11).width(43), type_row]
+    let types = row![text(crate::t!("Type")).size(typography::small()).width(43), type_row]
         .spacing(4)
         .align_y(iced::Center);
     let actions = container(
         row![
-            button(text(crate::t!("Cancel")).size(11))
+            button(text(crate::t!("Cancel")).size(typography::small()))
                 .on_press(msg(GradientMsg::Cancel))
                 .style(button::secondary)
                 .padding([5, 14]),
-            button(text(crate::t!("OK")).size(11))
+            button(text(crate::t!("OK")).size(typography::small()))
                 .on_press(msg(GradientMsg::Apply))
                 .style(button::primary)
                 .padding([5, 18]),

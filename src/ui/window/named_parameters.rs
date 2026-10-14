@@ -18,6 +18,7 @@ use crate::scene::named_parameters::ParameterTable;
 use crate::scene::Scene;
 use crate::t;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use codec::types::Handle;
 use codec::EntityType;
 use iced::widget::tooltip::Position as TipPos;
@@ -66,7 +67,7 @@ fn used_by_cell<'a>(scene: &Scene, name: &str) -> Element<'a, Message> {
     }
     let lines = usage_lines(scene, name);
     if lines.is_empty() {
-        return text("—").size(11).style(muted_style).into();
+        return text("—").size(typography::small()).style(muted_style).into();
     }
     let mut counts: Vec<(String, usize)> = Vec::new();
     for line in &lines {
@@ -83,10 +84,10 @@ fn used_by_cell<'a>(scene: &Scene, name: &str) -> Element<'a, Message> {
         .join(", ");
     let mut body = column![].spacing(2);
     for line in &lines {
-        body = body.push(text(line.clone()).size(11));
+        body = body.push(text(line.clone()).size(typography::small()));
     }
     tooltip(
-        text(summary).size(11).style(muted_style),
+        text(summary).size(typography::small()).style(muted_style),
         container(body)
             .style(container::bordered_box)
             .padding([4, 8]),
@@ -199,11 +200,11 @@ pub fn view_window<'a>(
     scene: &'a Scene,
     sizing: crate::ui::modal::ModalSizing,
 ) -> Element<'a, Message> {
-    let title = text(t!("Named Parameters")).size(15);
+    let title = text(t!("Named Parameters")).size(typography::heading());
     let hint = text(t!(
         "Type a name and a formula (e.g. hole_dia = 12, hole_spacing = 2 * hole_dia + 1.5). Apply to save and re-solve; closing discards unapplied edits."
     ))
-    .size(11)
+    .size(typography::small())
     .style(muted_style);
 
     let gutter = iced::Padding {
@@ -218,12 +219,12 @@ pub fn view_window<'a>(
 
     let head = container(
         row![
-            container(text(t!("Name")).size(11).style(muted_style))
+            container(text(t!("Name")).size(typography::small()).style(muted_style))
                 .width(Length::Fixed(NAME_WIDTH)),
-            container(text(t!("Formula")).size(11).style(muted_style)).width(sizing.width),
-            container(text(t!("Value")).size(11).style(muted_style))
+            container(text(t!("Formula")).size(typography::small()).style(muted_style)).width(sizing.width),
+            container(text(t!("Value")).size(typography::small()).style(muted_style))
                 .width(Length::Fixed(VALUE_WIDTH)),
-            container(text(t!("Used by")).size(11).style(muted_style))
+            container(text(t!("Used by")).size(typography::small()).style(muted_style))
                 .width(Length::Fixed(USED_BY_WIDTH)),
             Space::new().width(Length::Fixed(30.0)),
         ]
@@ -240,7 +241,7 @@ pub fn view_window<'a>(
                 field: ParamField::Name,
                 value: v,
             })
-            .size(13)
+            .size(typography::body_large())
             .padding([3, 6])
             .width(Length::Fixed(NAME_WIDTH));
         let formula_box = text_input(t!("formula").as_ref(), &row.formula)
@@ -249,14 +250,14 @@ pub fn view_window<'a>(
                 field: ParamField::Formula,
                 value: v,
             })
-            .size(13)
+            .size(typography::body_large())
             .padding([3, 6])
             .width(sizing.width);
         let value_cell: Element<'_, Message> = match results.get(idx).cloned().flatten() {
             Some(Ok(value)) => {
-                container(text(format!("= {value:.4}")).size(12).style(muted_style)).into()
+                container(text(format!("= {value:.4}")).size(typography::body()).style(muted_style)).into()
             }
-            Some(Err(msg)) => container(text(msg).size(11).style(danger_style)).into(),
+            Some(Err(msg)) => container(text(msg).size(typography::small()).style(danger_style)).into(),
             None => Space::new().into(),
         };
         let used_by_cell = used_by_cell(scene, row.name.trim());
@@ -280,12 +281,12 @@ pub fn view_window<'a>(
         );
     }
 
-    let add = button(text(t!("+ Add parameter")).size(12))
+    let add = button(text(t!("+ Add parameter")).size(typography::body()))
         .on_press(Message::NamedParametersAdd)
         .padding([4, 10])
         .style(button::secondary);
 
-    let apply = button(text(t!("Apply")).size(12))
+    let apply = button(text(t!("Apply")).size(typography::body()))
         .on_press(Message::NamedParametersApply)
         .padding([4, 16])
         .style(button::primary);

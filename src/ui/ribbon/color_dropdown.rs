@@ -11,6 +11,7 @@ use super::widgets::{muted_text_style, popup_panel_style, popup_row_style};
 use crate::app::Message;
 use crate::t;
 use crate::ui::properties::acad_color_display;
+use crate::ui::typography;
 use codec::types::Color as AcadColor;
 use iced::widget::{button, column, container, row, text, Space};
 use iced::{Background, Border, Element, Length, Padding, Theme};
@@ -188,7 +189,7 @@ fn logical_row<'a>(
     });
 
     button(
-        row![swatch, text(t!(label)).size(11),]
+        row![swatch, text(t!(label)).size(typography::small()),]
             .spacing(8)
             .align_y(iced::Center),
     )
@@ -200,7 +201,7 @@ fn logical_row<'a>(
 }
 
 fn more_colors_row<'a>(active_color: AcadColor) -> Element<'a, Message> {
-    button(row![text(t!("Select Color...")).size(11)].align_y(iced::Center))
+    button(row![text(t!("Select Color...")).size(typography::small())].align_y(iced::Center))
         .on_press(Message::OpenColorWindow(
             crate::app::ColorPickTarget::Ribbon,
             active_color,
@@ -237,7 +238,7 @@ pub fn color_dropdown_panel<'a>(
     }
 
     // 3. Standard Index Colors (ACI 1..=9)
-    let index_header = text(t!("Index Color")).size(10).style(muted_text_style);
+    let index_header = text(t!("Index Color")).size(typography::caption()).style(muted_text_style);
     let mut standard_row = row![].spacing(SWATCH_GAP);
     for idx in 1u8..=9 {
         let color = AcadColor::Index(idx);
@@ -246,7 +247,7 @@ pub fn color_dropdown_panel<'a>(
     let section3 = column![index_header, standard_row].spacing(4);
 
     // 4. Recent Colors row (up to 9 swatches; pad with placeholders if fewer)
-    let recent_header = text(t!("Recent Colors")).size(10).style(muted_text_style);
+    let recent_header = text(t!("Recent Colors")).size(typography::caption()).style(muted_text_style);
     let mut recent_row = row![].spacing(SWATCH_GAP);
     let mut count = 0;
     for &color in recent_colors.iter().take(9) {

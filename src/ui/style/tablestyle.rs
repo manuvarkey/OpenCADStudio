@@ -315,7 +315,7 @@ impl canvas::Program<Message> for TablePreviewCanvas {
             ),
             position: Point::new(10.0, bounds.height - 9.0),
             color: ink.scale_alpha(0.65),
-            size: iced::Pixels(10.0),
+            size: iced::Pixels(typography::caption()),
             font: typography::font(),
             align_y: iced::alignment::Vertical::Center,
             ..Default::default()
@@ -331,10 +331,10 @@ fn input_row<'a>(
     message: impl Fn(String) -> Message + 'a,
 ) -> Element<'a, Message> {
     row![
-        text(label).size(11).style(muted_style).width(155),
+        text(label).size(typography::small()).style(muted_style).width(155),
         text_input(placeholder, value)
             .on_input(message)
-            .size(11)
+            .size(typography::small())
             .width(170),
     ]
     .spacing(8)
@@ -382,7 +382,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
                 current,
             ),
         );
-        row![text(label).size(11).style(muted_style).width(155), selector]
+        row![text(label).size(typography::small()).style(muted_style).width(155), selector]
             .spacing(8)
             .align_y(iced::Center)
     };
@@ -413,7 +413,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
         ))
         .push(
             row![
-                text(t!("Alignment")).size(11).style(muted_style).width(155),
+                text(t!("Alignment")).size(typography::small()).style(muted_style).width(155),
                 iced::widget::pick_list(
                     Some(EnumChoice {
                         code: selected_alignment.clone(),
@@ -436,7 +436,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
                     row: row_index,
                     value: choice.code
                 })
-                .text_size(11)
+                .text_size(typography::small())
                 .width(170),
             ]
             .spacing(8)
@@ -447,7 +447,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
                 .label(t!("Background fill enabled"))
                 .on_toggle(move |_| Message::TableStyleCellToggleFill(row_index))
                 .size(14)
-                .text_size(11),
+                .text_size(typography::small()),
         )
         .push(cell_input(
             t!("Data type"),
@@ -467,7 +467,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
             &v.cell_format[index],
             "format",
         ))
-        .push(text(t!("Borders")).size(11).style(primary_style));
+        .push(text(t!("Borders")).size(typography::small()).style(primary_style));
     let borders = [
         (t!("Left"), &row_style.left_border),
         (t!("Right"), &row_style.right_border),
@@ -481,7 +481,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
         let border_type = format!("{:?}", border.border_type);
         content = content.push(
             row![
-                text(label).size(10).style(muted_style).width(96),
+                text(label).size(typography::caption()).style(muted_style).width(96),
                 iced::widget::pick_list(
                     Some(EnumChoice {
                         code: border_type.clone(),
@@ -495,7 +495,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
                     border: border_index,
                     value: choice.code
                 })
-                .text_size(10)
+                .text_size(typography::caption())
                 .width(82),
                 text_input(
                     t!("Weight").as_ref(),
@@ -507,7 +507,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
                     field: "lw",
                     value
                 })
-                .size(10)
+                .size(typography::caption())
                 .width(68),
                 text_input(
                     t!("Color").as_ref(),
@@ -519,7 +519,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
                     field: "color",
                     value
                 })
-                .size(10)
+                .size(typography::caption())
                 .width(62),
                 text_input(
                     t!("Spacing").as_ref(),
@@ -531,7 +531,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
                     field: "spacing",
                     value
                 })
-                .size(10)
+                .size(typography::caption())
                 .width(68),
                 checkbox(border.is_invisible)
                     .label(t!("Hidden"))
@@ -540,7 +540,7 @@ fn cell_editor<'a>(v: &TableStyleView<'a>, row_index: u8) -> Element<'a, Message
                         border: border_index
                     })
                     .size(13)
-                    .text_size(10),
+                    .text_size(typography::caption()),
             ]
             .spacing(5)
             .align_y(iced::Center),
@@ -593,7 +593,7 @@ pub fn view_window<'a>(
 ) -> Element<'a, Message> {
     let style = v.style;
     let content: Element<'a, Message> = match (v.tab, style) {
-        (_, None) => text(t!("Select a style to view details.")).size(11).into(),
+        (_, None) => text(t!("Select a style to view details.")).size(typography::small()).into(),
         (0, Some(style)) => column![
             input_row(t!("Description"), "", v.description, |value| {
                 Message::TableStyleEdit {
@@ -603,7 +603,7 @@ pub fn view_window<'a>(
             }),
             row![
                 text(t!("Flow direction"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted_style)
                     .width(155),
                 iced::widget::pick_list(
@@ -615,7 +615,7 @@ pub fn view_window<'a>(
                     |value| value.to_string(),
                 )
                 .on_select(|choice| Message::TableStyleSetFlow(choice.code))
-                .text_size(11)
+                .text_size(typography::small())
                 .width(170),
             ]
             .spacing(8)
@@ -636,17 +636,17 @@ pub fn view_window<'a>(
                 .label(t!("Suppress title row"))
                 .on_toggle(|_| Message::TableStyleToggle("title_sup"))
                 .size(14)
-                .text_size(11),
+                .text_size(typography::small()),
             checkbox(style.header_suppressed)
                 .label(t!("Suppress header row"))
                 .on_toggle(|_| Message::TableStyleToggle("header_sup"))
                 .size(14)
-                .text_size(11),
+                .text_size(typography::small()),
             checkbox(style.annotative)
                 .label(t!("Annotative"))
                 .on_toggle(|_| Message::TableStyleToggleAnnotative)
                 .size(14)
-                .text_size(11),
+                .text_size(typography::small()),
         ]
         .spacing(9)
         .into(),

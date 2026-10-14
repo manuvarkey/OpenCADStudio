@@ -1,6 +1,7 @@
 use super::status_menu::{self, Entry};
 use crate::app::Message;
 use crate::input::spacemouse::{NavigationMode, Preferences, Status};
+use crate::ui::typography;
 use iced::widget::{button, row, text};
 use iced::{Element, Fill};
 
@@ -14,7 +15,7 @@ pub(crate) fn view(
     let root = button(
         row![
             crate::ui::icons::themed(crate::ui::window::options::spacemouse::ICON, 15.),
-            text(label).size(11),
+            text(label).size(typography::small()),
             crate::ui::icons::themed_arrow_toggle(false, 8.)
         ]
         .spacing(5)
@@ -23,7 +24,7 @@ pub(crate) fn view(
     .padding([3, 6])
     .style(button::subtle);
     let mut entries = vec![Entry::stay(
-        text(format!("SpaceMouse · {}", crate::t!(status.label()))).size(11),
+        text(format!("SpaceMouse · {}", crate::t!(status.label()))).size(typography::small()),
     )];
     for mode in NavigationMode::ALL {
         let label = format!(
@@ -36,7 +37,7 @@ pub(crate) fn view(
             crate::t!(mode.label())
         );
         entries.push(Entry::close(
-            button(text(label).size(12))
+            button(text(label).size(typography::body()))
                 .width(Fill)
                 .padding([7, 10])
                 .style(button::text)
@@ -45,7 +46,7 @@ pub(crate) fn view(
     }
     if sheet {
         entries.push(Entry::stay(
-            text(crate::t!("Paper sheets keep rotation locked.")).size(11),
+            text(crate::t!("Paper sheets keep rotation locked.")).size(typography::small()),
         ));
     }
     entries.push(Entry::close(
@@ -55,7 +56,7 @@ pub(crate) fn view(
             } else {
                 "Pause SpaceMouse"
             }))
-            .size(12),
+            .size(typography::body()),
         )
         .on_press(Message::SpaceMousePause)
         .style(button::text)
@@ -67,7 +68,7 @@ pub(crate) fn view(
         ("3Dconnexion settings…", Message::SpaceMouseDriverSettings),
     ] {
         entries.push(Entry::close(
-            button(text(crate::t!(label)).size(12))
+            button(text(crate::t!(label)).size(typography::body()))
                 .on_press(message)
                 .style(button::text)
                 .width(Fill)

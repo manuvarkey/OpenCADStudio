@@ -80,10 +80,10 @@ fn input_row<'a>(
     field: &'static str,
 ) -> Element<'a, Message> {
     row![
-        text(label).size(11).style(muted_style).width(165),
+        text(label).size(typography::small()).style(muted_style).width(165),
         text_input(placeholder, value)
             .on_input(move |value| Message::MLeaderStyleEdit { field, value })
-            .size(11)
+            .size(typography::small())
             .width(190),
     ]
     .spacing(8)
@@ -93,7 +93,7 @@ fn input_row<'a>(
 
 fn readonly_row<'a>(label: Cow<'static, str>, value: Cow<'static, str>) -> Element<'a, Message> {
     row![
-        text(label).size(11).style(muted_style).width(165),
+        text(label).size(typography::small()).style(muted_style).width(165),
         crate::ui::read_only::field(value.as_ref(), 11.0, Length::Fixed(190.0)),
     ]
     .spacing(8)
@@ -123,7 +123,7 @@ fn color_row<'a>(
         Message::MLeaderColorMore(field),
         Message::OpenColorWindow(crate::app::ColorPickTarget::MLeader(field), current),
     );
-    row![text(label).size(11).style(muted_style).width(165), selector]
+    row![text(label).size(typography::small()).style(muted_style).width(165), selector]
         .spacing(8)
         .align_y(iced::Center)
         .into()
@@ -141,7 +141,7 @@ fn enum_row<'a>(
         .map(|(_, label)| crate::i18n::translate(label))
         .unwrap_or_else(|| crate::i18n::translate(&selected));
     row![
-        text(label).size(11).style(muted_style).width(165),
+        text(label).size(typography::small()).style(muted_style).width(165),
         iced::widget::pick_list(
             Some(EnumChoice {
                 code: selected,
@@ -154,7 +154,7 @@ fn enum_row<'a>(
             field,
             value: choice.code
         })
-        .text_size(11)
+        .text_size(typography::small())
         .width(220),
     ]
     .spacing(8)
@@ -186,13 +186,13 @@ fn handle_row<'a>(
         })
         .collect();
     row![
-        text(label).size(11).style(muted_style).width(165),
+        text(label).size(typography::small()).style(muted_style).width(165),
         iced::widget::pick_list(Some(selected), options, |value| value.to_string())
             .on_select(move |value| Message::MLeaderStyleSetHandle {
                 field,
                 value: value.code
             })
-            .text_size(11)
+            .text_size(typography::small())
             .width(220),
     ]
     .spacing(8)
@@ -205,7 +205,7 @@ fn toggle<'a>(label: Cow<'static, str>, value: bool, field: &'static str) -> Ele
         .label(label)
         .on_toggle(move |_| Message::MLeaderStyleToggle(field))
         .size(14)
-        .text_size(11)
+        .text_size(typography::small())
         .into()
 }
 
@@ -635,7 +635,7 @@ impl canvas::Program<Message> for LeaderPreviewCanvas {
             ),
             position: Point::new(10.0, bounds.height - 9.0),
             color: ink.scale_alpha(0.62),
-            size: iced::Pixels(9.0),
+            size: iced::Pixels(typography::tiny()),
             font: typography::font(),
             align_y: iced::alignment::Vertical::Center,
             ..Default::default()
@@ -663,7 +663,7 @@ impl canvas::Program<Message> for LeaderPreviewCanvas {
             ),
             position: Point::new(10.0, 9.0),
             color: ink.scale_alpha(0.55),
-            size: iced::Pixels(9.0),
+            size: iced::Pixels(typography::tiny()),
             font: typography::font(),
             align_y: iced::alignment::Vertical::Center,
             ..Default::default()
@@ -678,7 +678,7 @@ pub fn view_window<'a>(
 ) -> Element<'a, Message> {
     let style = v.style;
     let content: Element<'a, Message> = match (v.tab, style) {
-        (_, None) => text(t!("Select a style to view details.")).size(11).into(),
+        (_, None) => text(t!("Select a style to view details.")).size(typography::small()).into(),
         (0, Some(style)) => column![
             input_row(t!("Description"), "", v.description, "description"),
             enum_row(
@@ -699,7 +699,7 @@ pub fn view_window<'a>(
             ),
             row![
                 text(t!("Line weight"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted_style)
                     .width(165),
                 iced::widget::pick_list(
@@ -708,7 +708,7 @@ pub fn view_window<'a>(
                     |value| value.to_string(),
                 )
                 .on_select(|item| Message::MLeaderStyleLineWeightChanged(item.0))
-                .text_size(11)
+                .text_size(typography::small())
                 .width(220),
             ]
             .spacing(8)
