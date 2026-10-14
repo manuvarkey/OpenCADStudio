@@ -899,9 +899,37 @@ impl OpenCADStudio {
                 }
                 if script == crate::scene::text::web_font::primary_script() {
                     let family = iced::font::Family::name(script.family());
-                    return iced::font::set_defaults(iced::Font::with_family(family), 16.0);
+                    return crate::ui::typography::set_family(family).set_iced_defaults();
                 }
                 Task::none()
+            }
+
+            // Native: the renderer's families arrived; settle the system UI
+            // font on an installed family and push any change to iced.
+            Message::UiFontFamiliesListed(families) => {
+                match crate::ui::typography::resolve_installed(&families) {
+                    Some(typography) => typography.set_iced_defaults(),
+                    None => Task::none(),
+                }
+            }
+
+            #[cfg(not(target_arch = "wasm32"))]
+            Message::UiFontSettingsChanged => Task::perform(
+                crate::ui::typography::redetect(),
+                Message::UiFontDetected,
+            ),
+            #[cfg(target_arch = "wasm32")]
+            Message::UiFontSettingsChanged => Task::none(),
+
+            Message::UiFontDetected(system) => {
+                if !crate::ui::typography::update_system(system) {
+                    return Task::none();
+                }
+                iced::font::list().map(|families| {
+                    Message::UiFontFamiliesListed(crate::ui::typography::family_names(
+                        families.unwrap_or_default(),
+                    ))
+                })
             }
 
             Message::Tick(t) => self.on_tick(t),

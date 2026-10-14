@@ -5,6 +5,7 @@ use crate::app::document::DocumentTab;
 use crate::app::{Message, OpenCADStudio};
 use crate::t;
 use crate::ui::dock::DOCK_DIVIDER_W;
+use crate::ui::typography;
 use iced::widget::{button, canvas, column, container, mouse_area, row, stack, text, Space};
 use iced::{Background, Border, Color, Element, Fill, Length, Theme};
 
@@ -912,6 +913,7 @@ impl canvas::Program<Message> for VBarLabel {
                 position: iced::Point::new(-bounds.height / 2.0, 0.0),
                 color: theme.palette().background.base.text.scale_alpha(0.72),
                 size: iced::Pixels(13.0),
+                font: typography::font(),
                 align_x: iced::advanced::text::Alignment::Left,
                 align_y: iced::alignment::Vertical::Center,
                 shaping: iced::advanced::text::Shaping::Advanced,

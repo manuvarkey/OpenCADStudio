@@ -3,6 +3,7 @@
 use crate::app::{Message, StyleKind};
 use crate::t;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{
     button, canvas, checkbox, column, container, row, scrollable, text, text_input,
 };
@@ -202,6 +203,7 @@ impl canvas::Program<Message> for TextPreviewCanvas {
             position: Point::new(10.0, bounds.height - 9.0),
             color: ink.scale_alpha(0.65),
             size: iced::Pixels(10.0),
+            font: typography::font(),
             align_y: iced::alignment::Vertical::Center,
             ..Default::default()
         });

@@ -2397,6 +2397,12 @@ pub enum Message {
     ApplyWebFont(crate::scene::text::web_font::Script),
     /// Completion of the UI renderer's runtime font registration.
     WebUiFontLoaded(crate::scene::text::web_font::Script, Result<(), String>),
+    /// Font families the renderer has, for resolving the system UI font.
+    UiFontFamiliesListed(Vec<String>),
+    /// The desktop reported (or a poll may have found) a UI-font change.
+    UiFontSettingsChanged,
+    /// A re-read of the desktop UI font finished.
+    UiFontDetected(Option<crate::sys::ui_font::SystemUiFont>),
     /// Ctrl+V. Routed by `update` into an open text editor, the drawing-object
     /// clipboard, or the system text clipboard.
     PasteShortcut,
@@ -5316,11 +5322,22 @@ impl OpenCADStudio {
         let discussions_fetch = Task::none();
         // Recent-file thumbnails: decoded off-thread — parsing every recent
         // DWG's preview on the boot path held the first frame back.
+        // Check the system UI font against the families the renderer really has:
+        // a missing family would otherwise render in per-glyph fallback faces.
+        #[cfg(not(target_arch = "wasm32"))]
+        let ui_font = iced::font::list().map(|families| {
+            Message::UiFontFamiliesListed(crate::ui::typography::family_names(
+                families.unwrap_or_default(),
+            ))
+        });
+        #[cfg(target_arch = "wasm32")]
+        let ui_font = Task::none();
         let thumbs_fetch = s.refresh_recent_thumbs();
         (
             s,
             Task::batch([
                 open_main,
+                ui_font,
                 check_update,
                 focus_cmd,
                 cli_open,
@@ -5436,15 +5453,19 @@ use std::path::PathBuf;
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn run() -> iced::Result {
+    // The desktop's UI font becomes iced's default font and text size. UI
+    // scaling stays in `scale_factor` below, so the two compose once.
+    let mut settings = iced::Settings {
+        power_preference: iced::backend::PowerPreference::HighPerformance,
+        ..iced::Settings::default()
+    };
+    crate::ui::typography::init_from_system().apply_to_settings(&mut settings);
     iced::daemon(
         OpenCADStudio::boot,
         OpenCADStudio::update,
         OpenCADStudio::view,
     )
-    .settings(iced::Settings {
-        power_preference: iced::backend::PowerPreference::HighPerformance,
-        ..iced::Settings::default()
-    })
+    .settings(settings)
     .subscription(OpenCADStudio::subscription)
     .scale_factor(|state: &OpenCADStudio, _| f32::from(state.ui_scale_percent) / 100.0)
     .title(|state: &OpenCADStudio, window_id: window::Id| {

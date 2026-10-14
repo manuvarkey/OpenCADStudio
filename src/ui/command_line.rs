@@ -13,6 +13,7 @@ use iced::{Background, Border, Color, Element, Length, Padding, Theme};
 use std::ops::Range;
 
 use crate::ui::style::common::accessible_accent_threshold;
+use crate::ui::typography;
 
 /// Maximum entries kept for the context menu's "Recent Input" list.
 pub const RECENT_INPUT_CAP: usize = 10;
@@ -749,7 +750,7 @@ impl CommandLine {
                         }
                     });
                     if is_error {
-                        txt = txt.font(iced::Font::DEFAULT.weight(iced::font::Weight::Bold));
+                        txt = txt.font(typography::bold());
                     }
                     txt
                 };
@@ -1326,7 +1327,7 @@ fn history_highlight_format(
     iced::advanced::text::highlighter::Format {
         color: Some(history_color(theme, kind)),
         font: match kind {
-            EntryKind::Error => Some(iced::Font::DEFAULT.weight(iced::font::Weight::Bold)),
+            EntryKind::Error => Some(typography::bold()),
             _ => None,
         },
     }
@@ -1520,7 +1521,7 @@ mod tests {
     #[test]
     fn error_history_uses_bold_highlight_format() {
         let theme = iced::Theme::Light;
-        let bold = iced::Font::DEFAULT.weight(iced::font::Weight::Bold);
+        let bold = crate::ui::typography::bold();
         assert_eq!(
             history_highlight_format(&EntryKind::Error, &theme).font,
             Some(bold)

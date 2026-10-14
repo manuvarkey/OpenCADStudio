@@ -20,6 +20,7 @@ use iced::{
 use super::{draw_panel, item_id, Ribbon};
 use crate::app::Message;
 use crate::modules::{RibbonItem, ToolDef};
+use crate::ui::typography;
 use crate::ui::wrap_bar::{fresh_bounds, PosReport};
 
 /// Key tip input, from the keyboard listener or automation.
@@ -912,13 +913,6 @@ const PILL_TEXT: f32 = 11.0;
 const BAR_H: f32 = 24.0;
 const BAR_TEXT: f32 = 12.0;
 
-fn bold(renderer: &Renderer) -> iced::Font {
-    iced::Font {
-        weight: iced::font::Weight::Semibold,
-        ..renderer.default_font()
-    }
-}
-
 fn text_width(content: &str, size: f32, font: iced::Font) -> f32 {
     <Renderer as advanced_text::Renderer>::Paragraph::with_text(advanced_text::Text {
         content,
@@ -1006,7 +1000,7 @@ impl overlay::Overlay<Message, Theme, Renderer> for KeyTipOverlay<'_> {
     ) {
         let window = layout.bounds();
         let (fill, edge, ink) = colors(theme);
-        let font = bold(renderer);
+        let font = typography::semibold();
         let mut shown = Vec::new();
         renderer.with_layer(window, |renderer| {
             for (anchor, code) in &self.layer.tips {
@@ -1086,7 +1080,7 @@ fn draw_bar(renderer: &mut Renderer, theme: &Theme, parts: &[String; 3]) {
         return;
     };
     let (fill, edge, ink) = colors(theme);
-    let font = bold(renderer);
+    let font = typography::semibold();
     let bar = Rectangle::new(
         Point::new(ribbon.x, ribbon.y + ribbon.height),
         Size::new(ribbon.width, BAR_H),
@@ -1111,7 +1105,7 @@ fn draw_bar(renderer: &mut Renderer, theme: &Theme, parts: &[String; 3]) {
     );
     let mut x = bar.x + 12.0;
     let y = bar.center_y();
-    let regular = renderer.default_font();
+    let regular = typography::font();
     for (index, part) in parts.iter().enumerate() {
         let (part_font, color) = match index {
             0 => (font, ink),

@@ -3,6 +3,7 @@
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{canvas, checkbox, column, container, row, text, text_input};
 use iced::{mouse, Color, Element, Length, Point, Rectangle, Size, Theme};
 use std::borrow::Cow;
@@ -635,6 +636,7 @@ impl canvas::Program<Message> for LeaderPreviewCanvas {
             position: Point::new(10.0, bounds.height - 9.0),
             color: ink.scale_alpha(0.62),
             size: iced::Pixels(9.0),
+            font: typography::font(),
             align_y: iced::alignment::Vertical::Center,
             ..Default::default()
         });
@@ -662,6 +664,7 @@ impl canvas::Program<Message> for LeaderPreviewCanvas {
             position: Point::new(10.0, 9.0),
             color: ink.scale_alpha(0.55),
             size: iced::Pixels(9.0),
+            font: typography::font(),
             align_y: iced::alignment::Vertical::Center,
             ..Default::default()
         });

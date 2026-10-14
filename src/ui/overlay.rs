@@ -11,6 +11,7 @@ use crate::app::settings::{CursorType, IsoPlane};
 use crate::app::Message;
 use crate::scene::model::object::GripShape;
 use crate::scene::SelectionState;
+use crate::ui::typography;
 
 use crate::snap::SnapType;
 use std::sync::Arc;
@@ -2211,6 +2212,7 @@ impl canvas::Program<Message> for SelectionCanvas {
                         draw_tangent_constraint_glyph(&mut frame, center, Color::WHITE);
                     } else {
                         frame.fill_text(canvas::Text {
+                            font: typography::font(),
                             content: label.clone(),
                             position: center,
                             color: Color::WHITE,
@@ -2388,6 +2390,7 @@ impl canvas::Program<Message> for SelectionCanvas {
                             fg
                         };
                         frame.fill_text(canvas::Text {
+                            font: typography::font(),
                             content: label.to_string(),
                             position: glyph_center,
                             color,
@@ -2452,6 +2455,7 @@ impl canvas::Program<Message> for SelectionCanvas {
                             .with_width(1.0),
                     );
                     frame.fill_text(canvas::Text {
+                        font: typography::font(),
                         content: label.to_string(),
                         position: Point::new(left + width * 0.5, top + height * 0.5),
                         color: theme.palette().background.strong.text,
@@ -3470,6 +3474,7 @@ fn draw_ucs_icon(
                 (1.0, 0.0)
             };
             frame.fill_text(canvas::Text {
+                font: typography::font(),
                 content: ax.label.to_string(),
                 // Offset beyond tip along the axis direction; subtract ~half glyph
                 // size to visually center the single character on the axis line.
@@ -3692,6 +3697,7 @@ impl DynInputCanvas {
                 .with_width(if b.active { 1.6 } else { 1.0 }),
         );
         frame.fill_text(canvas::Text {
+            font: typography::font(),
             content,
             position: Point {
                 x: x + DYN_PAD,
@@ -3753,6 +3759,7 @@ impl DynInputCanvas {
                 .with_width(1.0),
         );
         frame.fill_text(canvas::Text {
+            font: typography::font(),
             content: self.prompt.clone(),
             position: Point {
                 x: pos.x + DYN_PAD,
@@ -3791,6 +3798,8 @@ impl DynInputCanvas {
         );
 
         frame.fill_text(canvas::Text {
+
+            font: typography::font(),
             content: text.to_string(),
             position: Point {
                 x: pos.x + DYN_PAD,
@@ -4122,6 +4131,7 @@ impl DynInputCanvas {
                     .with_width(if b.active { 1.6 } else { 1.0 }),
             );
             frame.fill_text(canvas::Text {
+                font: typography::font(),
                 content: texts[i].clone(),
                 position: Point {
                     x: x + DYN_PAD,

@@ -9,6 +9,7 @@ use crate::t;
 use crate::ui::dock::PanelId;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{button_style, dialog_button, field_style};
+use crate::ui::typography;
 use crate::ui::window::pdf_dialogs::{accent_text, card_style};
 use codec::sheet_set::{self as ss, ComponentKind, Element as SsElement, SheetSetDatabase};
 use iced::widget::{
@@ -1139,10 +1140,7 @@ fn model_views_rows<'a>(state: &SheetSetManager) -> Vec<Element<'a, Message>> {
 fn heading(label: &str) -> Element<'static, Message> {
     text(t!(label).into_owned())
         .size(11)
-        .font(iced::Font {
-            weight: iced::font::Weight::Bold,
-            ..iced::Font::DEFAULT
-        })
+        .font(typography::bold())
         .style(|theme: &Theme| text::Style {
             color: Some(theme.palette().primary.base.color),
         })

@@ -23,6 +23,7 @@ use crate::modules::{IconKind, ModuleEvent, RibbonItem, StyleKey, ToolDef};
 use crate::t;
 use crate::ui::icons;
 use crate::ui::properties::{acad_color_display, linetype_display_name, LwItem};
+use crate::ui::typography;
 use crate::ui::wrap_bar::PosReport;
 
 use super::LayerInfo;
@@ -93,8 +94,9 @@ const COMBO_PANEL_PAD: Padding = Padding {
 thread_local! {
     /// Ribbon layout runs on every pointer-driven view update. Cache the font-
     /// measured width per translated label so the automatic sizing stays cheap.
-    static LARGE_WIDTH_CACHE: RefCell<HashMap<String, f32>> =
-        RefCell::new(HashMap::default());
+    /// Widths depend on the UI font, so a typography change empties it.
+    static LARGE_WIDTH_CACHE: RefCell<(typography::Typography, HashMap<String, f32>)> =
+        RefCell::new((typography::Typography::FALLBACK, HashMap::default()));
 }
 
 /// Dropdown items that report a state and cannot be picked.
@@ -103,12 +105,11 @@ pub(super) fn is_disabled_item(cmd: &str) -> bool {
 }
 
 fn ribbon_label_bounds(
-    renderer: &iced::Renderer,
     label: &str,
     width: f32,
     wrapping: advanced_text::Wrapping,
 ) -> Size {
-    use advanced_text::{Paragraph as _, Renderer as _};
+    use advanced_text::Paragraph as _;
 
     let paragraph =
         <iced::Renderer as advanced_text::Renderer>::Paragraph::with_text(advanced_text::Text {
@@ -116,7 +117,7 @@ fn ribbon_label_bounds(
             bounds: Size::new(width, f32::INFINITY),
             size: Pixels(LARGE_LABEL_SIZE),
             line_height: advanced_text::LineHeight::default(),
-            font: renderer.default_font(),
+            font: typography::font(),
             align_x: advanced_text::Alignment::Center,
             align_y: iced::alignment::Vertical::Center,
             shaping: advanced_text::Shaping::default(),
@@ -131,14 +132,14 @@ fn ribbon_label_bounds(
 /// only labels that would need more than two lines widen their button. The
 /// binary search uses the renderer's real font metrics, so locale and UI scale
 /// changes do not rely on character-count estimates.
-fn measure_large_width(renderer: &iced::Renderer, label: &str) -> f32 {
+fn measure_large_width(label: &str) -> f32 {
     let base_inner = (LARGE_W - LARGE_LABEL_HPAD).max(1.0);
     let line_height = advanced_text::LineHeight::default()
         .to_absolute(Pixels(LARGE_LABEL_SIZE))
         .0;
     let max_label_height = line_height * LARGE_LABEL_LINES + 0.5;
     let fits = |width: f32| {
-        let bounds = ribbon_label_bounds(renderer, label, width, advanced_text::Wrapping::Word);
+        let bounds = ribbon_label_bounds(label, width, advanced_text::Wrapping::Word);
         bounds.width <= width + 0.5 && bounds.height <= max_label_height
     };
 
@@ -147,7 +148,6 @@ fn measure_large_width(renderer: &iced::Renderer, label: &str) -> f32 {
     }
 
     let natural = ribbon_label_bounds(
-        renderer,
         label,
         f32::INFINITY,
         advanced_text::Wrapping::None,
@@ -171,14 +171,22 @@ fn measure_large_width(renderer: &iced::Renderer, label: &str) -> f32 {
     (high + LARGE_LABEL_HPAD).ceil().max(LARGE_W)
 }
 
-fn automatic_large_width(renderer: &iced::Renderer, label: &str) -> f32 {
-    if let Some(width) = LARGE_WIDTH_CACHE.with(|cache| cache.borrow().get(label).copied()) {
+fn automatic_large_width(label: &str) -> f32 {
+    let current = typography::current();
+    let cached = LARGE_WIDTH_CACHE.with(|cache| {
+        let mut cache = cache.borrow_mut();
+        if cache.0 != current {
+            *cache = (current, HashMap::default());
+        }
+        cache.1.get(label).copied()
+    });
+    if let Some(width) = cached {
         return width;
     }
 
-    let width = measure_large_width(renderer, label);
+    let width = measure_large_width(label);
     LARGE_WIDTH_CACHE.with(|cache| {
-        cache.borrow_mut().insert(label.to_string(), width);
+        cache.borrow_mut().1.insert(label.to_string(), width);
     });
     width
 }
@@ -211,7 +219,7 @@ impl Widget<Message, Theme, iced::Renderer> for AutomaticLargeWidth<'_> {
         renderer: &iced::Renderer,
         limits: &layout::Limits,
     ) -> layout::Node {
-        let width = automatic_large_width(renderer, &self.label);
+        let width = automatic_large_width(&self.label);
         self.content
             .as_widget_mut()
             .layout(tree, renderer, &limits.width(Length::Fixed(width)))

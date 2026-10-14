@@ -6,6 +6,7 @@
 use crate::app::Message;
 use crate::scene::model::point_cloud::{self, UNASSIGNED_OFF};
 use crate::ui::dock::PanelId;
+use crate::ui::typography;
 use codec::entities::ExtendedEntityData;
 use codec::{CadDocument, EntityType, Handle};
 use iced::widget::{
@@ -375,11 +376,7 @@ pub fn view<'a>(
 
     let heading = text(crate::t!("REGIONS AND SCANS").into_owned())
         .size(11)
-        .font(iced::Font {
-            weight: iced::font::Weight::Bold,
-            style: iced::font::Style::Italic,
-            ..iced::Font::DEFAULT
-        })
+        .font(typography::bold_italic())
         .style(|theme: &Theme| text::Style {
             color: Some(theme.palette().primary.base.color),
         })

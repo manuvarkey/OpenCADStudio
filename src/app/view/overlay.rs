@@ -3,6 +3,7 @@ use crate::t;
 use crate::ui::popup::context_menu::{
     ContextMenu, MenuIcon, MenuItem, MenuRow, MENU_PAD_TOP, MENU_ROW_H,
 };
+use crate::ui::typography;
 use iced::advanced::layout;
 use iced::advanced::mouse;
 use iced::advanced::overlay;
@@ -1274,10 +1275,7 @@ pub(super) fn viewport_context_menu_overlay(
 fn context_menu_row(item: &MenuItem, indent: f32, highlighted: bool) -> Element<'static, Message> {
     let mut label_text = text(item.label.clone()).size(12);
     if item.default {
-        label_text = label_text.font(iced::Font {
-            weight: iced::font::Weight::Bold,
-            ..iced::Font::DEFAULT
-        });
+        label_text = label_text.font(typography::bold());
     }
     let enabled = item.enabled;
     let mut content = row![context_menu_gutter(item.icon, enabled), label_text]
