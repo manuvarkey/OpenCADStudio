@@ -13,6 +13,7 @@ use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form;
 use crate::ui::style::form::{hdivider, vseparator as vsep};
+use crate::ui::typography;
 use iced::widget::{
     button, checkbox, column, container, mouse_area, row, scrollable, text, text_input, Space,
 };
@@ -717,7 +718,7 @@ fn setup_row<'a>(
             .on_input(|value| Message::PlotDlg(PlotDlgMsg::NameInput(value)))
             .on_submit(Message::PlotDlg(PlotDlgMsg::NameCommit))
             .style(form::field_style)
-            .size(11)
+            .size(typography::small())
             .padding([4, 8])
             .width(Fit)
             .into();
@@ -728,7 +729,7 @@ fn setup_row<'a>(
     } else {
         Cow::Owned(name.to_string())
     };
-    let cell = container(text(display_name).size(11))
+    let cell = container(text(display_name).size(typography::small()))
         .padding([4, 8])
         .width(Fit)
         .style(move |theme: &Theme| {
@@ -817,7 +818,7 @@ fn check<'a>(label: Cow<'static, str>, on: bool, flag: PlotFlag) -> Element<'a, 
         .label(label)
         .on_toggle(move |_| Message::PlotDlg(PlotDlgMsg::Flag(flag)))
         .size(14)
-        .text_size(11)
+        .text_size(typography::small())
         .into()
 }
 
@@ -833,7 +834,7 @@ fn check_enabled<'a>(
     checkbox(on)
         .label(label)
         .size(14)
-        .text_size(11)
+        .text_size(typography::small())
         .style(checkbox::primary)
         .into()
 }
@@ -847,9 +848,9 @@ fn page_setup_import_chooser<'a>(
     let msg = |m: PageSetupImportMsg| Message::PlotDlg(PlotDlgMsg::Import(m));
     let mut rows = column![].spacing(3);
     if let Some(error) = &draft.error {
-        rows = rows.push(text(error.clone()).size(10).style(muted_style));
+        rows = rows.push(text(error.clone()).size(typography::caption()).style(muted_style));
     } else if draft.setups.is_empty() {
-        let none = text(t!("No named page setups in this drawing.")).size(10);
+        let none = text(t!("No named page setups in this drawing.")).size(typography::caption());
         rows = rows.push(none.style(muted_style));
     }
     for (name, _, on) in &draft.setups {
@@ -859,28 +860,28 @@ fn page_setup_import_chooser<'a>(
                 .label(name.clone())
                 .on_toggle(move |_| msg(PageSetupImportMsg::Toggle(name.clone())))
                 .size(13)
-                .text_size(11),
+                .text_size(typography::small()),
         );
     }
     let all = !draft.setups.is_empty() && draft.setups.iter().all(|(_, _, on)| *on);
     let any = draft.setups.iter().any(|(_, _, on)| *on);
-    let mut import = button(text(t!("Import")).size(11))
+    let mut import = button(text(t!("Import")).size(typography::small()))
         .style(btn(true))
         .padding([4, 8]);
     if any {
         import = import.on_press(msg(PageSetupImportMsg::Apply));
     }
     column![
-        text(draft.file.clone()).size(10).style(muted_style),
+        text(draft.file.clone()).size(typography::caption()).style(muted_style),
         scrollable(rows).height(height),
         checkbox(all)
             .label(t!("All"))
             .on_toggle(move |on| msg(PageSetupImportMsg::All(on)))
             .size(13)
-            .text_size(11),
+            .text_size(typography::small()),
         row![
             import,
-            button(text(t!("Cancel")).size(11))
+            button(text(t!("Cancel")).size(typography::small()))
                 .on_press(msg(PageSetupImportMsg::Cancel))
                 .style(btn(false))
                 .padding([4, 8]),
@@ -896,7 +897,7 @@ fn page_setup_import_chooser<'a>(
 /// either side replaces the picked scale with the typed ratio.
 fn custom_scale_row<'a>(s: &'a PlotDialogState, enabled: bool) -> Element<'a, Message> {
     let field = |value: &'a str, ctor: fn(String) -> PlotDlgMsg| {
-        let mut input = text_input("", value).size(11).padding([3, 6]).width(58);
+        let mut input = text_input("", value).size(typography::small()).padding([3, 6]).width(58);
         if enabled {
             input = input.on_input(move |v| Message::PlotDlg(ctor(v)));
         }
@@ -907,12 +908,12 @@ fn custom_scale_row<'a>(s: &'a PlotDialogState, enabled: bool) -> Element<'a, Me
         PaperUnits::Millimeters => t!("Millimeters"),
     };
     row![
-        text(t!("Custom")).size(11).width(form::LABEL_WIDTH),
+        text(t!("Custom")).size(typography::small()).width(form::LABEL_WIDTH),
         field(&s.custom_scale_paper, PlotDlgMsg::CustomScalePaper),
-        text(unit).size(11),
-        text("=").size(11),
+        text(unit).size(typography::small()),
+        text("=").size(typography::small()),
         field(&s.custom_scale_drawing, PlotDlgMsg::CustomScaleDrawing),
-        text(t!("units")).size(11),
+        text(t!("units")).size(typography::small()),
     ]
     .spacing(6)
     .align_y(iced::Center)
@@ -923,7 +924,7 @@ fn custom_scale_row<'a>(s: &'a PlotDialogState, enabled: bool) -> Element<'a, Me
 /// the file's own problem, or where a copy would be found.
 fn style_note<'a>(s: &'a PlotDialogState) -> Element<'a, Message> {
     match &s.style_error {
-        Some(error) if s.style_missing => text(error.clone()).size(10).style(muted_style).into(),
+        Some(error) if s.style_missing => text(error.clone()).size(typography::caption()).style(muted_style).into(),
         _ => Space::new().height(0).into(),
     }
 }
@@ -955,7 +956,7 @@ fn printer_options_editor<'a>(
         (Some(options), _) if options.is_empty() => {
             rows = rows.push(
                 text(t!("This printer reports no driver options."))
-                    .size(10)
+                    .size(typography::caption())
                     .style(muted_style),
             );
         }
@@ -991,7 +992,7 @@ fn printer_options_editor<'a>(
         (None, Some(error)) => {
             rows = rows.push(
                 text(crate::tf!("Could not read the printer's options: {error}"))
-                    .size(10)
+                    .size(typography::caption())
                     .style(|theme: &Theme| iced::widget::text::Style {
                         color: Some(theme.palette().danger.base.color),
                     }),
@@ -1000,18 +1001,18 @@ fn printer_options_editor<'a>(
         (None, None) => {
             rows = rows.push(
                 text(t!("Reading the printer's options…"))
-                    .size(10)
+                    .size(typography::caption())
                     .style(muted_style),
             );
         }
     }
     let mut buttons = row![
-        button(text(t!("Reset")).size(11))
+        button(text(t!("Reset")).size(typography::small()))
             .on_press(Message::PlotDlg(PlotDlgMsg::PrinterOptionsReset))
             .style(btn(false))
             .padding([4, 10]),
         Space::new().width(Length::Fill),
-        button(text(t!("Cancel")).size(11))
+        button(text(t!("Cancel")).size(typography::small()))
             .on_press(Message::PlotDlg(PlotDlgMsg::PrinterOptionsCancel))
             .style(btn(false))
             .padding([4, 10]),
@@ -1019,7 +1020,7 @@ fn printer_options_editor<'a>(
     .spacing(6);
     if draft.options.is_some() {
         buttons = buttons.push(
-            button(text(t!("Apply")).size(11))
+            button(text(t!("Apply")).size(typography::small()))
                 .on_press(Message::PlotDlg(PlotDlgMsg::PrinterOptionsApply))
                 .style(btn(true))
                 .padding([4, 12]),
@@ -1074,7 +1075,7 @@ fn custom_paper_editor<'a>(draft: &'a CustomPaperDraft, width: Length) -> Elemen
     };
     let error: Element<'_, Message> = match draft.error {
         Some(CustomPaperError::Size) => text(t!("Enter a positive width and height."))
-            .size(10)
+            .size(typography::caption())
             .style(|theme: &Theme| iced::widget::text::Style {
                 color: Some(theme.palette().danger.base.color),
             })
@@ -1100,12 +1101,12 @@ fn custom_paper_editor<'a>(draft: &'a CustomPaperDraft, width: Length) -> Elemen
             row![
                 dimension(t!("Width"), &draft.width, CustomPaperMsg::Width),
                 dimension(t!("Height"), &draft.height, CustomPaperMsg::Height),
-                text(unit).size(11).style(muted_style),
+                text(unit).size(typography::small()).style(muted_style),
             ]
             .spacing(14)
             .align_y(iced::Center),
             text(format!("{} ({unit})", t!("Printable margins")))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
             row![
                 margin(t!("Left"), MarginSide::Left, 0),
@@ -1120,11 +1121,11 @@ fn custom_paper_editor<'a>(draft: &'a CustomPaperDraft, width: Length) -> Elemen
             error,
             row![
                 Space::new().width(Length::Fill),
-                button(text(t!("Cancel")).size(11))
+                button(text(t!("Cancel")).size(typography::small()))
                     .on_press(msg(CustomPaperMsg::Cancel))
                     .style(btn(false))
                     .padding([4, 10]),
-                button(text(t!("Add")).size(11))
+                button(text(t!("Add")).size(typography::small()))
                     .on_press(msg(CustomPaperMsg::Add))
                     .style(btn(true))
                     .padding([4, 12]),
@@ -1211,7 +1212,7 @@ pub fn view_window(
         .map(|name| setup_row(name, &s.selected_setup, renaming, rename_buf))
         .collect();
     let list_body: Element<'_, Message> = if rows.is_empty() {
-        container(text(t!("(no page setups)")).size(11).style(muted_style))
+        container(text(t!("(no page setups)")).size(typography::small()).style(muted_style))
             .padding([6, 8])
             .into()
     } else {
@@ -1223,14 +1224,14 @@ pub fn view_window(
                 .on_input(|value| Message::PlotDlg(PlotDlgMsg::NameInput(value)))
                 .on_submit(Message::PlotDlg(PlotDlgMsg::NameCommit))
                 .style(form::field_style)
-                .size(11)
+                .size(typography::small())
                 .padding([4, 8])
                 .width(Length::Fill),
-            button(text(t!("Save")).size(11))
+            button(text(t!("Save")).size(typography::small()))
                 .on_press(Message::PlotDlg(PlotDlgMsg::NameCommit))
                 .style(btn(true))
                 .padding([4, 8]),
-            button(text("×").size(11))
+            button(text("×").size(typography::small()))
                 .on_press(Message::PlotDlg(PlotDlgMsg::NameCancel))
                 .style(btn(false))
                 .padding([4, 8]),
@@ -1248,7 +1249,7 @@ pub fn view_window(
     };
     let list_panel = container(
         column![
-            text(t!("Page setups")).size(10).style(muted_style),
+            text(t!("Page setups")).size(typography::caption()).style(muted_style),
             new_name,
             container(list_body)
                 .style(|theme: &Theme| {
@@ -1279,25 +1280,25 @@ pub fn view_window(
         left: 12.0,
     });
 
-    let mut new_button = button(text(t!("New")).size(11))
+    let mut new_button = button(text(t!("New")).size(typography::small()))
         .style(btn(false))
         .padding([4, 12]);
     if !print_all_options {
         new_button = new_button.on_press(Message::PlotDlg(PlotDlgMsg::NewSetup));
     }
-    let mut copy_button = button(text(t!("Copy")).size(11))
+    let mut copy_button = button(text(t!("Copy")).size(typography::small()))
         .style(btn(false))
         .padding([4, 12]);
     if can_copy && !print_all_options {
         copy_button = copy_button.on_press(Message::PlotDlg(PlotDlgMsg::CopySetup));
     }
-    let mut delete_button = button(text(t!("Delete")).size(11))
+    let mut delete_button = button(text(t!("Delete")).size(typography::small()))
         .style(btn(false))
         .padding([4, 12]);
     if is_named && !print_all_options {
         delete_button = delete_button.on_press(Message::PlotDlg(PlotDlgMsg::DeleteSetup));
     }
-    let mut import_button = button(text(t!("Import…")).size(11))
+    let mut import_button = button(text(t!("Import…")).size(typography::small()))
         .style(btn(false))
         .padding([4, 12]);
     if !print_all_options && s.import_draft.is_none() {
@@ -1376,7 +1377,7 @@ pub fn view_window(
         text(t!(
             "Sheet sizes and printable areas reported by the printer."
         ))
-        .size(10)
+        .size(typography::caption())
         .style(muted_style)
         .width(width)
         .into()
@@ -1387,7 +1388,7 @@ pub fn view_window(
         text(t!(
             "Layout plots the current sheet using the selected paper size."
         ))
-        .size(10)
+        .size(typography::caption())
         .style(muted_style)
         .width(width)
         .into()
@@ -1399,12 +1400,12 @@ pub fn view_window(
     // stays readable; the driver's Properties… button sits beneath it.
     let output_field = row![
         text(t!("Printer / plotter"))
-            .size(11)
+            .size(typography::small())
             .style(muted_style)
             .width(form::LABEL_WIDTH),
         iced::widget::pick_list(printer_sel, printer_opts, |value| value.to_string())
             .on_select(|choice| Message::PlotDlg(PlotDlgMsg::Printer(choice.raw)))
-            .text_size(12)
+            .text_size(typography::body())
             .padding([3, 6])
             .width(Length::Fill),
     ]
@@ -1417,7 +1418,7 @@ pub fn view_window(
         row![
             field_row(t!("Copies"), &s.copies, PlotDlgMsg::Copies, 60),
             Space::new().width(Length::Fill),
-            button(text(t!("Properties…")).size(11))
+            button(text(t!("Properties…")).size(typography::small()))
                 .on_press(Message::PlotDlg(PlotDlgMsg::PrinterProperties))
                 .style(btn(false))
                 .padding([4, 10]),
@@ -1432,14 +1433,14 @@ pub fn view_window(
         (None, _) if s.printers_error.is_some() => {
             let error = s.printers_error.clone().unwrap_or_default();
             text(crate::tf!("Could not list printers: {error}"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted_style)
                 .into()
         }
         (None, Some(printer)) if s.driver_options.get(printer).is_some_and(|o| !o.is_empty()) => {
             let count = s.driver_options[printer].len();
             text(crate::tf!("{count} driver option(s) set for this printer."))
-                .size(10)
+                .size(typography::caption())
                 .style(muted_style)
                 .into()
         }
@@ -1464,7 +1465,7 @@ pub fn view_window(
             let mut buttons = row![Space::new().width(Length::Fill)].spacing(6);
             if selected_is_custom {
                 buttons = buttons.push(
-                    button(text(t!("Remove")).size(11))
+                    button(text(t!("Remove")).size(typography::small()))
                         .on_press(Message::PlotDlg(PlotDlgMsg::CustomPaper(
                             CustomPaperMsg::Remove,
                         )))
@@ -1474,7 +1475,7 @@ pub fn view_window(
             }
             buttons
                 .push(
-                    button(text(t!("Custom…")).size(11))
+                    button(text(t!("Custom…")).size(typography::small()))
                         .on_press(Message::PlotDlg(PlotDlgMsg::CustomPaper(
                             CustomPaperMsg::Open,
                         )))
@@ -1506,7 +1507,7 @@ pub fn view_window(
     }
     let mut area_row = row![
         text(t!("What to plot"))
-            .size(11)
+            .size(typography::small())
             .style(muted_style)
             .width(92),
         iced::widget::pick_list(
@@ -1515,7 +1516,7 @@ pub fn view_window(
             |value| value.to_string(),
         )
         .on_select(|choice| Message::PlotDlg(PlotDlgMsg::Area(choice.raw)))
-        .text_size(12)
+        .text_size(typography::body())
         .padding([3, 6])
         .width(Length::Fill),
     ]
@@ -1523,7 +1524,7 @@ pub fn view_window(
     .align_y(iced::Center);
     if s.area == "Window" && !print_all_options {
         area_row = area_row.push(
-            button(text(t!("Pick…")).size(11))
+            button(text(t!("Pick…")).size(typography::small()))
                 .on_press(Message::PlotDlg(PlotDlgMsg::PickWindow))
                 .style(btn(false))
                 .padding([4, 10]),
@@ -1657,11 +1658,11 @@ pub fn view_window(
                 s.paper_space && !s.style_name.is_empty(),
             ),
             row![
-                button(text(t!("Load…")).size(11))
+                button(text(t!("Load…")).size(typography::small()))
                     .on_press(Message::PlotDlg(PlotDlgMsg::LoadStyle))
                     .style(btn(false))
                     .padding([4, 10]),
-                button(text(t!("Edit…")).size(11))
+                button(text(t!("Edit…")).size(typography::small()))
                     .on_press(Message::PlotStylePanelOpen)
                     .style(btn(false))
                     .padding([4, 10]),
@@ -1805,21 +1806,21 @@ pub fn view_window(
     let mut toolbar_row = row![left_bar, Space::new().width(width)]
         .align_y(iced::Center)
         .push(
-            button(text(t!("Set current")).size(11))
+            button(text(t!("Set current")).size(typography::small()))
                 .on_press(Message::PlotDlg(PlotDlgMsg::SetCurrent))
                 .style(btn(false))
                 .padding([4, 12]),
         )
         .push(Space::new().width(6))
         .push(
-            button(text(t!("Preview")).size(11))
+            button(text(t!("Preview")).size(typography::small()))
                 .on_press(Message::PlotDlg(PlotDlgMsg::Preview))
                 .style(btn(false))
                 .padding([4, 12]),
         )
         .push(Space::new().width(6));
     toolbar_row = toolbar_row.push(
-        button(text(action).size(11))
+        button(text(action).size(typography::small()))
             .on_press(Message::PlotDlg(PlotDlgMsg::Commit))
             .style(btn(true))
             .padding([4, 18]),

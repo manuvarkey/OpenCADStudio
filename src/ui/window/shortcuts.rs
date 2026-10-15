@@ -3,6 +3,7 @@
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{button, column, container, row, scrollable, text, text_input, Space};
 use iced::{Background, Element, Length, Theme};
 
@@ -57,11 +58,11 @@ pub fn view_window<'a>(
     close_confirm: bool,
     sizing: crate::ui::modal::ModalSizing,
 ) -> Element<'a, Message> {
-    let title = text(t!("Keyboard Shortcuts")).size(15);
+    let title = text(t!("Keyboard Shortcuts")).size(typography::heading());
     let hint = text(t!(
         "Click + Add, press a key combination, type the command, then Apply. Esc cancels the pending row."
     ))
-    .size(11)
+    .size(typography::small())
     .style(muted_style);
     let gutter = iced::Padding {
         top: 0.0,
@@ -72,8 +73,8 @@ pub fn view_window<'a>(
 
     let head = container(
         row![
-            container(text(t!("Key")).size(11).style(muted_style)).width(Length::Fixed(180.0)),
-            container(text(t!("Command")).size(11).style(muted_style)).width(sizing.width),
+            container(text(t!("Key")).size(typography::small()).style(muted_style)).width(Length::Fixed(180.0)),
+            container(text(t!("Command")).size(typography::small()).style(muted_style)).width(sizing.width),
             Space::new().width(Length::Fixed(30.0)),
         ]
         .spacing(8),
@@ -97,20 +98,20 @@ pub fn view_window<'a>(
             key.clone()
         };
         let key_box = if armed {
-            button(text(key_label).size(13))
+            button(text(key_label).size(typography::body_large()))
                 .on_press(Message::ShortcutCaptureClear)
                 .padding([3, 6])
                 .width(Length::Fixed(180.0))
                 .style(button::primary)
         } else if duplicate {
             // The whole field turns red, not just the text.
-            button(text(key_label).size(13))
+            button(text(key_label).size(typography::body_large()))
                 .on_press(Message::ShortcutCaptureStart(idx))
                 .padding([3, 6])
                 .width(Length::Fixed(180.0))
                 .style(button::danger)
         } else {
-            button(text(key_label).size(13).style(muted_style))
+            button(text(key_label).size(typography::body_large()).style(muted_style))
                 .on_press(Message::ShortcutCaptureStart(idx))
                 .padding([3, 6])
                 .width(Length::Fixed(180.0))
@@ -123,7 +124,7 @@ pub fn view_window<'a>(
                 field: ShortcutField::Command,
                 value,
             })
-            .size(13)
+            .size(typography::body_large())
             .padding([3, 6])
             .width(sizing.width);
         // An unrunnable command turns the whole field red, mirroring the
@@ -180,12 +181,12 @@ pub fn view_window<'a>(
     // While a draft row is pending, the add button doubles as the visible
     // cancel affordance (Esc works too).
     let add = if pending_add {
-        button(text(t!("Cancel add (Esc)")).size(12))
+        button(text(t!("Cancel add (Esc)")).size(typography::body()))
             .on_press(Message::ShortcutCaptureCancel)
             .padding([4, 10])
             .style(button::danger)
     } else {
-        button(text(format!("+ {}", t!("Add"))).size(12))
+        button(text(format!("+ {}", t!("Add"))).size(typography::body()))
             .on_press(Message::ShortcutEditorAdd)
             .padding([4, 10])
             .style(button::secondary)
@@ -197,7 +198,7 @@ pub fn view_window<'a>(
     } else {
         row![
             text(format!("{}: {}", t!("Number of shortcuts"), rows.len()))
-                .size(12)
+                .size(typography::body())
                 .style(muted_style)
         ]
     };
@@ -209,13 +210,13 @@ pub fn view_window<'a>(
                 text(t!(
                     "Are you sure you want to reset? You will lose all your current shortcuts!"
                 ))
-                .size(12)
+                .size(typography::body())
                 .style(danger_text_style),
-                button(text(t!("Yes, reset")).size(12))
+                button(text(t!("Yes, reset")).size(typography::body()))
                     .on_press(Message::ShortcutEditorResetConfirm)
                     .padding([4, 10])
                     .style(button::danger),
-                button(text(t!("No")).size(12))
+                button(text(t!("No")).size(typography::body()))
                     .on_press(Message::ShortcutEditorResetDeny)
                     .padding([4, 10])
                     .style(button::secondary),
@@ -226,7 +227,7 @@ pub fn view_window<'a>(
         )
     } else {
         (
-            row![button(text(t!("Reset to default")).size(12))
+            row![button(text(t!("Reset to default")).size(typography::body()))
                 .on_press(Message::ShortcutEditorResetAsk)
                 .padding([4, 10])
                 .style(button::secondary)]
@@ -235,11 +236,11 @@ pub fn view_window<'a>(
             row![add],
         )
     };
-    let apply = button(text(t!("Apply")).size(12))
+    let apply = button(text(t!("Apply")).size(typography::body()))
         .on_press(Message::ShortcutEditorApply)
         .padding([4, 16])
         .style(button::primary);
-    let apply_exit = button(text(t!("Apply & Exit")).size(12))
+    let apply_exit = button(text(t!("Apply & Exit")).size(typography::body()))
         .on_press(Message::ShortcutEditorApplyExit)
         .padding([4, 16])
         .style(button::primary);
@@ -260,14 +261,14 @@ pub fn view_window<'a>(
                 key,
                 command
             ))
-            .size(12)
+            .size(typography::body())
             .style(danger_text_style),
         );
     }
     for command in unknown_commands {
         conflict_banner = conflict_banner.push(
             text(crate::tf!("Unknown command: {}", command))
-                .size(12)
+                .size(typography::body())
                 .style(danger_text_style),
         );
     }
@@ -324,14 +325,14 @@ pub fn view_window<'a>(
     .interaction(iced::mouse::Interaction::Idle);
     let panel = container(
         column![
-            text(t!("Unsaved changes will be discarded.")).size(14),
+            text(t!("Unsaved changes will be discarded.")).size(typography::subheading()),
             Space::new().height(10),
             row![
-                button(text(t!("Discard & close")).size(12))
+                button(text(t!("Discard & close")).size(typography::body()))
                     .on_press(Message::ShortcutEditorCloseDiscard)
                     .padding([4, 12])
                     .style(button::danger),
-                button(text(t!("Keep editing")).size(12))
+                button(text(t!("Keep editing")).size(typography::body()))
                     .on_press(Message::ShortcutEditorCloseKeep)
                     .padding([4, 12])
                     .style(button::secondary),

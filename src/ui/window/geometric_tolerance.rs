@@ -14,6 +14,7 @@ use iced::{Border, Element, Fill, Length, Theme};
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::form::{dialog_button, dialog_button_styled_opt};
+use crate::ui::typography;
 
 const EMPTY: &str = "";
 
@@ -394,7 +395,7 @@ fn muted(theme: &Theme) -> iced::widget::text::Style {
 }
 
 fn panel<'a>(title: String, body: Element<'a, Message>) -> Element<'a, Message> {
-    container(column![text(title).size(11).style(muted), body].spacing(6))
+    container(column![text(title).size(typography::small()).style(muted), body].spacing(6))
         .padding(8)
         .width(Fill)
         .style(|theme: &Theme| container::Style {
@@ -422,7 +423,7 @@ fn material_picker<'a>(index: usize, datum: bool, code: &str) -> Element<'a, Mes
                 ))
             }
         })
-        .text_size(11)
+        .text_size(typography::small())
         .padding([3, 6])
         .width(Length::Fixed(190.0))
         .into()
@@ -440,7 +441,7 @@ pub fn view_window<'a>(
             .on_select(|choice| {
                 Message::ToleranceDialogField(Field::Symbol(choice.code.to_string()))
             })
-            .text_size(12)
+            .text_size(typography::body())
             .padding([4, 6])
             .width(Fill)
             .into(),
@@ -455,7 +456,7 @@ pub fn view_window<'a>(
                 column.push(
                     row![
                         text(format!("{} {}", t!("Tolerance"), index + 1))
-                            .size(11)
+                            .size(typography::small())
                             .style(muted)
                             .width(Length::Fixed(82.0)),
                         checkbox(entry.diameter)
@@ -463,12 +464,12 @@ pub fn view_window<'a>(
                                 Toggle::Diameter(index, value)
                             ))
                             .size(14),
-                        text(t!("Diameter")).size(11).width(Length::Fixed(62.0)),
+                        text(t!("Diameter")).size(typography::small()).width(Length::Fixed(62.0)),
                         text_input(EMPTY, &entry.value)
                             .on_input(move |value| Message::ToleranceDialogField(
                                 Field::ToleranceValue(index, value)
                             ))
-                            .size(12)
+                            .size(typography::body())
                             .padding([3, 6])
                             .width(Length::Fixed(125.0)),
                         material_picker(index, false, &entry.material),
@@ -488,14 +489,14 @@ pub fn view_window<'a>(
                 column.push(
                     row![
                         text(format!("{} {}", t!("Datum"), index + 1))
-                            .size(11)
+                            .size(typography::small())
                             .style(muted)
                             .width(Length::Fixed(82.0)),
                         text_input(EMPTY, &entry.value)
                             .on_input(move |value| Message::ToleranceDialogField(
                                 Field::DatumValue(index, value)
                             ))
-                            .size(12)
+                            .size(typography::body())
                             .padding([3, 6])
                             .width(Length::Fixed(212.0)),
                         material_picker(index, true, &entry.material),
@@ -511,29 +512,29 @@ pub fn view_window<'a>(
         column![
             row![
                 text(t!("Projected height"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted)
                     .width(Length::Fixed(112.0)),
                 text_input(EMPTY, &state.projected_height)
                     .on_input(|value| Message::ToleranceDialogField(Field::ProjectedHeight(value)))
-                    .size(12)
+                    .size(typography::body())
                     .padding([3, 6])
                     .width(Length::Fixed(125.0)),
                 checkbox(state.projected_zone)
                     .on_toggle(|value| Message::ToleranceDialogToggle(Toggle::ProjectedZone(value)))
                     .size(14),
-                text(t!("Projected tolerance zone")).size(11),
+                text(t!("Projected tolerance zone")).size(typography::small()),
             ]
             .spacing(6)
             .align_y(iced::Center),
             row![
                 text(t!("Datum identifier"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted)
                     .width(Length::Fixed(112.0)),
                 text_input(EMPTY, &state.datum_identifier)
                     .on_input(|value| Message::ToleranceDialogField(Field::DatumIdentifier(value)))
-                    .size(12)
+                    .size(typography::body())
                     .padding([3, 6])
                     .width(Length::Fixed(212.0)),
             ]

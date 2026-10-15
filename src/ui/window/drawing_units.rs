@@ -19,6 +19,7 @@ use crate::app::Message;
 use crate::modules::draw::units;
 use crate::t;
 use crate::ui::style::form::dialog_button;
+use crate::ui::typography;
 
 /// The dialog's working copy. Nothing reaches the drawing until OK, so a format
 /// can be tried against the sample and abandoned.
@@ -77,7 +78,7 @@ fn muted(theme: &Theme) -> iced::widget::text::Style {
 }
 
 fn group<'a>(title: String, body: Element<'a, Message>) -> Element<'a, Message> {
-    container(column![text(title).size(11).style(muted), body].spacing(6))
+    container(column![text(title).size(typography::small()).style(muted), body].spacing(6))
         .padding(8)
         .width(Fill)
         .style(|theme: &Theme| container::Style {
@@ -99,10 +100,10 @@ fn drop_row<'a>(
 ) -> Element<'a, Message> {
     let picker = iced::widget::pick_list(selected, options, |choice| choice.to_string())
         .on_select(move |choice| Message::DrawingUnitsField(ctor(choice.code)))
-        .text_size(12)
+        .text_size(typography::body())
         .padding([3, 6])
         .width(Fill);
-    row![text(label).size(11).style(muted).width(78), picker]
+    row![text(label).size(typography::small()).style(muted).width(78), picker]
         .spacing(8)
         .align_y(iced::Center)
         .into()
@@ -208,13 +209,13 @@ pub fn view_window<'a>(
             ),
             precision_row(state.angular_precision, false, Field::AngularPrecision),
             row![
-                text(t!("Zero at")).size(11).style(muted).width(78),
+                text(t!("Zero at")).size(typography::small()).style(muted).width(78),
                 text_input("0", &state.base_angle)
                     .on_input(|value| Message::DrawingUnitsField(Field::BaseAngle(value)))
-                    .size(12)
+                    .size(typography::body())
                     .padding([3, 6])
                     .width(Length::Fixed(80.0)),
-                text(t!("degrees")).size(11).style(muted),
+                text(t!("degrees")).size(typography::small()).style(muted),
             ]
             .spacing(8)
             .align_y(iced::Center),
@@ -223,7 +224,7 @@ pub fn view_window<'a>(
                 checkbox(state.clockwise)
                     .on_toggle(|on| Message::DrawingUnitsField(Field::Clockwise(on)))
                     .size(14),
-                text(t!("Positive angles run clockwise")).size(11),
+                text(t!("Positive angles run clockwise")).size(typography::small()),
             ]
             .spacing(6)
             .align_y(iced::Center),
@@ -247,7 +248,7 @@ pub fn view_window<'a>(
             text(t!(
                 "Scales blocks and drawings inserted from elsewhere. Unitless inserts them unscaled."
             ))
-            .size(10)
+            .size(typography::caption())
             .style(muted),
         ]
         .spacing(6)
@@ -257,8 +258,8 @@ pub fn view_window<'a>(
     let sample = group(
         t!("Sample output").into_owned(),
         column![
-            text(sample_length(state)).size(12),
-            text(sample_angle(state)).size(12),
+            text(sample_length(state)).size(typography::body()),
+            text(sample_angle(state)).size(typography::body()),
         ]
         .spacing(3)
         .into(),

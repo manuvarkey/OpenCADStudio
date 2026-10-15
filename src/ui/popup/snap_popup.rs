@@ -8,6 +8,7 @@ use crate::app::Message;
 use crate::snap::{SnapType, Snapper, ALL_SNAP_MODES};
 use crate::t;
 use crate::ui::statusbar::status_menu::Entry;
+use crate::ui::typography;
 
 pub fn menu_entries<'a>(
     snapper: &'a Snapper,
@@ -36,7 +37,7 @@ pub fn menu_entries<'a>(
     let mut iso_planes = row![].spacing(3);
     for plane in IsoPlane::ALL {
         iso_planes = iso_planes.push(
-            button(text(t!(plane.label())).size(10))
+            button(text(t!(plane.label())).size(typography::caption()))
                 .on_press(Message::SetIsoPlane(plane))
                 .style(if isometric && iso_plane == plane {
                     button::primary
@@ -51,12 +52,12 @@ pub fn menu_entries<'a>(
             checkbox(isometric)
                 .on_toggle(|_| Message::ToggleIsometricDrafting)
                 .size(14),
-            text(t!("Isometric drafting")).size(11),
+            text(t!("Isometric drafting")).size(typography::small()),
         ]
         .spacing(6)
         .align_y(iced::Center),
         iso_planes,
-        text(t!("F5 cycles the active plane.")).size(10),
+        text(t!("F5 cycles the active plane.")).size(typography::caption()),
     ]
     .spacing(5)
     .padding([5, 8]);
@@ -98,7 +99,7 @@ fn snap_row<'a>(snap_type: SnapType, label: &'a str, active: bool) -> Element<'a
     .width(Length::Fixed(16.0))
     .align_x(iced::Center);
 
-    let label_el = text(t!(label)).size(11);
+    let label_el = text(t!(label)).size(typography::small());
 
     let content = row![checkmark, icon_el, label_el]
         .spacing(4)
@@ -113,7 +114,7 @@ fn snap_row<'a>(snap_type: SnapType, label: &'a str, active: bool) -> Element<'a
 }
 
 fn header_btn(label: &str, msg: Message, enabled: bool) -> Element<'_, Message> {
-    let b = button(text(t!(label)).size(10));
+    let b = button(text(t!(label)).size(typography::caption()));
     let b = if enabled { b.on_press(msg) } else { b };
     b.style(button::secondary).padding([3, 8]).into()
 }

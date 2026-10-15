@@ -9,6 +9,7 @@
 
 use crate::app::{Message, StyleKind};
 use crate::t;
+use crate::ui::typography;
 use iced::widget::button::{Status, Style};
 use iced::widget::{button, column, container, row, scrollable, text, Space};
 use iced::{Background, Border, Element, Length, Theme};
@@ -95,7 +96,7 @@ pub fn view<'a, 'b>(s: Scaffold<'a, 'b>) -> Element<'a, Message> {
 
     let list_panel = container(
         column![
-            text(t!("Styles")).size(10).style(muted_text_style),
+            text(t!("Styles")).size(typography::caption()).style(muted_text_style),
             container(scrollable(column(rows).spacing(1)).height(height))
                 .style(|theme: &Theme| {
                     let palette = theme.palette();
@@ -167,7 +168,7 @@ pub fn editor_shell<'a>(shell: EditorShell<'a>) -> Element<'a, Message> {
         .tabs
         .into_iter()
         .map(|tab| {
-            button(text(tab.label).size(11))
+            button(text(tab.label).size(typography::small()))
                 .on_press(tab.on_press)
                 .style(tab_button_style(tab.active))
                 .padding([4, 10])
@@ -176,13 +177,13 @@ pub fn editor_shell<'a>(shell: EditorShell<'a>) -> Element<'a, Message> {
         .collect();
     let comparison: Element<'a, Message> = match shell.comparison {
         Some(comparison) if !comparison.options.is_empty() => row![
-            text(t!("Compare with")).size(10).style(muted_text_style),
+            text(t!("Compare with")).size(typography::caption()).style(muted_text_style),
             iced::widget::pick_list(Some(comparison.selected), comparison.options, |value| value
                 .to_string(),)
             .on_select(comparison.on_select)
-            .text_size(11)
+            .text_size(typography::small())
             .width(150),
-            text(comparison.summary).size(10).style(muted_text_style),
+            text(comparison.summary).size(typography::caption()).style(muted_text_style),
         ]
         .spacing(8)
         .align_y(iced::Center)
@@ -203,9 +204,9 @@ pub fn editor_shell<'a>(shell: EditorShell<'a>) -> Element<'a, Message> {
     container(
         column![
             row![
-                text(shell.selected).size(13).style(primary_text_style),
+                text(shell.selected).size(typography::body_large()).style(primary_text_style),
                 Space::new().width(Length::Fill),
-                text(shell.status).size(10).style(muted_text_style),
+                text(shell.status).size(typography::caption()).style(muted_text_style),
             ]
             .align_y(iced::Center),
             preview,
@@ -242,7 +243,7 @@ pub(crate) fn tb_button(
     accent: bool,
 ) -> Element<'static, Message> {
     let pad = if accent { [4, 14] } else { [4, 10] };
-    button(text(label.into()).size(11))
+    button(text(label.into()).size(typography::small()))
         .on_press(msg)
         .style(btn_s(accent))
         .padding(pad)
@@ -256,7 +257,7 @@ pub(crate) fn tb_button_enabled(
     enabled: bool,
 ) -> Element<'static, Message> {
     let pad = if accent { [4, 14] } else { [4, 10] };
-    let button = button(text(label.into()).size(11))
+    let button = button(text(label.into()).size(typography::small()))
         .style(btn_s(accent))
         .padding(pad);
     if enabled {

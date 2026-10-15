@@ -1,5 +1,6 @@
 use crate::app::Message;
 use crate::scene::WireModel;
+use crate::ui::typography;
 use iced::widget::{button, column, container, pick_list, row, text, text_input, Space};
 use iced::{Element, Fill};
 
@@ -27,12 +28,12 @@ pub(crate) fn view(state: &State, sizing: crate::ui::modal::ModalSizing) -> Elem
     .width(Fill);
     container(
         column![
-            text(crate::t!("Block name").into_owned()).size(13),
+            text(crate::t!("Block name").into_owned()).size(typography::body_large()),
             field,
             names,
             super::block_palette::preview_canvas(&state.preview, 160.0),
             text(state.error.clone().unwrap_or_default())
-                .size(12)
+                .size(typography::body())
                 .style(text::danger),
             row![
                 Space::new().width(Fill),

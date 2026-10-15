@@ -14,6 +14,7 @@ use crate::io::xref_model::Pathtype;
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{button_style, dialog_button, field_style, form_radio};
+use crate::ui::typography;
 use crate::ui::window::block_definition::{group, labeled_checkbox};
 
 /// One edit in the dialog.
@@ -144,7 +145,7 @@ fn number_field<'a>(
     on_input: impl Fn(String) -> Message + 'a,
 ) -> Element<'a, Message> {
     let mut field = text_input("", value)
-        .size(11)
+        .size(typography::small())
         .padding([3, 6])
         .width(Fill)
         .style(field_style);
@@ -153,7 +154,7 @@ fn number_field<'a>(
     }
     row![
         text(label)
-            .size(11)
+            .size(typography::small())
             .style(muted_style)
             .width(Length::Fixed(16.0)),
         field
@@ -166,11 +167,11 @@ fn number_field<'a>(
 fn read_only_field<'a>(label: String, value: &'a str, label_width: f32) -> Element<'a, Message> {
     row![
         text(label)
-            .size(11)
+            .size(typography::small())
             .style(muted_style)
             .width(Length::Fixed(label_width)),
         text_input("", value)
-            .size(11)
+            .size(typography::small())
             .padding([3, 6])
             .width(Fill)
             .style(field_style),
@@ -195,14 +196,14 @@ pub fn view_window<'a>(
         },
         |chosen: String| msg(XrefAttachMsg::Name(chosen)),
     )
-    .size(11)
+    .size(typography::small())
     .padding([3, 6])
     .width(Fill);
     let name_section = column![
-        text(t!("Name:")).size(11).style(muted_style),
+        text(t!("Name:")).size(typography::small()).style(muted_style),
         row![
             name_combo,
-            button(text(t!("Browse...")).size(11))
+            button(text(t!("Browse...")).size(typography::small()))
                 .on_press(msg(XrefAttachMsg::Browse))
                 .style(button_style(false))
                 .padding([4, 12])
@@ -314,13 +315,13 @@ pub fn view_window<'a>(
             choice.to_string()
         })
         .on_select(|v| msg(XrefAttachMsg::PathType(v)))
-        .text_size(11)
+        .text_size(typography::small())
         .padding([3, 6])
         .width(Fill),
         Length::Shrink,
     );
     let mut angle = text_input("", &state.rotation)
-        .size(11)
+        .size(typography::small())
         .padding([3, 6])
         .width(Fill)
         .style(field_style);
@@ -335,7 +336,7 @@ pub fn view_window<'a>(
             )),
             row![
                 text(t!("Angle:"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted_style)
                     .width(Length::Fixed(44.0)),
                 angle
@@ -383,7 +384,7 @@ pub fn view_window<'a>(
         t!("Show Details")
     };
     let footer = row![
-        button(text(details_label).size(12))
+        button(text(details_label).size(typography::body()))
             .on_press(msg(XrefAttachMsg::Details(!state.details)))
             .style(button::secondary)
             .padding([6, 18]),

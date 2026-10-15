@@ -25,6 +25,7 @@ use crate::snap::Snapper;
 use crate::t;
 use crate::ui::statusbar::status_menu::Entry as StatusMenuEntry;
 use crate::ui::statusbar::statusbar_config::{StatusBarConfig, StatusPill};
+use crate::ui::typography;
 use crate::ui::wrap_bar::WrapBar;
 
 /// Height of one status-bar row. Matches the drawing-tab strip above it so the
@@ -179,7 +180,7 @@ impl StatusBar {
             )
         };
 
-        let add_button = button(text("+").size(12))
+        let add_button = button(text("+").size(typography::body()))
             .style(button::subtle)
             .padding([4, 8]);
         let add_btn = if is_start {
@@ -710,7 +711,7 @@ fn tip<'a>(
     content: Element<'a, Message>,
     label: std::borrow::Cow<'static, str>,
 ) -> Element<'a, Message> {
-    tip_node(content, text(label).size(11).into())
+    tip_node(content, text(label).size(typography::small()).into())
 }
 
 /// A menu root shows its tooltip until clicked. Moving from the root into the
@@ -843,7 +844,7 @@ fn polar_pill<'a>(
     let main = mouse_area(
         row![
             polar_icon,
-            text(angle).size(11).style(move |theme: &Theme| {
+            text(angle).size(typography::small()).style(move |theme: &Theme| {
                 let palette = theme.palette();
                 text::Style {
                     color: Some(if active {
@@ -861,7 +862,7 @@ fn polar_pill<'a>(
     .on_right_press(Message::SetPolarAngle(next_angle));
     let main = tooltip(
         main,
-        container(text(tooltip_text).size(11))
+        container(text(tooltip_text).size(typography::small()))
             .style(container::bordered_box)
             .padding([4, 8]),
         TipPos::Top,
@@ -938,7 +939,7 @@ fn osnap_btn<'a>(
 
 fn layout_tab_context_menu(name: String) -> Element<'static, Message> {
     let rename = mouse_area(
-        container(text(t!("Rename")).size(12))
+        container(text(t!("Rename")).size(typography::body()))
             .padding([4, 12])
             .width(Length::Fill),
     )
@@ -946,7 +947,7 @@ fn layout_tab_context_menu(name: String) -> Element<'static, Message> {
     .interaction(iced::mouse::Interaction::Pointer);
 
     let delete = mouse_area(
-        container(text(t!("Delete")).size(12))
+        container(text(t!("Delete")).size(typography::body()))
             .padding([4, 12])
             .width(Length::Fill),
     )
@@ -999,7 +1000,7 @@ fn space_tab<'a>(
     };
 
     if !enabled {
-        let display = container(text(label.clone()).size(12))
+        let display = container(text(label.clone()).size(typography::body()))
             .style(tab_style)
             .padding([4, 10]);
         crate::ui::wrap_bar::PosReport::owned(
@@ -1016,7 +1017,7 @@ fn space_tab<'a>(
             .id(iced::widget::Id::new(LAYOUT_RENAME_INPUT_ID))
             .on_input(Message::LayoutRenameEdit)
             .on_submit(Message::LayoutRenameCommit)
-            .size(12)
+            .size(typography::body())
             .padding([3, 6])
             .width(Length::Fixed(90.0));
 
@@ -1035,7 +1036,7 @@ fn space_tab<'a>(
     } else {
         // Normal clickable tab — left click switches. Paper-layout tabs are
         // wrapped in `ContextMenu`, which owns right-click handling.
-        let display = container(text(label.clone()).size(12))
+        let display = container(text(label.clone()).size(typography::body()))
             .style(tab_style)
             .padding([4, 10]);
 
@@ -1077,7 +1078,7 @@ fn space_mode_btn(current_layout: &str, in_mspace: bool) -> Element<'static, Mes
     };
 
     let clickable = on_press.is_some();
-    let mut btn = button(text(label).size(12))
+    let mut btn = button(text(label).size(typography::body()))
         .style(move |theme: &Theme, status| {
             let mut style = button::subtle(theme, status);
             if active {
@@ -1102,7 +1103,7 @@ fn space_mode_btn(current_layout: &str, in_mspace: bool) -> Element<'static, Mes
 }
 
 fn status_pill(label: impl Into<String>) -> Element<'static, Message> {
-    container(text(label.into()).size(12))
+    container(text(label.into()).size(typography::body()))
         .style(container::bordered_box)
         .padding([4, 8])
         .into()
@@ -1123,7 +1124,7 @@ fn gpu_pill_label(status: &crate::scene::pipeline::GpuStatus) -> Option<String> 
 /// A pill in the theme's warning colours: the only status-bar item that
 /// means "something is wrong", so it must not look like a toggle.
 fn warning_pill(label: impl Into<String>, msg: Message) -> Element<'static, Message> {
-    button(text(label.into()).size(12))
+    button(text(label.into()).size(typography::body()))
         .on_press(msg)
         .style(button::warning)
         .padding([4, 8])
@@ -1131,7 +1132,7 @@ fn warning_pill(label: impl Into<String>, msg: Message) -> Element<'static, Mess
 }
 
 fn success_pill(label: impl Into<String>) -> Element<'static, Message> {
-    container(text(label.into()).size(12))
+    container(text(label.into()).size(typography::body()))
         .style(|theme: &Theme| {
             let palette = theme.palette();
             container::Style {
@@ -1158,7 +1159,7 @@ fn popup_pill(label: impl Into<String>) -> Element<'static, Message> {
 
 fn action_pill(label: impl Into<String>, msg: Message) -> Element<'static, Message> {
     let label = label.into();
-    button(text(label).size(12))
+    button(text(label).size(typography::body()))
         .on_press(msg)
         .style(button::subtle)
         .padding([4, 7])

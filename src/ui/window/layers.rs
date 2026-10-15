@@ -6,6 +6,7 @@ use crate::ui::properties::{lw_options, LinetypeItem, LwItem};
 use crate::ui::style::common::muted_style;
 use crate::ui::style::row_button::{cell_button_style, header_button_style};
 use crate::ui::ROW_H;
+use crate::ui::typography;
 use codec::tables::layer::Layer as DocLayer;
 use codec::tables::Table;
 use codec::types::aci_table::aci_to_rgb;
@@ -45,9 +46,15 @@ pub enum LayerSortCol {
 /// SVG icon size inside a layer-table cell.
 const ICON_SZ: f32 = ROW_H * 0.62; // ≈16 px at ROW_H=26
 /// Font size for cell text.
-const FONT_SZ: f32 = ROW_H * 0.42; // ≈11 px at ROW_H=26
+/// Row text uses the small UI role (ROW_H * 0.42, about 11 px, at the design size).
+fn font_sz() -> f32 {
+    typography::small()
+}
 /// Vertical padding for combo_box / text_input so their total height = ROW_H.
-const COMBO_PAD_V: f32 = (ROW_H - FONT_SZ * 1.3 - 2.0) / 2.0;
+/// Vertical combo padding that fills a combo to ROW_H at the current text size.
+fn combo_pad_v() -> f32 {
+    ((ROW_H - font_sz() * 1.3 - 2.0) / 2.0).max(0.0)
+}
 const LINETYPE_MENU_W: f32 = 220.0;
 /// Widget id for the layer-table scrollable, so a freshly created layer can be
 /// scrolled into view after it is added (#271).
@@ -401,7 +408,7 @@ impl LayerPanel {
                 // Search box: filters rows by name as the user types (#343).
                 text_input(t!("Search…").as_ref(), &self.filter)
                     .on_input(Message::LayerManagerFilterChanged)
-                    .size(FONT_SZ)
+                    .size(font_sz())
                     .padding([3, 6])
                     .width(Length::Fixed(180.0))
                     .style(table_input_style),
@@ -420,7 +427,7 @@ impl LayerPanel {
         let sc = self.sort_col;
         let sa = self.sort_asc;
         let mut header_row = row![
-            text(t!("Status")).size(10).style(muted_style).width(50),
+            text(t!("Status")).size(typography::caption()).style(muted_style).width(50),
             sortable_header(
                 t!("Name"),
                 LayerSortCol::Name,
@@ -498,7 +505,7 @@ impl LayerPanel {
         for vp in &self.vp_cols {
             header_row = header_row.push(
                 text(vp.label.as_str())
-                    .size(10)
+                    .size(typography::caption())
                     .style(muted_style)
                     .width(Length::Fixed(COL_ICON)),
             );
@@ -598,7 +605,7 @@ fn sortable_header<'a>(
     active: Option<LayerSortCol>,
     asc: bool,
 ) -> Element<'a, Message> {
-    let mut content = row![text(label).size(10).style(muted_style)]
+    let mut content = row![text(label).size(typography::caption()).style(muted_style)]
         .spacing(3)
         .align_y(iced::Center);
     if active == Some(col) {
@@ -629,7 +636,7 @@ fn toolbar_btn<'a>(
     msg: Message,
 ) -> Element<'a, Message> {
     button(
-        row![crate::ui::icons::themed(icon, 12.0), text(label).size(11),]
+        row![crate::ui::icons::themed(icon, 12.0), text(label).size(typography::small()),]
             .spacing(5)
             .align_y(iced::Center),
     )
@@ -669,10 +676,10 @@ fn toolbar_btn_cond<'a>(
                 crate::ui::icons::themed_disabled(icon, 12.0)
             },
             if enabled {
-                text(label).size(11)
+                text(label).size(typography::small())
             } else {
                 text(label)
-                    .size(11)
+                    .size(typography::small())
                     .style(|theme: &Theme| iced::widget::text::Style {
                         color: Some(theme.palette().background.base.text.scale_alpha(0.42)),
                     })
@@ -714,7 +721,7 @@ fn toolbar_btn_cond<'a>(
 #[allow(clippy::too_many_arguments)]
 /// Hover popup showing a layer's full name when the cell truncates it.
 fn name_tip<'a>(name: &'a str) -> Element<'a, Message> {
-    container(text(name).size(FONT_SZ))
+    container(text(name).size(font_sz()))
         .padding(Padding {
             top: 3.0,
             bottom: 3.0,
@@ -765,8 +772,8 @@ fn layer_row<'a>(
             .on_press(on_press)
             .style(cell_button_style(is_selected, index))
             .padding(Padding {
-                top: COMBO_PAD_V,
-                bottom: COMBO_PAD_V,
+                top: combo_pad_v(),
+                bottom: combo_pad_v(),
                 left: 4.0,
                 right: 4.0,
             })
@@ -793,8 +800,8 @@ fn layer_row<'a>(
         .on_press(Message::LayerTogglePlot(lname.clone()))
         .style(cell_button_style(is_selected, index))
         .padding(Padding {
-            top: COMBO_PAD_V,
-            bottom: COMBO_PAD_V,
+            top: combo_pad_v(),
+            bottom: combo_pad_v(),
             left: 4.0,
             right: 4.0,
         })
@@ -813,10 +820,10 @@ fn layer_row<'a>(
             .id(rename_input_id())
             .on_input(Message::LayerRenameEdit)
             .on_submit(Message::LayerRenameCommit)
-            .size(FONT_SZ)
+            .size(font_sz())
             .padding(Padding {
-                top: COMBO_PAD_V,
-                bottom: COMBO_PAD_V,
+                top: combo_pad_v(),
+                bottom: combo_pad_v(),
                 left: 4.0,
                 right: 4.0,
             })
@@ -827,12 +834,12 @@ fn layer_row<'a>(
         // ~6 px per glyph at the 10 px row font — track the column width.
         let name_budget = ((name_col_w / 6.0) as usize).max(8);
         let name_btn =
-            button(text(crate::ui::text_util::elide(&layer.name, name_budget)).size(FONT_SZ))
+            button(text(crate::ui::text_util::elide(&layer.name, name_budget)).size(font_sz()))
                 .on_press(Message::LayerRenameStart(lname.clone()))
                 .style(cell_button_style(is_selected, index))
                 .padding(Padding {
-                    top: COMBO_PAD_V,
-                    bottom: COMBO_PAD_V,
+                    top: combo_pad_v(),
+                    bottom: combo_pad_v(),
                     left: 4.0,
                     right: 4.0,
                 })
@@ -888,10 +895,10 @@ fn layer_row<'a>(
                 Some(&cur_lt_item),
                 |item: LinetypeItem| Message::LayerLinetypeSet(item.name),
             )
-            .size(FONT_SZ)
+            .size(font_sz())
             .padding(Padding {
-                top: COMBO_PAD_V,
-                bottom: COMBO_PAD_V,
+                top: combo_pad_v(),
+                bottom: combo_pad_v(),
                 left: 4.0,
                 right: 4.0,
             })
@@ -901,7 +908,7 @@ fn layer_row<'a>(
         )
     } else {
         text(layer.linetype.as_str())
-            .size(FONT_SZ)
+            .size(font_sz())
             .style(muted_style)
             .width(Length::Fixed(COL_LT))
             .into()
@@ -916,10 +923,10 @@ fn layer_row<'a>(
             Some(&cur_lw_item),
             |item: LwItem| Message::LayerLineweightSet(item.0),
         )
-        .size(FONT_SZ)
+        .size(font_sz())
         .padding(Padding {
-            top: COMBO_PAD_V,
-            bottom: COMBO_PAD_V,
+            top: combo_pad_v(),
+            bottom: combo_pad_v(),
             left: 4.0,
             right: 4.0,
         })
@@ -928,7 +935,7 @@ fn layer_row<'a>(
         .into()
     } else {
         text(cur_lw_item.to_string())
-            .size(FONT_SZ)
+            .size(font_sz())
             .style(muted_style)
             .width(Length::Fixed(COL_LW))
             .into()
@@ -939,10 +946,10 @@ fn layer_row<'a>(
     let lname_trans = lname.clone();
     let trans_cell = text_input("0", &trans_str)
         .on_input(move |s| Message::LayerTransparencyEdit(lname_trans.clone(), s))
-        .size(FONT_SZ)
+        .size(font_sz())
         .padding(Padding {
-            top: COMBO_PAD_V,
-            bottom: COMBO_PAD_V,
+            top: combo_pad_v(),
+            bottom: combo_pad_v(),
             left: 4.0,
             right: 4.0,
         })

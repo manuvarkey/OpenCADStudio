@@ -4,6 +4,7 @@ use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{hdivider, vsep};
+use crate::ui::typography;
 use iced::widget::{button, column, container, row, scrollable, text, text_input, Space};
 use iced::{Background, Element, Theme};
 
@@ -45,11 +46,11 @@ pub fn view_window<'a>(
     // ── Toolbar ───────────────────────────────────────────────────────────
     let toolbar = container(
         row![
-            button(text(t!("New Layout")).size(11))
+            button(text(t!("New Layout")).size(typography::small()))
                 .on_press(Message::LayoutManagerNew)
                 .style(btn_s(false))
                 .padding([4, 10]),
-            button(text(t!("Delete")).size(11))
+            button(text(t!("Delete")).size(typography::small()))
                 .on_press(Message::LayoutManagerDelete)
                 .style(move |theme: &Theme, status| {
                     if is_model {
@@ -63,7 +64,7 @@ pub fn view_window<'a>(
             button(
                 row![
                     crate::ui::icons::themed_arrow_left(9.0),
-                    text(t!("Move Left")).size(11),
+                    text(t!("Move Left")).size(typography::small()),
                 ]
                 .spacing(4)
                 .align_y(iced::Center),
@@ -73,7 +74,7 @@ pub fn view_window<'a>(
             .padding([4, 8]),
             button(
                 row![
-                    text(t!("Move Right")).size(11),
+                    text(t!("Move Right")).size(typography::small()),
                     crate::ui::icons::themed_arrow_right(9.0),
                 ]
                 .spacing(4)
@@ -82,7 +83,7 @@ pub fn view_window<'a>(
             .on_press(Message::LayoutManagerMoveRight)
             .style(btn_s(false))
             .padding([4, 8]),
-            button(text(t!("Set Current")).size(11))
+            button(text(t!("Set Current")).size(typography::small()))
                 .on_press(Message::LayoutManagerSetCurrent)
                 .style(btn_s(true))
                 .padding([4, 10]),
@@ -103,7 +104,7 @@ pub fn view_window<'a>(
         .map(|name| {
             let is_sel = name.as_str() == selected;
             let is_cur = name.as_str() == current.as_str();
-            let mut item_row = row![text(name.clone()).size(12)]
+            let mut item_row = row![text(name.clone()).size(typography::body())]
                 .spacing(5)
                 .align_y(iced::Center);
             if is_cur {
@@ -120,7 +121,7 @@ pub fn view_window<'a>(
 
     let layout_list = container(
         column![
-            text(t!("Layouts")).size(10).style(muted_style),
+            text(t!("Layouts")).size(typography::caption()).style(muted_style),
             container(scrollable(column(list_items).spacing(2)).height(sizing.height))
                 .style(container::bordered_box)
                 .width(sizing.width)
@@ -147,22 +148,22 @@ pub fn view_window<'a>(
             } else {
                 t!("Paper Space Layout")
             })
-            .size(13),
+            .size(typography::body_large()),
             Space::new().height(8),
             row![
-                text(t!("Name:")).size(11).style(muted_style).width(80),
-                text(selected).size(11),
+                text(t!("Name:")).size(typography::small()).style(muted_style).width(80),
+                text(selected).size(typography::small()),
             ]
             .spacing(8)
             .align_y(iced::Center),
             row![
-                text(t!("Status:")).size(11).style(muted_style).width(80),
+                text(t!("Status:")).size(typography::small()).style(muted_style).width(80),
                 text(if selected == current.as_str() {
                     t!("Active")
                 } else {
                     t!("Inactive")
                 })
-                .size(11)
+                .size(typography::small())
                 .style(move |theme: &Theme| {
                     if selected == current.as_str() {
                         primary_style(theme)
@@ -174,14 +175,14 @@ pub fn view_window<'a>(
             .spacing(8)
             .align_y(iced::Center),
             Space::new().height(16),
-            text(t!("Rename")).size(10).style(muted_style),
+            text(t!("Rename")).size(typography::caption()).style(muted_style),
             row![
                 text_input(t!("New name…").as_ref(), rename_buf)
                     .on_input(Message::LayoutManagerRenameBuf)
                     .on_submit(Message::LayoutManagerRenameCommit)
-                    .size(11)
+                    .size(typography::small())
                     .padding([4, 8]),
-                button(text(t!("OK")).size(11))
+                button(text(t!("OK")).size(typography::small()))
                     .on_press(Message::LayoutManagerRenameCommit)
                     .style(btn_s(true))
                     .padding([4, 10]),

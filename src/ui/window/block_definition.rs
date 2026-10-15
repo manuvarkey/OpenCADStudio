@@ -15,6 +15,7 @@ use crate::modules::draw::units;
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{button_style, dialog_button, field_style, form_radio};
+use crate::ui::typography;
 
 static ICON_PICK_POINT: &[u8] = include_bytes!("../../../assets/icons/blocks/pick_point.svg");
 static ICON_SELECT_OBJECTS: &[u8] =
@@ -175,7 +176,7 @@ pub(crate) fn group<'a>(
     container(
         column![
             text(title.into())
-                .size(11)
+                .size(typography::small())
                 .style(|theme: &Theme| text::Style {
                     color: Some(theme.palette().background.strongest.text.scale_alpha(0.85)),
                 }),
@@ -204,7 +205,7 @@ pub(crate) fn labeled_checkbox<'a>(
 ) -> Element<'a, Message> {
     row![
         checkbox(is_checked).on_toggle(on_toggle).size(14),
-        text(label.into()).size(11),
+        text(label.into()).size(typography::small()),
     ]
     .spacing(5)
     .align_y(iced::Center)
@@ -227,7 +228,7 @@ pub fn view_window<'a>(
         |chosen: String| Message::BlockDefNameSelect(chosen),
     )
     .on_input(Message::BlockDefName)
-    .size(11)
+    .size(typography::small())
     .padding([3, 6])
     .width(Fill);
 
@@ -236,7 +237,7 @@ pub fn view_window<'a>(
     {
         Some(
             text(crate::tf!("Invalid character '{invalid_char}' in block name (\\ / : * ? \" < > | = ` are not allowed)"))
-                .size(10)
+                .size(typography::caption())
                 .style(|theme: &Theme| text::Style {
                     color: Some(theme.palette().danger.base.color),
                 })
@@ -248,7 +249,7 @@ pub fn view_window<'a>(
                 "Block \"{}\" already exists — will redefine upon OK",
                 state.name.trim()
             ))
-            .size(10)
+            .size(typography::caption())
             .style(|theme: &Theme| text::Style {
                 color: Some(theme.palette().primary.base.color),
             })
@@ -258,7 +259,7 @@ pub fn view_window<'a>(
         None
     };
 
-    let mut name_column = column![text(t!("Name:")).size(11).style(muted_style), name_combo,]
+    let mut name_column = column![text(t!("Name:")).size(typography::small()).style(muted_style), name_combo,]
         .spacing(3)
         .width(Fill);
 
@@ -278,7 +279,7 @@ pub fn view_window<'a>(
     let pick_pt_icon = crate::ui::icons::semantic(ICON_PICK_POINT, 15.0);
 
     let mut pick_pt_btn = button(
-        row![pick_pt_icon, text(t!("Pick point")).size(11)]
+        row![pick_pt_icon, text(t!("Pick point")).size(typography::small())]
             .spacing(5)
             .align_y(iced::Center),
     )
@@ -297,7 +298,7 @@ pub fn view_window<'a>(
                 .on_input(on_input)
                 .on_submit(Message::BlockDefApply)
                 .style(field_style)
-                .size(11)
+                .size(typography::small())
                 .padding([2, 5])
                 .width(Fill)
                 .into()
@@ -306,7 +307,7 @@ pub fn view_window<'a>(
         };
         row![
             text(axis)
-                .size(11)
+                .size(typography::small())
                 .style(muted_style)
                 .width(Length::Fixed(16.0)),
             input,
@@ -340,7 +341,7 @@ pub fn view_window<'a>(
     let sel_obj_icon = crate::ui::icons::semantic(ICON_SELECT_OBJECTS, 15.0);
 
     let mut sel_obj_btn = button(
-        row![sel_obj_icon, text(t!("Select objects")).size(11)]
+        row![sel_obj_icon, text(t!("Select objects")).size(typography::small())]
             .spacing(5)
             .align_y(iced::Center),
     )
@@ -388,7 +389,7 @@ pub fn view_window<'a>(
         row![
             crate::ui::icons::semantic(ICON_WARN, 13.0),
             text(t!("No objects selected"))
-                .size(10)
+                .size(typography::caption())
                 .style(|theme: &Theme| text::Style {
                     color: Some(theme.palette().background.strongest.text.scale_alpha(0.75)),
                 }),
@@ -398,7 +399,7 @@ pub fn view_window<'a>(
         .into()
     } else {
         row![text(crate::tf!("{count} objects selected"))
-            .size(10)
+            .size(typography::caption())
             .style(|theme: &Theme| text::Style {
                 color: Some(theme.palette().primary.base.color),
             }),]
@@ -436,8 +437,8 @@ pub fn view_window<'a>(
                 .on_toggle(Message::BlockDefMatchOrientation)
                 .size(13),
             column![
-                text(t!("Match block orientation")).size(10),
-                text(t!("to layout")).size(10),
+                text(t!("Match block orientation")).size(typography::caption()),
+                text(t!("to layout")).size(typography::caption()),
             ]
             .spacing(1),
         ]
@@ -450,9 +451,9 @@ pub fn view_window<'a>(
             checkbox(false).size(13),
             column![
                 text(t!("Match block orientation"))
-                    .size(10)
+                    .size(typography::caption())
                     .style(muted_style),
-                text(t!("to layout")).size(10).style(muted_style),
+                text(t!("to layout")).size(typography::caption()).style(muted_style),
             ]
             .spacing(1),
         ]
@@ -500,7 +501,7 @@ pub fn view_window<'a>(
 
     let unit_picker = pick_list(selected_unit, unit_options, |choice| choice.to_string())
         .on_select(|choice| Message::BlockDefUnit(choice.code))
-        .text_size(11)
+        .text_size(typography::small())
         .padding([2, 5])
         .width(Fill);
 
@@ -510,7 +511,7 @@ pub fn view_window<'a>(
         } else {
             t!("Hyperlink*")
         })
-        .size(11),
+        .size(typography::small()),
     )
     .on_press(Message::BlockDefHyperlink)
     .style(button_style(false))
@@ -519,7 +520,7 @@ pub fn view_window<'a>(
     let settings_group = group(
         t!("Settings").into_owned(),
         column![
-            text(t!("Block unit:")).size(10).style(muted_style),
+            text(t!("Block unit:")).size(typography::caption()).style(muted_style),
             unit_picker,
             Space::new().height(6),
             row![
@@ -536,7 +537,7 @@ pub fn view_window<'a>(
     let desc_editor = text_editor(&state.description_content)
         .on_action(Message::BlockDefDescriptionAction)
         .placeholder(&state.desc_placeholder)
-        .size(11)
+        .size(typography::small())
         .padding([4, 6])
         .height(Fill)
         .style(|theme: &Theme, status| {
@@ -598,12 +599,12 @@ pub fn view_window<'a>(
             row![
                 crate::ui::icons::semantic(ICON_WARN, 16.0),
                 text(err.clone())
-                    .size(11)
+                    .size(typography::small())
                     .style(|theme: &Theme| text::Style {
                         color: Some(theme.palette().background.strongest.text),
                     }),
                 Space::new().width(Fill),
-                button(text("×").size(12))
+                button(text("×").size(typography::body()))
                     .on_press(Message::BlockDefDismissError)
                     .style(button_style(false))
                     .padding([1, 6]),
@@ -651,7 +652,7 @@ pub fn view_window<'a>(
         let panel = container(
             column![
                 text(question)
-                    .size(13)
+                    .size(typography::body_large())
                     .align_x(iced::alignment::Horizontal::Center),
                 Space::new().height(16),
                 row![

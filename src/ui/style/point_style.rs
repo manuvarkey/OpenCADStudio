@@ -9,6 +9,7 @@ use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{dialog_button, form_radio};
+use crate::ui::typography;
 use iced::widget::{button, canvas, column, container, row, text, text_input, Space};
 use iced::{mouse, Background, Border, Element, Length, Point, Rectangle, Size, Theme};
 use std::borrow::Cow;
@@ -159,13 +160,13 @@ pub fn view_window<'a>(
     }
 
     let size_row = row![
-        text(t!("Point Size:")).size(13),
+        text(t!("Point Size:")).size(typography::body_large()),
         Space::new().width(10),
         text_input("0", size_buf)
             .on_input(Message::PointStyleSizeInput)
             .on_submit(Message::PointStyleApplySize)
             .style(field_style)
-            .size(13)
+            .size(typography::body_large())
             .width(110),
         Space::new().width(6),
         text(if relative {
@@ -173,7 +174,7 @@ pub fn view_window<'a>(
         } else {
             t!("units")
         })
-        .size(12)
+        .size(typography::body())
         .style(muted_style),
     ]
     .align_y(iced::Center);
@@ -198,7 +199,7 @@ pub fn view_window<'a>(
 
     container(
         column![
-            text(t!("Point Style")).size(18),
+            text(t!("Point Style")).size(typography::title()),
             Space::new().height(6),
             grid,
             Space::new().height(12),

@@ -4,6 +4,7 @@ use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{hdivider, vsep};
+use crate::ui::typography;
 use iced::widget::{button, column, container, row, scrollable, text, text_input, Space};
 use iced::{Background, Border, Element, Theme};
 use std::borrow::Cow;
@@ -134,24 +135,24 @@ pub fn view_window<'a>(
     // ── Toolbar ───────────────────────────────────────────────────────────
     let toolbar = container(
         row![
-            button(text(t!("Load CTB/STB")).size(11))
+            button(text(t!("Load CTB/STB")).size(typography::small()))
                 .on_press(Message::PlotStyleLoad)
                 .style(btn_s(false))
                 .padding([4, 10]),
-            button(text(t!("Save")).size(11))
+            button(text(t!("Save")).size(typography::small()))
                 .on_press(Message::PlotStylePanelSaveDirect)
                 .style(btn_s(true))
                 .padding([4, 14]),
-            button(text(t!("Save As…")).size(11))
+            button(text(t!("Save As…")).size(typography::small()))
                 .on_press(Message::PlotStylePanelSave)
                 .style(btn_s(false))
                 .padding([4, 10]),
-            button(text(t!("Clear Table")).size(11))
+            button(text(t!("Clear Table")).size(typography::small()))
                 .on_press(Message::PlotStyleClear)
                 .style(btn_s(false))
                 .padding([4, 10]),
             Space::new().width(sizing.width),
-            text(table_name).size(10).style(muted_style),
+            text(table_name).size(typography::caption()).style(muted_style),
         ]
         .spacing(4)
         .align_y(iced::Center),
@@ -205,11 +206,11 @@ pub fn view_window<'a>(
                 row![
                     crate::ui::color_select::swatch(aci_color),
                     text(label)
-                        .size(10)
+                        .size(typography::caption())
                         .font(iced::Font::MONOSPACE)
                         .width(iced::Length::Fill),
                     text(usage_label)
-                        .size(10)
+                        .size(typography::caption())
                         .font(iced::Font::MONOSPACE)
                         .width(42),
                 ]
@@ -242,10 +243,10 @@ pub fn view_window<'a>(
         column![
             row![
                 text(t!("ACI Color Index"))
-                    .size(10)
+                    .size(typography::caption())
                     .style(muted_style)
                     .width(iced::Length::Fill),
-                text(t!("Layers")).size(10).style(muted_style).width(42),
+                text(t!("Layers")).size(typography::caption()).style(muted_style).width(42),
             ]
             .align_y(iced::Center),
             container(scrollable(column(aci_items).spacing(1)).height(sizing.height))
@@ -308,7 +309,7 @@ pub fn view_window<'a>(
         .map(|e| format!("{}%", e.screening))
         .unwrap_or_else(|| "—".into());
 
-    let lbl = |s: Cow<'static, str>| text(s).size(11).style(muted_style);
+    let lbl = |s: Cow<'static, str>| text(s).size(typography::small()).style(muted_style);
     let lw_items = plot_lineweight_options();
 
     let current_lw_index = lw_buf.trim().parse::<u8>().unwrap_or(255);
@@ -322,8 +323,8 @@ pub fn view_window<'a>(
     let edit_panel = container(
         column![
             row![
-                text(t!("ACI:")).size(11).style(muted_style).width(100),
-                text(format!("{selected_aci}")).size(11),
+                text(t!("ACI:")).size(typography::small()).style(muted_style).width(100),
+                text(format!("{selected_aci}")).size(typography::small()),
             ]
             .spacing(8)
             .align_y(iced::Center),
@@ -331,10 +332,10 @@ pub fn view_window<'a>(
                 container(
                     column![
                         text(format!("{}: {}", t!("Layers"), selected_layers.len()))
-                            .size(10)
+                            .size(typography::caption())
                             .style(muted_style),
                         text(selected_layers_text)
-                            .size(10)
+                            .size(typography::caption())
                             .width(iced::Length::Fill),
                     ]
                     .spacing(3),
@@ -372,21 +373,21 @@ pub fn view_window<'a>(
                     container(
                         row![
                             crate::ui::color_select::swatch(swatch_color),
-                            text(display_text).size(11),
+                            text(display_text).size(typography::small()),
                         ]
                         .spacing(6)
                         .align_y(iced::Center)
                     )
                     .padding([4, 8])
                     .width(iced::Length::Fill),
-                    button(text(t!("Choose color…")).size(11))
+                    button(text(t!("Choose color…")).size(typography::small()))
                         .on_press(Message::OpenColorWindow(
                             crate::app::ColorPickTarget::PlotStyle,
                             display_color,
                         ))
                         .style(btn_s(false))
                         .padding([4, 10]),
-                    button(text(t!("Reset")).size(11))
+                    button(text(t!("Reset")).size(typography::small()))
                         .on_press(Message::PlotStylePanelColorBuf(String::new()))
                         .style(btn_s(false))
                         .padding([4, 10]),
@@ -398,7 +399,7 @@ pub fn view_window<'a>(
             lbl(t!("Lineweight:")),
             iced::widget::pick_list(Some(current_lw), lw_items, |item| item.to_string(),)
                 .on_select(|item: PlotLineweightItem| { Message::PlotStylePanelLwSet(item.index) })
-                .text_size(11)
+                .text_size(typography::small())
                 .padding([3, 5])
                 .width(iced::Length::Fill),
             // ── Screening ────────────────────────────────────────────────────
@@ -406,14 +407,14 @@ pub fn view_window<'a>(
             text_input("100", screen_buf)
                 .on_input(Message::PlotStylePanelScreenBuf)
                 .style(field_style)
-                .size(11)
+                .size(typography::small())
                 .padding([4, 8]),
             Space::new().height(8),
             // ── Current values ───────────────────────────────────────────────
-            text(t!("Current values:")).size(10).style(muted_style),
-            text(t!("  Color: %{cur_color}", cur_color = cur_color)).size(10),
-            text(t!("  Lineweight: %{cur_lw}", cur_lw = cur_lw)).size(10),
-            text(t!("  Screening: %{cur_scr}", cur_scr = cur_scr)).size(10),
+            text(t!("Current values:")).size(typography::caption()).style(muted_style),
+            text(t!("  Color: %{cur_color}", cur_color = cur_color)).size(typography::caption()),
+            text(t!("  Lineweight: %{cur_lw}", cur_lw = cur_lw)).size(typography::caption()),
+            text(t!("  Screening: %{cur_scr}", cur_scr = cur_scr)).size(typography::caption()),
             Space::new().height(12),
             hdivider(iced::Length::Fill),
             Space::new().height(8),
@@ -421,7 +422,7 @@ pub fn view_window<'a>(
                 container(
                     column![
                         row![
-                            text(crate::tf!("Layers using ACI {selected_aci}")).size(11),
+                            text(crate::tf!("Layers using ACI {selected_aci}")).size(typography::small()),
                             Space::new().width(iced::Length::Fill),
                             text(format!(
                                 "{} {}",
@@ -432,19 +433,19 @@ pub fn view_window<'a>(
                                     t!("layers")
                                 }
                             ))
-                            .size(10)
+                            .size(typography::caption())
                             .style(muted_style),
                         ]
                         .align_y(iced::Center),
                         if selected_layers.is_empty() {
                             column![text(t!("No layers use this ACI in the current drawing."))
-                                .size(10)
+                                .size(typography::caption())
                                 .style(muted_style)]
                         } else {
                             column(
                                 selected_layers
                                     .iter()
-                                    .map(|name| text(format!("• {name}")).size(10).into())
+                                    .map(|name| text(format!("• {name}")).size(typography::caption()).into())
                                     .collect::<Vec<Element<'_, Message>>>(),
                             )
                             .spacing(4)

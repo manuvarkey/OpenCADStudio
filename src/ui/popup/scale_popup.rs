@@ -6,6 +6,7 @@ use iced::{Element, Fill};
 
 use crate::app::Message;
 use crate::ui::statusbar::status_menu::Entry;
+use crate::ui::typography;
 
 /// - `is_model`: true = model space (dispatches SetAnnotationScale), false = paper space (SetViewportScale).
 /// - `current_anno_scale`: current annotation_scale from Scene (used to highlight active row in model space).
@@ -50,7 +51,7 @@ pub fn menu_entries(
 fn scale_row(label: String, active: bool, msg: Message) -> Element<'static, Message> {
     let check = crate::ui::icons::themed_check_cell(active);
 
-    let lbl = text(label).size(11);
+    let lbl = text(label).size(typography::small());
 
     let content = row![check, lbl].spacing(6).align_y(iced::Center);
 
@@ -63,7 +64,7 @@ fn scale_row(label: String, active: bool, msg: Message) -> Element<'static, Mess
 }
 
 fn manage_row() -> Element<'static, Message> {
-    button(text(t!("Manage...")).size(11))
+    button(text(t!("Manage...")).size(typography::small()))
         .on_press(Message::ScaleManagerOpen)
         .style(button::primary)
         .width(Fill)

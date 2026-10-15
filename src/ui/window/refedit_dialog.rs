@@ -11,6 +11,7 @@ use crate::app::Message;
 use crate::scene::model::wire_model::WireModel;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{button_style, dialog_button};
+use crate::ui::typography;
 use crate::ui::window::pdf_dialogs::{card, well_style};
 
 /// One edit in the Edit Reference dialog.
@@ -68,7 +69,7 @@ impl RefEditDialogState {
 
 fn label<'a>(value: String, enabled: bool) -> Element<'a, Message> {
     text(value)
-        .size(12)
+        .size(typography::body())
         .style(move |theme: &Theme| {
             if enabled {
                 text::Style::default()
@@ -101,7 +102,7 @@ fn switch_row<'a>(
 
 /// A level of the chain as a pill; the chosen one framed in the accent colour.
 fn level_chip<'a>(name: &str, index: usize, chosen: bool) -> Element<'a, Message> {
-    button(text(name.to_string()).size(12))
+    button(text(name.to_string()).size(typography::body()))
         .on_press(msg(RefEditDialogMsg::Level(index)))
         .padding([5, 12])
         .style(move |theme: &Theme, status| {
@@ -140,12 +141,12 @@ pub fn view<'a>(
     let mut chips = row![].spacing(6).align_y(iced::Center);
     for (index, level) in state.levels.iter().enumerate() {
         if index > 0 {
-            chips = chips.push(text("›").size(13).style(muted_style));
+            chips = chips.push(text("›").size(typography::body_large()).style(muted_style));
         }
         chips = chips.push(level_chip(&level.name, index, index == state.level));
     }
     let mut about = column![text(crate::tr!("ref-edit", "dialog-chain-hint"))
-        .size(11)
+        .size(typography::small())
         .style(muted_style)]
     .spacing(4);
     if let Some(path) = current.and_then(|l| l.xref_path.as_deref()) {
@@ -159,7 +160,7 @@ pub fn view<'a>(
         };
         about = about.push(
             text(format!("{} {}", crate::tr!("ref-edit", "dialog-path"), shown))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
         );
     }
@@ -179,7 +180,7 @@ pub fn view<'a>(
     );
 
     let segment = |nested: bool, name: String| {
-        button(text(name).size(12).width(Fill).align_x(iced::Center))
+        button(text(name).size(typography::body()).width(Fill).align_x(iced::Center))
             .on_press(msg(RefEditDialogMsg::Nested(nested)))
             .style(button_style(state.nested == nested))
             .padding([6, 8])
@@ -225,7 +226,7 @@ pub fn view<'a>(
         .spacing(10),
     );
     let footer = row![
-        button(text("?").size(12))
+        button(text("?").size(typography::body()))
             .on_press(msg(RefEditDialogMsg::Help))
             .style(button_style(false))
             .padding([5, 11]),

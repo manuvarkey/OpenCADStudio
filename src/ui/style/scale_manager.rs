@@ -8,6 +8,7 @@
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::style_manager::{hdivider, muted_text_style, tb_button, vsep};
+use crate::ui::typography;
 use iced::widget::{column, container, mouse_area, row, scrollable, text, text_input, Space};
 use iced::{Background, Border, Element, Theme};
 use std::borrow::Cow;
@@ -81,7 +82,7 @@ pub fn view_window<'a, 'b>(
                         .id(rename_input_id())
                         .on_input(Message::ScaleRenameEdit)
                         .on_submit(Message::ScaleRenameCommit)
-                        .size(11)
+                        .size(typography::small())
                         .padding([4, 8])
                         .width(sizing.width)
                         .into();
@@ -91,8 +92,8 @@ pub fn view_window<'a, 'b>(
                 let check = crate::ui::icons::themed_check_cell(is_cur);
                 let label = row![
                     check,
-                    text(name.clone()).size(11).width(sizing.width),
-                    text(ratio.clone()).size(10).style(muted_text_style),
+                    text(name.clone()).size(typography::small()).width(sizing.width),
+                    text(ratio.clone()).size(typography::caption()).style(muted_text_style),
                 ]
                 .spacing(4)
                 .align_y(iced::Center);
@@ -115,7 +116,7 @@ pub fn view_window<'a, 'b>(
 
     let list_panel = container(
         column![
-            text(t!("Scales")).size(10).style(muted_text_style),
+            text(t!("Scales")).size(typography::caption()).style(muted_text_style),
             container(scrollable(column(rows).spacing(1)).height(sizing.height))
                 .style(|theme: &Theme| {
                     let palette = theme.palette();
@@ -151,11 +152,11 @@ pub fn view_window<'a, 'b>(
                  value: &str,
                  on: fn(String) -> Message| {
         row![
-            text(label).size(11).style(muted_text_style).width(96),
+            text(label).size(typography::small()).style(muted_text_style).width(96),
             text_input(ph.as_ref(), value)
                 .on_input(on)
                 .style(field_style)
-                .size(12)
+                .size(typography::body())
                 .padding([5, 8])
                 .width(sizing.width),
         ]
@@ -165,12 +166,12 @@ pub fn view_window<'a, 'b>(
 
     let editor = container(
         column![
-            text(Cow::Borrowed("Scale")).size(10).style(muted_text_style),
+            text(Cow::Borrowed("Scale")).size(typography::caption()).style(muted_text_style),
             field(t!("Paper units"), Cow::Borrowed("1"), paper_buf, Message::ScaleManagerPaperBuf),
             field(t!("Drawing units"), Cow::Borrowed("50"), drawing_buf, Message::ScaleManagerDrawingBuf),
             Space::new().height(6),
             text(t!("Double-click a scale to rename it; edit its paper : drawing ratio here. New / Copy add a scale. Changes are kept only if you click Apply before closing."))
-                .size(10)
+                .size(typography::caption())
                 .style(muted_text_style),
         ]
         .spacing(8),

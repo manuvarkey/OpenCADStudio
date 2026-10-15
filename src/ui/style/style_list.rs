@@ -9,6 +9,7 @@
 //! carries both `on_press` (select) and `on_double_click` (rename) itself.
 
 use crate::app::{Message, StyleKind};
+use crate::ui::typography;
 use iced::widget::{container, mouse_area, row, text, text_input};
 use iced::{Background, Element, Fill, Theme};
 
@@ -36,7 +37,7 @@ pub fn item<'a>(
             .id(iced::widget::Id::new("style-rename-input"))
             .on_input(Message::StyleRenameEdit)
             .on_submit(Message::StyleRenameCommit(kind))
-            .size(11)
+            .size(typography::small())
             .padding([4, 8])
             .width(Fill)
             .into()
@@ -44,7 +45,7 @@ pub fn item<'a>(
         // Fixed-width ✓ column keeps every name left-aligned whether or not the
         // row is current.
         let check = crate::ui::icons::themed_check_cell(is_current);
-        let label = row![check, text(name.to_string()).size(11)].align_y(iced::Center);
+        let label = row![check, text(name.to_string()).size(typography::small())].align_y(iced::Center);
         let cell = container(label)
             .padding([4, 8])
             .width(Fill)

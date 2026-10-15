@@ -5,6 +5,7 @@
 
 use crate::app::Message;
 use crate::ui::style::form::dialog_button_styled_opt;
+use crate::ui::typography;
 use iced::widget::{button, column, container, row, scrollable, text, text_input, Space};
 use iced::{Element, Fill, Length, Shrink, Theme};
 
@@ -33,7 +34,7 @@ pub fn view_window<'a>(
     };
     let listed: Vec<Element<'a, Message>> = fonts
         .iter()
-        .map(|name| text(format!("  {name}")).size(12).into())
+        .map(|name| text(format!("  {name}")).size(typography::body()).into())
         .collect();
     let download = dialog_button_styled_opt(
         if downloading {
@@ -57,11 +58,11 @@ pub fn view_window<'a>(
 
     container(
         column![
-            text(crate::t!("Missing fonts")).size(20),
+            text(crate::t!("Missing fonts")).size(typography::title_large()),
             text(crate::t!(
                 "This drawing uses fonts that are not installed on this machine. OpenCADStudio can download any redistributable fonts that exist in the selected repository; unavailable fonts will keep using a substitute."
             ))
-            .size(11)
+            .size(typography::small())
             .style(muted_style),
             // The right padding keeps the names clear of the scrollbar, which
             // a list as wide as its longest name would otherwise draw over.
@@ -78,14 +79,14 @@ pub fn view_window<'a>(
                 .style(container::bordered_box),
             column![
                 text(crate::t!("Font source — leave empty for the community repository, or point at any folder (e.g. your company's font server):"))
-                    .size(10)
+                    .size(typography::caption())
                     .style(muted_style),
                 text_input(
                     crate::t!("https://server/fonts or a GitHub raw folder").as_ref(),
                     font_source,
                 )
                 .on_input(Message::MissingFontsSourceChanged)
-                .size(11)
+                .size(typography::small())
                 .padding([4, 8])
                 .width(content_width),
             ]

@@ -1,8 +1,9 @@
 use super::super::Message;
 use crate::t;
 use crate::ui::popup::context_menu::{
-    ContextMenu, MenuIcon, MenuItem, MenuRow, MENU_PAD_TOP, MENU_ROW_H,
+    ContextMenu, MenuIcon, MenuItem, MenuRow, MENU_PAD_TOP, menu_row_h,
 };
+use crate::ui::typography;
 use iced::advanced::layout;
 use iced::advanced::mouse;
 use iced::advanced::overlay;
@@ -45,7 +46,7 @@ pub(super) fn text_inline_overlay(
         .on_input(Message::TextInlineInput)
         .on_submit(Message::TextInlineOk)
         .padding(6)
-        .size(13)
+        .size(typography::body_large())
         .width(iced::Length::Fixed(240.0));
 
     let panel = container(field)
@@ -436,7 +437,7 @@ fn mtext_editor_content<'a>(
             .style(btn_style)
             .into()
     };
-    let lbl = |s: &'static str| text(s).size(11);
+    let lbl = |s: &'static str| text(s).size(typography::small());
     let small_input = |placeholder: &'static str,
                        val: &str,
                        on: fn(String) -> Message,
@@ -446,7 +447,7 @@ fn mtext_editor_content<'a>(
             .on_input(on)
             .width(iced::Length::Fixed(w))
             .padding(3)
-            .size(12)
+            .size(typography::body())
             .into()
     };
 
@@ -460,7 +461,7 @@ fn mtext_editor_content<'a>(
         value.to_string()
     })
     .on_select(Message::MTextStyle)
-    .text_size(11)
+    .text_size(typography::small())
     .width(iced::Length::Fixed(96.0));
     let annotative = checkbox(ed.annotative)
         .on_toggle(Message::MTextAnnotative)
@@ -479,7 +480,7 @@ fn mtext_editor_content<'a>(
         |value| t!(value).into_owned(),
     )
     .on_select(Message::MTextFont)
-    .text_size(11)
+    .text_size(typography::small())
     .width(iced::Length::Fixed(120.0));
     // Same colour picker as the Properties panel (named swatches + "More…" full
     // palette), applied to the selection or the whole text.
@@ -502,7 +503,7 @@ fn mtext_editor_content<'a>(
 
     let row1 = row![
         style_pl,
-        row![annotative, text(t!("Annotative")).size(11)]
+        row![annotative, text(t!("Annotative")).size(typography::small())]
             .spacing(3)
             .align_y(iced::Alignment::Center),
         font_pl,
@@ -550,7 +551,7 @@ fn mtext_editor_content<'a>(
         |value| value.to_string(),
     )
     .on_select(|c| Message::MTextJustify(c.0))
-    .text_size(11)
+    .text_size(typography::small())
     .width(iced::Length::Fixed(112.0));
     let row2 = row![
         button(lbl("↶"))
@@ -640,7 +641,7 @@ fn mtext_editor_content<'a>(
         |value| t!(value).into_owned(),
     )
     .on_select(Message::MTextColumnMode)
-    .text_size(11)
+    .text_size(typography::small())
     .width(iced::Length::Fixed(120.0));
     let reverse = checkbox(ed.column_flow_reversed)
         .on_toggle(Message::MTextColumnFlowReversed)
@@ -655,7 +656,7 @@ fn mtext_editor_content<'a>(
             .on_input(Message::MTextColumnHeight)
             .width(iced::Length::Fixed(58.0))
             .padding(3)
-            .size(12),
+            .size(typography::body()),
         lbl("Width"),
         small_input("0", &ed.column_width, Message::MTextColumnWidth, 58.0),
         lbl("Gutter"),
@@ -671,7 +672,7 @@ fn mtext_editor_content<'a>(
             ))
             .width(iced::Length::Fixed(48.0))
             .padding(3)
-            .size(12),
+            .size(typography::body()),
         lbl("Left"),
         text_input("0", &ed.paragraph_left_indent)
             .on_input(|value| Message::MTextParagraphNumber(
@@ -680,7 +681,7 @@ fn mtext_editor_content<'a>(
             ))
             .width(iced::Length::Fixed(48.0))
             .padding(3)
-            .size(12),
+            .size(typography::body()),
         lbl("Right"),
         text_input("0", &ed.paragraph_right_indent)
             .on_input(|value| Message::MTextParagraphNumber(
@@ -689,7 +690,7 @@ fn mtext_editor_content<'a>(
             ))
             .width(iced::Length::Fixed(48.0))
             .padding(3)
-            .size(12),
+            .size(typography::body()),
         lbl("Before"),
         text_input("0", &ed.paragraph_space_before)
             .on_input(|value| Message::MTextParagraphNumber(
@@ -698,7 +699,7 @@ fn mtext_editor_content<'a>(
             ))
             .width(iced::Length::Fixed(48.0))
             .padding(3)
-            .size(12),
+            .size(typography::body()),
         lbl("After"),
         text_input("0", &ed.paragraph_space_after)
             .on_input(|value| Message::MTextParagraphNumber(
@@ -707,7 +708,7 @@ fn mtext_editor_content<'a>(
             ))
             .width(iced::Length::Fixed(48.0))
             .padding(3)
-            .size(12),
+            .size(typography::body()),
     ]
     .spacing(4)
     .align_y(iced::Alignment::Center)
@@ -718,7 +719,7 @@ fn mtext_editor_content<'a>(
             .on_input(Message::MTextFindText)
             .width(iced::Length::Fixed(140.0))
             .padding(3)
-            .size(12),
+            .size(typography::body()),
         button(lbl("Next"))
             .on_press(Message::MTextFindNext)
             .padding(3)
@@ -728,7 +729,7 @@ fn mtext_editor_content<'a>(
             .on_input(Message::MTextReplaceText)
             .width(iced::Length::Fixed(140.0))
             .padding(3)
-            .size(12),
+            .size(typography::body()),
         button(lbl("Replace"))
             .on_press(Message::MTextReplaceNext)
             .padding(3)
@@ -751,9 +752,9 @@ fn mtext_editor_content<'a>(
                 "Width: %{value}",
                 value = format!("{:.3}", ed.rect_width)
             ))
-            .size(11),
+            .size(typography::small()),
             Space::new().width(width),
-            text(format!("{:.0}%", ed.rect_width / slider_max * 100.0)).size(11),
+            text(format!("{:.0}%", ed.rect_width / slider_max * 100.0)).size(typography::small()),
         ]
         .width(width),
         container(
@@ -1211,7 +1212,7 @@ pub(super) fn viewport_context_menu_overlay(
                 };
                 let content = row![
                     context_menu_gutter(*icon, enabled),
-                    text(label.clone()).size(12),
+                    text(label.clone()).size(typography::body()),
                     iced::widget::Space::new().width(Fill),
                     caret,
                 ]
@@ -1225,7 +1226,7 @@ pub(super) fn viewport_context_menu_overlay(
                         left: 6.0,
                     })
                     .width(Fill)
-                    .height(Length::Fixed(MENU_ROW_H))
+                    .height(Length::Fixed(menu_row_h()))
                     .style(move |theme: &Theme, status| {
                         context_menu_row_style(theme, status, is_hl)
                     });
@@ -1261,7 +1262,7 @@ pub(super) fn viewport_context_menu_overlay(
     // Shift the panel so the default row's centre line is under the pointer.
     let offset = Vector::new(
         -MENU_CURSOR_INSET_X,
-        -(menu.default_row_y() + MENU_ROW_H * 0.5),
+        -(menu.default_row_y() + menu_row_h() * 0.5),
     );
     position_canvas_overlay_clamped(pos, bottom_inset, offset, panel.into())
 }
@@ -1272,12 +1273,9 @@ pub(super) fn viewport_context_menu_overlay(
 /// aligned with the others. Disabled rows render without a press handler and
 /// with faded text and icons.
 fn context_menu_row(item: &MenuItem, indent: f32, highlighted: bool) -> Element<'static, Message> {
-    let mut label_text = text(item.label.clone()).size(12);
+    let mut label_text = text(item.label.clone()).size(typography::body());
     if item.default {
-        label_text = label_text.font(iced::Font {
-            weight: iced::font::Weight::Bold,
-            ..iced::Font::DEFAULT
-        });
+        label_text = label_text.font(typography::bold());
     }
     let enabled = item.enabled;
     let mut content = row![context_menu_gutter(item.icon, enabled), label_text]
@@ -1285,7 +1283,7 @@ fn context_menu_row(item: &MenuItem, indent: f32, highlighted: bool) -> Element<
         .align_y(iced::Center);
     if let Some(hint) = item.hint.as_ref() {
         content = content.push(iced::widget::Space::new().width(Fill)).push(
-            text(hint.clone()).size(11).style(move |theme: &Theme| {
+            text(hint.clone()).size(typography::small()).style(move |theme: &Theme| {
                 let palette = theme.palette();
                 let base = if highlighted {
                     palette.primary.strong.text
@@ -1316,7 +1314,7 @@ fn context_menu_row(item: &MenuItem, indent: f32, highlighted: bool) -> Element<
             left: 6.0 + indent,
         })
         .width(Fill)
-        .height(Length::Fixed(MENU_ROW_H))
+        .height(Length::Fixed(menu_row_h()))
         .style(move |theme: &Theme, status| context_menu_row_style(theme, status, highlighted));
     if enabled {
         btn = btn.on_press(Message::ContextMenuPick(item.action.clone()));
@@ -1385,7 +1383,7 @@ pub(super) fn snap_override_overlay(pos: iced::Point) -> Element<'static, Messag
                 .padding(2);
             iced::widget::tooltip(
                 btn,
-                container(text(label).size(11))
+                container(text(label).size(typography::small()))
                     .style(|theme: &Theme| {
                         let palette = theme.palette();
                         container::Style {
@@ -1574,10 +1572,10 @@ fn qselect_content<'a>(
     };
 
     let label =
-        |s: std::borrow::Cow<'static, str>| text(s).size(12).width(iced::Length::Fixed(112.0));
+        |s: std::borrow::Cow<'static, str>| text(s).size(typography::body()).width(iced::Length::Fixed(112.0));
     let section_label = |s: std::borrow::Cow<'static, str>| {
         text(s)
-            .size(11)
+            .size(typography::small())
             .style(|theme: &Theme| iced::widget::text::Style {
                 color: Some(theme.palette().background.base.text.scale_alpha(0.65)),
             })
@@ -1597,14 +1595,14 @@ fn qselect_content<'a>(
                 }
             }
             crate::app::QSelectValueEditor::Text | crate::app::QSelectValueEditor::Number => {
-                let mut input = text_input("", &state.value).size(12).width(field_width);
+                let mut input = text_input("", &state.value).size(typography::body()).width(field_width);
                 if value_enabled {
                     input = input.on_input(Message::QSelectSetValue);
                 }
                 input.into()
             }
         },
-        None => text_input("", "").size(12).width(field_width).into(),
+        None => text_input("", "").size(typography::body()).width(field_width).into(),
     };
 
     let derived_error = if candidate_count == 0 {
@@ -1658,7 +1656,7 @@ fn qselect_content<'a>(
 
     let mut condition_rows = column![].spacing(5);
     if state.conditions.is_empty() {
-        condition_rows = condition_rows.push(text(t!("No conditions added.")).size(12));
+        condition_rows = condition_rows.push(text(t!("No conditions added.")).size(typography::body()));
     }
     for (index, condition) in state.conditions.iter().enumerate() {
         let type_label = condition
@@ -1682,7 +1680,7 @@ fn qselect_content<'a>(
         condition_rows = condition_rows.push(
             row![
                 // The measuring copy must not fill the viewport's available width.
-                text(summary).size(12).width(flex_width),
+                text(summary).size(typography::body()).width(flex_width),
                 dialog_button(t!("Edit"), Message::QSelectEditCondition(index), false),
                 dialog_button(t!("Delete"), Message::QSelectRemoveCondition(index), false),
             ]
@@ -1724,7 +1722,7 @@ fn qselect_content<'a>(
             .width(sizing.width),
         Space::new().height(4),
         text(crate::tf!("{} candidate object(s)", candidate_count))
-            .size(11)
+            .size(typography::small())
             .style(|theme: &Theme| iced::widget::text::Style {
                 color: Some(theme.palette().background.base.text.scale_alpha(0.65)),
             }),
@@ -1804,7 +1802,7 @@ fn qselect_content<'a>(
         text(t!(
             "When the list is nonempty, only listed conditions are applied."
         ))
-        .size(11),
+        .size(typography::small()),
         Space::new().height(10),
         section_label(t!("Result")),
         Space::new().height(5),
@@ -1827,18 +1825,18 @@ fn qselect_content<'a>(
         row![
             append,
             Space::new().width(6),
-            text(t!("Append result to current selection")).size(12),
+            text(t!("Append result to current selection")).size(typography::body()),
         ]
         .align_y(iced::Alignment::Center),
         Space::new().height(10),
         if let Some(message) = error {
             text(message)
-                .size(11)
+                .size(typography::small())
                 .style(|theme: &Theme| iced::widget::text::Style {
                     color: Some(theme.palette().danger.base.color),
                 })
         } else {
-            text("").size(11)
+            text("").size(typography::small())
         },
         Space::new().height(8),
         row![

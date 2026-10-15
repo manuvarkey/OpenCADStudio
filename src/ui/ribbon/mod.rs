@@ -38,6 +38,7 @@ pub use keytips::{
     KeyTipStep,
 };
 use crate::t;
+use crate::ui::typography;
 use crate::ui::wrap_bar::{PosReport, WrapBar, WrapFlow};
 pub use collapse::CollapseMode;
 use collapse::{CollapsePanels, Panel};
@@ -108,7 +109,7 @@ pub struct Ribbon {
     /// Measured tab-bar height (28 on one row, 56 when tabs wrap). Written by
     /// the `WrapBar` widget during layout, read when anchoring dropdowns.
     tab_bar_h: Arc<AtomicU32>,
-    /// Measured tool-area height (TOOL_BAR_H at full density, shorter once every
+    /// Measured tool-area height (tool_bar_h() at full density, shorter once every
     /// panel is collapsed). Written by `CollapsePanels`, read when anchoring
     /// dropdowns below the ribbon.
     tool_bar_h: Arc<AtomicU32>,
@@ -224,7 +225,7 @@ impl Ribbon {
             table_style_names: vec![],
             active_table_style: String::new(),
             tab_bar_h: Arc::new(AtomicU32::new(28.0f32.to_bits())),
-            tool_bar_h: Arc::new(AtomicU32::new(TOOL_BAR_H.to_bits())),
+            tool_bar_h: Arc::new(AtomicU32::new(tool_bar_h().to_bits())),
             collapse_mode: CollapseMode::default(),
             collapse_tight: Arc::new(AtomicBool::new(false)),
             underlay_ctx: None,
@@ -600,7 +601,7 @@ impl Ribbon {
                             module.id(),
                             module.title(),
                         ))
-                        .size(12),
+                        .size(typography::body()),
                     )
                     .on_press(Message::RibbonSelectTab(i))
                     .style(move |theme: &Theme, status| {
@@ -756,7 +757,7 @@ impl Ribbon {
                     .iter()
                     .map(|g| self.panel(g, ts, &style_ctx, &|_| Vec::new()))
                     .collect();
-                CollapsePanels::new(panels, self.collapsed_open.clone(), TOOL_BAR_H)
+                CollapsePanels::new(panels, self.collapsed_open.clone(), tool_bar_h())
                     .report_height(self.tool_bar_h.clone())
                     .report_tight(self.collapse_tight.clone())
                     .mode(self.collapse_mode)
@@ -856,7 +857,7 @@ impl Ribbon {
                 .enumerate()
                 .map(|(idx, label)| {
                     let step = idx + 1;
-                    button(text(label.clone()).size(11))
+                    button(text(label.clone()).size(typography::small()))
                         .on_press(if is_undo {
                             Message::UndoMany(step)
                         } else {
@@ -888,7 +889,7 @@ impl Ribbon {
                     button(
                         row![
                             crate::ui::icons::themed_check_cell(m == current),
-                            text(t!(m.label())).size(11),
+                            text(t!(m.label())).size(typography::small()),
                         ]
                         .spacing(4)
                         .align_y(iced::Center),
@@ -973,7 +974,7 @@ impl Ribbon {
                     .width(Length::Fixed(20.0))
                     .into();
                 let label_el = text(t!(*label))
-                    .size(11)
+                    .size(typography::small())
                     .wrapping(iced::advanced::text::Wrapping::None)
                     .style(move |theme: &Theme| iced::widget::text::Style {
                         color: (!is_current || disabled)
@@ -1078,7 +1079,7 @@ impl Ribbon {
                 });
                 let checkmark: Element<'_, Message> =
                     crate::ui::icons::themed_check_cell(is_active);
-                let label = text(&info.name).size(11).style(move |theme: &Theme| {
+                let label = text(&info.name).size(typography::small()).style(move |theme: &Theme| {
                     iced::widget::text::Style {
                         color: (!is_active)
                             .then_some(theme.palette().background.base.text.scale_alpha(0.72)),
@@ -1114,12 +1115,12 @@ impl Ribbon {
         // Search box (#343): filters the list live as the user types.
         let search = iced::widget::text_input(t!("Search layers…").as_ref(), &self.layer_filter)
             .on_input(Message::RibbonLayerFilterChanged)
-            .size(11)
+            .size(typography::small())
             .padding([4, 6]);
         let state_manager = button(
             row![
                 crate::ui::icons::themed_arrow_right(9.0),
-                text(t!("Layer State Manager…")).size(11),
+                text(t!("Layer State Manager…")).size(typography::small()),
             ]
             .spacing(7)
             .align_y(iced::Center),
@@ -1205,7 +1206,7 @@ impl Ribbon {
                 button(
                     row![
                         checkmark,
-                        text(name.clone()).size(11).style(move |theme: &Theme| {
+                        text(name.clone()).size(typography::small()).style(move |theme: &Theme| {
                             iced::widget::text::Style {
                                 color: (!is_sel).then_some(
                                     theme.palette().background.base.text.scale_alpha(0.72),
@@ -1229,7 +1230,7 @@ impl Ribbon {
 
         if let Some(mgr) = manager_cmd {
             rows.push(
-                button(text(t!("Manage…")).size(11))
+                button(text(t!("Manage…")).size(typography::small()))
                     .on_press(Message::Command(mgr.to_string()))
                     .style(popup_row_style)
                     .width(Fill)
@@ -1293,13 +1294,13 @@ impl Ribbon {
                 let is_cur = lt.name == *active_lt;
                 let check: Element<'_, Message> = crate::ui::icons::themed_check_cell(is_cur);
                 let name_col = text(linetype_display_name(&lt.name))
-                    .size(11)
+                    .size(typography::small())
                     .style(move |theme: &Theme| iced::widget::text::Style {
                         color: (!is_cur)
                             .then_some(theme.palette().background.base.text.scale_alpha(0.72)),
                     })
                     .width(Length::Fixed(90.0));
-                let art_col = text(lt.art.clone()).size(9).style(muted_text_style);
+                let art_col = text(lt.art.clone()).size(typography::tiny()).style(muted_text_style);
                 let name = lt.name.clone();
                 button(
                     row![check, name_col, art_col]
@@ -1338,7 +1339,7 @@ impl Ribbon {
                 button(
                     row![
                         check,
-                        text(label).size(11).style(move |theme: &Theme| {
+                        text(label).size(typography::small()).style(move |theme: &Theme| {
                             iced::widget::text::Style {
                                 color: (!is_cur).then_some(
                                     theme.palette().background.base.text.scale_alpha(0.72),
@@ -1381,7 +1382,7 @@ impl Ribbon {
     }
 }
 
-/// Render a single ribbon panel (tools + group label), fixed `TOOL_BAR_H` tall.
+/// Render a single ribbon panel (tools + group label), fixed `tool_bar_h()` tall.
 /// When `compact`, large tools/dropdowns are drawn as small icon columns.
 #[allow(clippy::too_many_arguments)]
 fn render_group<'a>(
@@ -1456,7 +1457,7 @@ fn render_group<'a>(
     .align_x(iced::Center)
     .spacing(0)
     .padding([3u16, 4])
-    .height(Length::Fixed(TOOL_BAR_H))
+    .height(Length::Fixed(tool_bar_h()))
     .into()
 }
 
@@ -1561,7 +1562,7 @@ fn collapse_button<'a>(
                 icon,
                 row![
                     text(localized_title.clone())
-                        .size(9)
+                        .size(typography::tiny())
                         .width(Fill)
                         .align_x(iced::Center)
                         .wrapping(iced::advanced::text::Wrapping::Word)
@@ -1633,7 +1634,7 @@ fn collapse_button<'a>(
     let opener = button(
         row![
             text(localized_title.clone())
-                .size(9)
+                .size(typography::tiny())
                 .width(Fill)
                 .align_x(iced::Center)
                 .wrapping(iced::advanced::text::Wrapping::Word)
@@ -1656,7 +1657,7 @@ fn collapse_button<'a>(
     // The large face fills a fixed slot so a collapsed panel is shorter than a full
     // 3-row panel, letting `CollapsePanels` shrink the ribbon row.
     let face_box = container(face)
-        .height(Length::Fixed(COLLAPSED_FACE_H))
+        .height(Length::Fixed(collapsed_face_h()))
         .align_y(iced::Center);
 
     column![face_box, opener]

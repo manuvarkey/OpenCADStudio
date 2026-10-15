@@ -6,13 +6,14 @@
 
 use crate::app::Message;
 use crate::gpu_backend::{ActiveGpu, BackendChoice, GraphicsPrefs};
+use crate::ui::typography;
 use iced::widget::{checkbox, column, pick_list, row, text, Space};
 use iced::{Element, Fill};
 
 fn current_row(label: std::borrow::Cow<'static, str>, value: String) -> Element<'static, Message> {
     row![
-        text(label).size(12).width(150),
-        text(value).size(12).width(Fill),
+        text(label).size(typography::body()).width(150),
+        text(value).size(typography::body()).width(Fill),
     ]
     .spacing(10)
     .into()
@@ -36,15 +37,15 @@ pub(crate) fn view(prefs: GraphicsPrefs, active: ActiveGpu) -> Element<'static, 
     .width(260);
 
     let mut col = column![
-        text(crate::t!("Graphics")).size(15),
+        text(crate::t!("Graphics")).size(typography::heading()),
         Space::new().height(6),
         text(crate::t!(
             "Saved immediately. Changes take effect the next time Open CAD Studio starts."
         ))
-        .size(11)
+        .size(typography::small())
         .width(Fill),
         Space::new().height(16),
-        text(crate::t!("This session")).size(13),
+        text(crate::t!("This session")).size(typography::body_large()),
         Space::new().height(8),
         current_row(
             crate::t!("GPU"),
@@ -73,10 +74,10 @@ pub(crate) fn view(prefs: GraphicsPrefs, active: ActiveGpu) -> Element<'static, 
         Space::new().height(4),
         current_row(crate::t!("Selected by"), unknown(&active.origin)),
         Space::new().height(20),
-        text(crate::t!("Next launch")).size(13),
+        text(crate::t!("Next launch")).size(typography::body_large()),
         Space::new().height(8),
         row![
-            text(crate::t!("Graphics backend")).size(12).width(150),
+            text(crate::t!("Graphics backend")).size(typography::body()).width(150),
             backend
         ]
         .spacing(10)
@@ -89,7 +90,7 @@ pub(crate) fn view(prefs: GraphicsPrefs, active: ActiveGpu) -> Element<'static, 
             text(crate::t!(
                 "Use the compatibility renderer (for GPUs without shader storage buffers)"
             ))
-            .size(12),
+            .size(typography::body()),
         ]
         .spacing(8)
         .align_y(iced::Center),
@@ -104,7 +105,7 @@ pub(crate) fn view(prefs: GraphicsPrefs, active: ActiveGpu) -> Element<'static, 
                 text(crate::t!(
                     "Prefer OpenGL on older GPUs (automatic backend only)"
                 ))
-                .size(12),
+                .size(typography::body()),
             ]
             .spacing(8)
             .align_y(iced::Center),
@@ -117,7 +118,7 @@ pub(crate) fn view(prefs: GraphicsPrefs, active: ActiveGpu) -> Element<'static, 
                 "If a pinned backend fails to start, the next launch falls back to automatic selection. \
                  The --backend option and the WGPU_BACKEND variable override this page."
             ))
-            .size(11)
+            .size(typography::small())
             .width(Fill),
         )
         .spacing(0)

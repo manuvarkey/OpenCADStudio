@@ -13,6 +13,7 @@ use iced::{Background, Border, Color, Element, Length, Padding, Theme};
 use std::ops::Range;
 
 use crate::ui::style::common::accessible_accent_threshold;
+use crate::ui::typography;
 
 /// Maximum entries kept for the context menu's "Recent Input" list.
 pub const RECENT_INPUT_CAP: usize = 10;
@@ -742,14 +743,14 @@ impl CommandLine {
                 let kind = entry.kind.clone();
                 let is_error = kind == EntryKind::Error;
                 let entry_text = |value: String| {
-                    let mut txt = text(value).size(11).style({
+                    let mut txt = text(value).size(typography::small()).style({
                         let kind = kind.clone();
                         move |theme: &Theme| iced::widget::text::Style {
                             color: Some(history_color(theme, &kind)),
                         }
                     });
                     if is_error {
-                        txt = txt.font(iced::Font::DEFAULT.weight(iced::font::Weight::Bold));
+                        txt = txt.font(typography::bold());
                     }
                     txt
                 };
@@ -763,7 +764,7 @@ impl CommandLine {
                     let shown = strip_option_listing(&entry.text, &self.step_options);
                     let mut r = row![entry_text(shown)].spacing(6).align_y(iced::Center);
                     for opt in &self.step_options {
-                        let btn = button(text(opt.label.to_uppercase()).size(11))
+                        let btn = button(text(opt.label.to_uppercase()).size(typography::small()))
                             .on_press(Message::CommandOptionPick(opt.keyword.clone()))
                             .padding([1, 6])
                             .style(|theme: &Theme, status| {
@@ -794,7 +795,7 @@ impl CommandLine {
                     col.push(container(entry_text(entry.text.clone())).padding([1, 8]))
                 }
             });
-        let prompt = container(text(crate::tr!("command-line", "label")).size(11).style(
+        let prompt = container(text(crate::tr!("command-line", "label")).size(typography::small()).style(
             |theme: &Theme| {
                 let p = theme.palette();
                 let color = accessible_accent_threshold(
@@ -813,7 +814,7 @@ impl CommandLine {
         // can be typed. Persists until toggled off; a hand-typed leading `>`
         // lights the button too (same mode, one line only).
         let literal_active = self.literal_spaces || self.input.starts_with('>');
-        let literal_btn = button(text(">").size(11))
+        let literal_btn = button(text(">").size(typography::small()))
             .on_press(Message::CommandLiteralToggle)
             .padding([2, 6])
             .style(move |theme: &Theme, status| {
@@ -836,7 +837,7 @@ impl CommandLine {
                     ..Default::default()
                 }
             });
-        let literal_tip = container(text(crate::tr!("command-line", "literal-spaces")).size(11))
+        let literal_tip = container(text(crate::tr!("command-line", "literal-spaces")).size(typography::small()))
             .padding([3, 6])
             .style(container::bordered_box);
         let literal_btn = tooltip(literal_btn, literal_tip, tooltip::Position::Top).gap(4);
@@ -851,7 +852,7 @@ impl CommandLine {
                 .on_submit(Message::CommandSubmit);
         }
         let input = input
-            .size(11)
+            .size(typography::small())
             .padding(Padding {
                 top: 4.0,
                 right: 30.0,
@@ -931,7 +932,7 @@ impl CommandLine {
                         label = label.push(icon);
                     }
 
-                    label = label.push(text(cmd.clone()).size(11));
+                    label = label.push(text(cmd.clone()).size(typography::small()));
 
                     let row = button(label)
                         .on_press(Message::CommandSuggestionPick(cmd.clone()))
@@ -990,7 +991,7 @@ impl CommandLine {
         ]
         .width(Length::Fill);
         let (mcp_tooltip, mcp_color) = mcp_status(control_enabled, control_busy, pick_pending);
-        let mcp_btn = button(text("MCP").size(11))
+        let mcp_btn = button(text("MCP").size(typography::small()))
             .on_press(Message::ControlToggle)
             .style(move |theme: &Theme, status| {
                 let mut style = button::subtle(theme, status);
@@ -1001,7 +1002,7 @@ impl CommandLine {
                 style
             })
             .padding([2, 6]);
-        let mcp_tip = container(text(t!(mcp_tooltip)).size(11))
+        let mcp_tip = container(text(t!(mcp_tooltip)).size(typography::small()))
             .padding([3, 6])
             .style(container::bordered_box);
         let mcp_btn =
@@ -1021,7 +1022,7 @@ impl CommandLine {
                 }
             })
             .padding([2, 6]);
-        let graph_tip = container(text(t!("Node graph")).size(11))
+        let graph_tip = container(text(t!("Node graph")).size(typography::small()))
             .padding([3, 6])
             .style(container::bordered_box);
         let graph_btn = tooltip(graph_btn, graph_tip, tooltip::Position::Top).gap(4);
@@ -1042,7 +1043,7 @@ impl CommandLine {
                 .clamp(HISTORY_HEIGHT_MIN, history_max_height(window_height));
             let log = text_editor(history_content)
                 .on_action(Message::CommandHistoryEdit)
-                .size(11)
+                .size(typography::small())
                 .padding([2, 8])
                 .height(Length::Shrink)
                 .highlight_with::<HistoryHighlighter>(
@@ -1070,7 +1071,7 @@ impl CommandLine {
             let copy_btn = button(
                 row![
                     crate::ui::icons::themed_success(crate::ui::icons::COPY, 11.0),
-                    text(t!("Copy")).size(11),
+                    text(t!("Copy")).size(typography::small()),
                 ]
                 .spacing(4)
                 .align_y(iced::Center),
@@ -1081,7 +1082,7 @@ impl CommandLine {
             let clear_btn = button(
                 row![
                     crate::ui::icons::themed_warning(crate::ui::icons::TRASH, 11.0),
-                    text(t!("Clear")).size(11),
+                    text(t!("Clear")).size(typography::small()),
                 ]
                 .spacing(4)
                 .align_y(iced::Center),
@@ -1326,7 +1327,7 @@ fn history_highlight_format(
     iced::advanced::text::highlighter::Format {
         color: Some(history_color(theme, kind)),
         font: match kind {
-            EntryKind::Error => Some(iced::Font::DEFAULT.weight(iced::font::Weight::Bold)),
+            EntryKind::Error => Some(typography::bold()),
             _ => None,
         },
     }
@@ -1520,7 +1521,7 @@ mod tests {
     #[test]
     fn error_history_uses_bold_highlight_format() {
         let theme = iced::Theme::Light;
-        let bold = iced::Font::DEFAULT.weight(iced::font::Weight::Bold);
+        let bold = crate::ui::typography::bold();
         assert_eq!(
             history_highlight_format(&EntryKind::Error, &theme).font,
             Some(bold)

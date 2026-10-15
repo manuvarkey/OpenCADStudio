@@ -24,6 +24,7 @@ use serde_json::{json, Value};
 
 use crate::app::Message;
 use crate::t;
+use crate::ui::typography;
 
 pub const NODE_W: f32 = 280.0;
 const HEADER_H: f32 = 26.0;
@@ -616,7 +617,7 @@ impl Graph {
             },
         ];
         if let Some(Drag::Palette(item)) = self.drag {
-            let ghost = container(text(t!(item.label())).size(11))
+            let ghost = container(text(t!(item.label())).size(typography::small()))
                 .padding([3, 8])
                 .style(container::bordered_box);
             layers = layers.push(pin(ghost).x(self.cursor.x + 10.0).y(self.cursor.y + 10.0));
@@ -642,7 +643,7 @@ impl Graph {
         };
         mouse_area(
             container(
-                row![icon, text(t!(item.label())).size(12)]
+                row![icon, text(t!(item.label())).size(typography::body())]
                     .spacing(6)
                     .align_y(iced::Center),
             )
@@ -671,7 +672,7 @@ impl Graph {
             text_input(&t!("Search nodes…"), &self.search)
                 .on_input(|value| msg(GraphMsg::Search(value)))
                 .padding([4, 8])
-                .size(12),
+                .size(typography::body()),
             tool(crate::ui::icons::DOC_NEW, "New graph", GraphMsg::New),
             tool(crate::ui::icons::FOLDER_OPEN, "Open graph", GraphMsg::Open),
             tool(crate::ui::icons::SAVE, "Save graph", GraphMsg::Save),
@@ -709,7 +710,7 @@ impl Graph {
                 button(
                     row![
                         crate::ui::icons::themed_arrow_toggle(open, 9.0),
-                        text(t!(category)).size(11)
+                        text(t!(category)).size(typography::small())
                     ]
                     .spacing(4)
                     .align_y(iced::Center),
@@ -762,7 +763,7 @@ impl Graph {
         };
         let header = row![
             mouse_area(
-                container(text(title).size(12))
+                container(text(title).size(typography::body()))
                     .padding([4, 8])
                     .width(Length::Fill)
                     .height(HEADER_H),
@@ -783,7 +784,7 @@ impl Graph {
         let mut col = column![header];
         if sections.is_empty() {
             col = col.push(
-                container(text(t!("Object deleted")).size(11))
+                container(text(t!("Object deleted")).size(typography::small()))
                     .padding([4, 8])
                     .height(ROW_H),
             );
@@ -795,7 +796,7 @@ impl Graph {
                     button(
                         row![
                             crate::ui::icons::themed_arrow_toggle(open, 9.0),
-                            text(section.title.clone()).size(11)
+                            text(section.title.clone()).size(typography::small())
                         ]
                         .spacing(4)
                         .align_y(iced::Center),
@@ -861,7 +862,7 @@ impl Graph {
                     if step > 0.0 {
                         bar = bar.step(step);
                     }
-                    row![bar.width(Length::Fill), text(shown).size(11)]
+                    row![bar.width(Length::Fill), text(shown).size(typography::small())]
                         .spacing(4)
                         .align_y(iced::Center)
                         .width(Length::Fill)
@@ -881,18 +882,18 @@ impl Graph {
                     text_input("", &draft)
                         .on_input(move |s| msg(GraphMsg::Input(edit.clone(), s)))
                         .on_submit(msg(GraphMsg::Commit(port)))
-                        .size(11)
+                        .size(typography::small())
                         .padding([2, 4])
                         .width(Length::Fill)
                         .into()
                 }
             }
         } else {
-            text(shown).size(11).width(Length::Fill).into()
+            text(shown).size(typography::small()).width(Length::Fill).into()
         };
         row![
             in_port,
-            text(node_row.label).size(11).width(LABEL_W),
+            text(node_row.label).size(typography::small()).width(LABEL_W),
             value,
             out_port
         ]

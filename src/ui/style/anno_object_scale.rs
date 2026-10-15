@@ -9,6 +9,7 @@
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::style_manager::{hdivider, muted_text_style, tb_button};
+use crate::ui::typography;
 use iced::widget::{column, container, mouse_area, row, scrollable, text, Space};
 use iced::{Background, Border, Element, Theme};
 
@@ -21,7 +22,7 @@ pub fn view_window(
 ) -> Element<'static, Message> {
     let toolbar = container(
         row![
-            text(t!("Object: %{object_label}", object_label = object_label)).size(11),
+            text(t!("Object: %{object_label}", object_label = object_label)).size(typography::small()),
             Space::new().width(sizing.width),
             tb_button(t!("Close"), Message::CloseModal, true),
         ]
@@ -41,8 +42,8 @@ pub fn view_window(
             let check = crate::ui::icons::themed_check_cell(*member);
             let label = row![
                 check,
-                text(name.clone()).size(11).width(sizing.width),
-                text(ratio.clone()).size(10).style(muted_text_style),
+                text(name.clone()).size(typography::small()).width(sizing.width),
+                text(ratio.clone()).size(typography::caption()).style(muted_text_style),
             ]
             .spacing(4)
             .align_y(iced::Center);
@@ -75,7 +76,7 @@ pub fn view_window(
             text(t!(
                 "Click a scale to add or remove the object's representation for it."
             ))
-            .size(10)
+            .size(typography::caption())
             .style(muted_text_style),
             list,
         ]

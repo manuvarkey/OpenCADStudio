@@ -6,6 +6,7 @@ use iced::{Element, Fill, Length};
 
 use crate::app::Message;
 use crate::ui::statusbar::status_menu::Entry;
+use crate::ui::typography;
 
 /// Angle increments offered in the picker, in degrees. Matches the common
 /// drafting set and adds the fine 1° step requested in #264.
@@ -33,11 +34,11 @@ pub fn menu_entries<'a>(current: f32, custom: &'a str) -> Vec<Entry<'a>> {
     let custom_field = text_input(t!("Custom…").as_ref(), custom)
         .on_input(Message::PolarCustomInput)
         .on_submit(Message::SubmitPolarCustom)
-        .size(11)
+        .size(typography::small())
         .padding([2, 6])
         .width(Length::Fixed(58.0));
     let custom_row = container(
-        row![custom_field, text("°").size(11),]
+        row![custom_field, text("°").size(typography::small()),]
             .spacing(4)
             .align_y(iced::Center),
     )
@@ -49,7 +50,7 @@ pub fn menu_entries<'a>(current: f32, custom: &'a str) -> Vec<Entry<'a>> {
 fn angle_row<'a>(deg: f32, active: bool) -> Element<'a, Message> {
     let check = crate::ui::icons::themed_check_cell(active);
 
-    let lbl = text(angle_label(deg)).size(11);
+    let lbl = text(angle_label(deg)).size(typography::small());
 
     let content = row![check, lbl].spacing(6).align_y(iced::Center);
 

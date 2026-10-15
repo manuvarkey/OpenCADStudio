@@ -12,6 +12,7 @@ use crate::scene::model::wire_model::WireModel;
 use crate::ui::dock::PanelId;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{button_style, field_style};
+use crate::ui::typography;
 use crate::ui::window::pdf_dialogs::{accent_text, card_style, well_style};
 use iced::widget::canvas::{Frame, Path, Program, Stroke};
 use iced::widget::{
@@ -23,7 +24,9 @@ use iced::{Background, Border, Color, Element, Fill, Length, Theme};
 const TOOL_H: f32 = 22.0;
 /// Fixed single-line height of a card's label so every cell in a row
 /// shares the same height.
-const LABEL_LINE_H: f32 = 16.0;
+fn label_line_h() -> f32 {
+    typography::grow(16.0)
+}
 
 /// The palette's tabs.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -493,7 +496,7 @@ fn thumb<'a>(palette: &'a BlockPalette, item: &Item, size: f32) -> Element<'a, M
 /// The context menu for an item.
 fn item_menu(tab: Tab, item: Item, in_drawing: bool, external: bool) -> Element<'static, Message> {
     let entry = |label: String, action: MenuAction, enabled: bool| -> Element<'static, Message> {
-        let b = button(text(label).size(12))
+        let b = button(text(label).size(typography::body()))
             .width(Fill)
             .padding([5, 12])
             .style(|theme: &Theme, status| {
@@ -594,9 +597,9 @@ fn item_view<'a>(palette: &'a BlockPalette, item: Item) -> Element<'a, Message> 
         Some((_, size)) => column![
             thumb(palette, &item, size),
             text(crate::ui::text_util::elide(&name, 14))
-                .size(11)
+                .size(typography::small())
                 .width(Fill)
-                .height(Length::Fixed(LABEL_LINE_H))
+                .height(Length::Fixed(label_line_h()))
                 .center(),
         ]
         .spacing(4)
@@ -604,7 +607,7 @@ fn item_view<'a>(palette: &'a BlockPalette, item: Item) -> Element<'a, Message> 
         None => match palette.view {
             ViewMode::Small => row![
                 container(thumb(palette, &item, 16.0)).width(Length::Fixed(20.0)),
-                text(crate::ui::text_util::elide(&name, 16)).size(11),
+                text(crate::ui::text_util::elide(&name, 16)).size(typography::small()),
             ]
             .spacing(4)
             .align_y(iced::Center)
@@ -617,16 +620,16 @@ fn item_view<'a>(palette: &'a BlockPalette, item: Item) -> Element<'a, Message> 
                     |v: bool| if v { crate::t!("Yes") } else { crate::t!("No") }.into_owned();
                 row![
                     container(thumb(palette, &item, 16.0)).width(Length::Fixed(40.0)),
-                    text(name.clone()).size(11).width(Fill),
+                    text(name.clone()).size(typography::small()).width(Fill),
                     text(format!("{} / {}", yes_no(ann), yes_no(dynamic)))
-                        .size(11)
+                        .size(typography::small())
                         .width(Length::Fixed(140.0)),
                 ]
                 .spacing(4)
                 .align_y(iced::Center)
                 .into()
             }
-            _ => text(name.clone()).size(11).width(Fill).into(),
+            _ => text(name.clone()).size(typography::small()).width(Fill).into(),
         },
     };
     let card = container(body)
@@ -658,7 +661,7 @@ fn item_view<'a>(palette: &'a BlockPalette, item: Item) -> Element<'a, Message> 
 
 fn icon_button<'a>(icon: IconKind, tip: &str, msg: BlockPaletteMsg) -> Element<'a, Message> {
     let icon_el: Element<'_, Message> = match icon {
-        IconKind::Glyph(s) => text(s).size(15).into(),
+        IconKind::Glyph(s) => text(s).size(typography::heading()).into(),
         IconKind::Svg(bytes) => crate::ui::icons::semantic(bytes, TOOL_H),
     };
     crate::ui::dock::tool_button(icon_el, crate::t!(tip).into_owned(), pm(msg))
@@ -669,14 +672,14 @@ fn options_card<'a>(palette: &'a BlockPalette) -> Element<'a, Message> {
     let check = |label: String, on: bool, f: fn(bool) -> OptionMsg| -> Element<'a, Message> {
         checkbox(on)
             .label(label)
-            .text_size(12)
+            .text_size(typography::body())
             .size(14)
             .on_toggle(move |v| pm(BlockPaletteMsg::Option(f(v))))
             .into()
     };
     let num = |value: &'a str, f: fn(String) -> OptionMsg, enabled: bool| -> Element<'a, Message> {
         let mut input = text_input("", value)
-            .size(11)
+            .size(typography::small())
             .padding([3, 6])
             .width(Length::Fixed(48.0))
             .style(field_style);
@@ -688,7 +691,7 @@ fn options_card<'a>(palette: &'a BlockPalette) -> Element<'a, Message> {
     let header = mouse_area(
         row![
             text(crate::t!("Options").to_uppercase())
-                .size(10)
+                .size(typography::caption())
                 .style(accent_text),
             Space::new().width(Fill),
             if palette.options_collapsed {
@@ -715,7 +718,7 @@ fn options_card<'a>(palette: &'a BlockPalette) -> Element<'a, Message> {
                     v == uniform_label,
                 )))
             })
-            .text_size(11)
+            .text_size(typography::small())
             .padding([3, 6]);
         let fields_on = !o.scale;
         let mut scale_row = row![
@@ -733,18 +736,18 @@ fn options_card<'a>(palette: &'a BlockPalette) -> Element<'a, Message> {
         if o.scale {
             scale_row = scale_row.push(
                 text(crate::t!("specified on screen"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted_style),
             );
         } else if o.uniform {
             xyz_row = xyz_row.push(num(&palette.option_text[0], OptionMsg::X, fields_on));
         } else {
             xyz_row = xyz_row
-                .push(text("X").size(11))
+                .push(text("X").size(typography::small()))
                 .push(num(&palette.option_text[0], OptionMsg::X, fields_on))
-                .push(text("Y").size(11))
+                .push(text("Y").size(typography::small()))
                 .push(num(&palette.option_text[1], OptionMsg::Y, fields_on))
-                .push(text("Z").size(11))
+                .push(text("Z").size(typography::small()))
                 .push(num(&palette.option_text[2], OptionMsg::Z, fields_on));
         }
         let mut rot_row = row![
@@ -760,13 +763,13 @@ fn options_card<'a>(palette: &'a BlockPalette) -> Element<'a, Message> {
         if o.rotation {
             rot_row = rot_row.push(
                 text(crate::t!("specified on screen"))
-                    .size(11)
+                    .size(typography::small())
                     .style(muted_style),
             );
         } else {
             rot_row = rot_row
                 .push(num(&palette.option_text[3], OptionMsg::Angle, true))
-                .push(text(crate::t!("Angle")).size(11));
+                .push(text(crate::t!("Angle")).size(typography::small()));
         }
         content = content
             .push(check(
@@ -817,7 +820,7 @@ pub fn view(
 
     let tabs = {
         let buttons = [Tab::Current, Tab::Recent, Tab::Favorites, Tab::Libraries].map(|t| {
-            button(text(t.label()).size(10).width(Fill).align_x(iced::Center))
+            button(text(t.label()).size(typography::caption()).width(Fill).align_x(iced::Center))
                 .on_press(pm(BlockPaletteMsg::Tab(t)))
                 .style(button_style(t == palette.tab))
                 .padding([5, 1])
@@ -833,7 +836,7 @@ pub fn view(
     let search_input = text_input(&crate::t!("Filter... (* ? wildcards)"), &palette.search)
         .on_input(|v| pm(BlockPaletteMsg::Search(v)))
         .padding([4, 8])
-        .size(12)
+        .size(typography::body())
         .style(field_style);
     let view_pick = pick_list(
         Some(palette.view.label()),
@@ -848,7 +851,7 @@ pub fn view(
                 .unwrap_or_default(),
         ))
     })
-    .text_size(11)
+    .text_size(typography::small())
     .width(Length::Fixed(118.0))
     .padding([3, 6]);
     let header = row![
@@ -871,7 +874,7 @@ pub fn view(
             pick_list(selected, names, |v: &String| v.clone())
                 .on_select(|v: String| pm(BlockPaletteMsg::LibrarySelect(v)))
                 .placeholder(crate::t!("No library").into_owned())
-                .text_size(11)
+                .text_size(typography::small())
                 .padding([3, 6])
                 .width(Fill),
             button(crate::ui::icons::themed(
@@ -907,14 +910,14 @@ pub fn view(
             };
             top = top.push(
                 text(format!("{} {shown}", crate::t!("Path:")))
-                    .size(10)
+                    .size(typography::caption())
                     .style(accent_text),
             );
         }
     }
     top = top.push(
         text(palette.tab.heading().to_uppercase())
-            .size(10)
+            .size(typography::caption())
             .style(accent_text),
     );
 
@@ -929,7 +932,7 @@ pub fn view(
             }
             _ => crate::t!("No matches"),
         };
-        container(text(msg).size(12).style(muted_style))
+        container(text(msg).size(typography::body()).style(muted_style))
             .center_x(Fill)
             .center_y(Fill)
             .width(Fill)
@@ -967,15 +970,15 @@ pub fn view(
                     col = col.push(
                         row![
                             text(crate::t!("Icon"))
-                                .size(11)
+                                .size(typography::small())
                                 .style(muted_style)
                                 .width(Length::Fixed(40.0)),
                             text(crate::t!("Name"))
-                                .size(11)
+                                .size(typography::small())
                                 .style(muted_style)
                                 .width(Fill),
                             text(crate::t!("Annotative / Dynamic"))
-                                .size(11)
+                                .size(typography::small())
                                 .style(muted_style)
                                 .width(Length::Fixed(140.0)),
                         ]
@@ -1026,9 +1029,9 @@ pub fn gallery(palette: &BlockPalette) -> Element<'_, Message> {
                 .width(Fill)
                 .height(Length::Fixed(48.0)),
                 text(crate::ui::text_util::elide(&block.name, 10))
-                    .size(10)
+                    .size(typography::caption())
                     .width(Fill)
-                    .height(Length::Fixed(LABEL_LINE_H))
+                    .height(Length::Fixed(label_line_h()))
                     .center(),
             ]
             .spacing(2);
@@ -1048,7 +1051,7 @@ pub fn gallery(palette: &BlockPalette) -> Element<'_, Message> {
     let blocks: Element<'_, Message> = if palette.blocks.is_empty() {
         container(
             text(crate::t!("No blocks in this drawing"))
-                .size(11)
+                .size(typography::small())
                 .style(muted_style),
         )
         .padding(10)
@@ -1065,7 +1068,7 @@ pub fn gallery(palette: &BlockPalette) -> Element<'_, Message> {
         .into()
     };
     let link = |label: std::borrow::Cow<'static, str>, tab: &str| -> Element<'_, Message> {
-        button(text(label.into_owned()).size(11))
+        button(text(label.into_owned()).size(typography::small()))
             .on_press(ribbon_command(format!("_BLOCKSPALETTE {tab}")))
             .style(crate::ui::ribbon::widgets::popup_row_style)
             .width(Fill)
@@ -1075,7 +1078,7 @@ pub fn gallery(palette: &BlockPalette) -> Element<'_, Message> {
     container(
         column![
             text(crate::t!("Current Drawing Blocks").to_uppercase())
-                .size(10)
+                .size(typography::caption())
                 .style(accent_text),
             container(blocks).height(Length::Fixed(
                 ((palette.blocks.len().div_ceil(4)) as f32 * 79.0).clamp(36.0, 260.0)

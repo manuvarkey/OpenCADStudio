@@ -14,6 +14,7 @@ use crate::t;
 use crate::ui::statusbar::status_menu::Entry;
 
 use crate::modules::draw::units;
+use crate::ui::typography;
 
 pub fn menu_entries(current: i16) -> Vec<Entry<'static>> {
     let mut entries: Vec<Entry<'static>> = units::linear_formats()
@@ -54,7 +55,7 @@ fn divider() -> Element<'static, Message> {
 }
 
 fn link(label: String, command: &'static str) -> Element<'static, Message> {
-    button(text(label).size(11))
+    button(text(label).size(typography::small()))
         .on_press(Message::Command(command.into()))
         .style(button::subtle)
         .width(Fill)
@@ -72,9 +73,9 @@ fn format_row(
 ) -> Element<'static, Message> {
     let content = row![
         crate::ui::icons::themed_check_cell(active),
-        text(t!(label)).size(11),
+        text(t!(label)).size(typography::small()),
         Space::new().width(Fill),
-        text(sample).size(10).style(|theme: &Theme| {
+        text(sample).size(typography::caption()).style(|theme: &Theme| {
             iced::widget::text::Style {
                 color: Some(theme.palette().background.base.text.scale_alpha(0.55)),
             }

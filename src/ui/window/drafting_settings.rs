@@ -2,6 +2,7 @@ use crate::app::settings::IsoPlane;
 use crate::app::Message;
 use crate::snap::{SnapType, ALL_3D_SNAP_MODES, ALL_SNAP_MODES};
 use crate::ui::style::form::{dialog_button, dialog_button_styled_opt};
+use crate::ui::typography;
 use iced::widget::{button, checkbox, column, container, row, scrollable, text, text_input, Space};
 use iced::{Background, Border, Element, Fill, Theme};
 use std::borrow::Cow;
@@ -121,7 +122,7 @@ fn group<'a>(
     container(
         column![
             text(title.into())
-                .size(11)
+                .size(typography::small())
                 .style(|theme: &Theme| text::Style {
                     color: Some(theme.palette().background.strongest.text.scale_alpha(0.75)),
                 }),
@@ -151,7 +152,7 @@ pub fn view_window<'a>(
     let toggle = |value: bool, label: Cow<'a, str>, message: Message| {
         row![
             checkbox(value).on_toggle(move |_| message.clone()).size(15),
-            text(label).size(12),
+            text(label).size(typography::body()),
         ]
         .spacing(7)
         .align_y(iced::Center)
@@ -164,7 +165,7 @@ pub fn view_window<'a>(
     // onto a second row.
     let tab_button = |tab: DraftingSettingsTab, label: Cow<'a, str>| {
         let is_active = state.active_tab == tab;
-        button(text(label).size(11))
+        button(text(label).size(typography::small()))
             .on_press(Message::DraftingSettingsTabChanged(tab))
             .style(move |theme: &Theme, status| {
                 let palette = theme.palette();
@@ -245,20 +246,20 @@ pub fn view_window<'a>(
             crate::t!("Snap spacing"),
             column![
                 row![
-                    text(crate::t!("Snap X spacing:")).size(11).width(120),
+                    text(crate::t!("Snap X spacing:")).size(typography::small()).width(120),
                     text_input("10", &state.snap_x_input)
                         .on_input(Message::DraftingSettingsSnapXChanged)
-                        .size(11)
+                        .size(typography::small())
                         .padding([4, 7])
                         .width(100),
                 ]
                 .spacing(8)
                 .align_y(iced::Center),
                 row![
-                    text(crate::t!("Snap Y spacing:")).size(11).width(120),
+                    text(crate::t!("Snap Y spacing:")).size(typography::small()).width(120),
                     text_input("10", &state.snap_y_input)
                         .on_input(Message::DraftingSettingsSnapYChanged)
-                        .size(11)
+                        .size(typography::small())
                         .padding([4, 7])
                         .width(100),
                 ]
@@ -268,7 +269,7 @@ pub fn view_window<'a>(
                     checkbox(state.snap_equal)
                         .on_toggle(|_| Message::DraftingSettingsToggleEqualSnap)
                         .size(14),
-                    text(crate::t!("Equal X and Y spacing")).size(11),
+                    text(crate::t!("Equal X and Y spacing")).size(typography::small()),
                 ]
                 .spacing(6)
                 .align_y(iced::Center),
@@ -279,7 +280,7 @@ pub fn view_window<'a>(
         let mut iso_planes = row![].spacing(4);
         for plane in IsoPlane::ALL {
             iso_planes = iso_planes.push(
-                button(text(crate::t!(plane.label())).size(11))
+                button(text(crate::t!(plane.label())).size(typography::small()))
                     .on_press(Message::DraftingSettingsSetIsoPlane(plane))
                     .style(if state.isometric && state.iso_plane == plane {
                         button::primary
@@ -299,15 +300,15 @@ pub fn view_window<'a>(
                     Message::DraftingSettingsToggleIsometric,
                 ),
                 iso_planes,
-                text(crate::t!("F5 cycles Left, Top, and Right.")).size(10.5),
+                text(crate::t!("F5 cycles Left, Top, and Right.")).size(typography::caption()),
                 Space::new().height(4),
                 row![
                     text(crate::t!(
                         "Rotation: %{angle}°",
                         angle = state.snap_angle_deg
                     ))
-                    .size(11),
-                    button(text(crate::t!("Reset rotation")).size(10))
+                    .size(typography::small()),
+                    button(text(crate::t!("Reset rotation")).size(typography::caption()))
                         .on_press(Message::DraftingSettingsResetRotation)
                         .style(button::secondary)
                         .padding([3, 8]),
@@ -333,30 +334,30 @@ pub fn view_window<'a>(
             crate::t!("Grid spacing"),
             column![
                 row![
-                    text(crate::t!("Grid X spacing:")).size(11).width(120),
+                    text(crate::t!("Grid X spacing:")).size(typography::small()).width(120),
                     text_input("10", &state.grid_x_input)
                         .on_input(Message::DraftingSettingsGridXChanged)
-                        .size(11)
+                        .size(typography::small())
                         .padding([4, 7])
                         .width(100),
                 ]
                 .spacing(8)
                 .align_y(iced::Center),
                 row![
-                    text(crate::t!("Grid Y spacing:")).size(11).width(120),
+                    text(crate::t!("Grid Y spacing:")).size(typography::small()).width(120),
                     text_input("10", &state.grid_y_input)
                         .on_input(Message::DraftingSettingsGridYChanged)
-                        .size(11)
+                        .size(typography::small())
                         .padding([4, 7])
                         .width(100),
                 ]
                 .spacing(8)
                 .align_y(iced::Center),
                 row![
-                    text(crate::t!("Major line every:")).size(11).width(120),
+                    text(crate::t!("Major line every:")).size(typography::small()).width(120),
                     text_input("5", &state.grid_major_input)
                         .on_input(Message::DraftingSettingsGridMajorChanged)
-                        .size(11)
+                        .size(typography::small())
                         .padding([4, 7])
                         .width(100),
                 ]
@@ -373,7 +374,7 @@ pub fn view_window<'a>(
                     checkbox(state.grid_adaptive)
                         .on_toggle(|_| Message::DraftingSettingsToggleAdaptiveGrid)
                         .size(14),
-                    text(crate::t!("Adaptive grid")).size(11),
+                    text(crate::t!("Adaptive grid")).size(typography::small()),
                 ]
                 .spacing(6)
                 .align_y(iced::Center),
@@ -381,7 +382,7 @@ pub fn view_window<'a>(
                     checkbox(state.grid_beyond_limits)
                         .on_toggle(|_| Message::DraftingSettingsToggleBeyondLimits)
                         .size(14),
-                    text(crate::t!("Display grid beyond Limits")).size(11),
+                    text(crate::t!("Display grid beyond Limits")).size(typography::small()),
                 ]
                 .spacing(6)
                 .align_y(iced::Center),
@@ -414,15 +415,15 @@ pub fn view_window<'a>(
             crate::t!("Polar Angle Settings"),
             column![
                 row![
-                    text(crate::t!("Increment angle:")).size(11).width(130),
-                    text(format!("{:.1}°", state.polar_increment_deg)).size(11),
+                    text(crate::t!("Increment angle:")).size(typography::small()).width(130),
+                    text(format!("{:.1}°", state.polar_increment_deg)).size(typography::small()),
                 ]
                 .spacing(8)
                 .align_y(iced::Center),
                 text(crate::t!(
                     "Polar Tracking guides cursor movement along specified angles. Ortho mode constrains movement to orthogonal axes."
                 ))
-                .size(10.5)
+                .size(typography::caption())
                 .style(|theme: &Theme| text::Style {
                     color: Some(theme.palette().background.strongest.text.scale_alpha(0.7)),
                 }),
@@ -455,11 +456,11 @@ pub fn view_window<'a>(
         );
 
         let action_buttons = row![
-            button(text(crate::t!("Select All")).size(10.5))
+            button(text(crate::t!("Select All")).size(typography::caption()))
                 .on_press(Message::DraftingSettingsSnapSelectAll)
                 .style(button::secondary)
                 .padding([4, 10]),
-            button(text(crate::t!("Clear All")).size(10.5))
+            button(text(crate::t!("Clear All")).size(typography::caption()))
                 .on_press(Message::DraftingSettingsSnapClearAll)
                 .style(button::secondary)
                 .padding([4, 10]),
@@ -479,7 +480,7 @@ pub fn view_window<'a>(
                     checkbox(is_checked)
                         .on_toggle(move |_| Message::DraftingSettingsToggleSnapMode(snap_type))
                         .size(14),
-                    text(crate::t!(label)).size(11),
+                    text(crate::t!(label)).size(typography::small()),
                 ]
                 .spacing(7)
                 .align_y(iced::Center),
@@ -494,7 +495,7 @@ pub fn view_window<'a>(
                     checkbox(is_checked)
                         .on_toggle(move |_| Message::DraftingSettingsToggleSnapMode(snap_type))
                         .size(14),
-                    text(crate::t!(label)).size(11),
+                    text(crate::t!(label)).size(typography::small()),
                 ]
                 .spacing(7)
                 .align_y(iced::Center),
@@ -534,7 +535,7 @@ pub fn view_window<'a>(
                     checkbox(is_checked)
                         .on_toggle(move |_| Message::DraftingSettingsToggleSnapMode3d(snap_type))
                         .size(14),
-                    text(crate::t!(label)).size(11),
+                    text(crate::t!(label)).size(typography::small()),
                 ]
                 .spacing(7)
                 .align_y(iced::Center),
@@ -561,13 +562,13 @@ pub fn view_window<'a>(
             column![
                 row![
                     checkbox(true).size(14),
-                    text(crate::t!("Display coordinate input near crosshairs")).size(11),
+                    text(crate::t!("Display coordinate input near crosshairs")).size(typography::small()),
                 ]
                 .spacing(7)
                 .align_y(iced::Center),
                 row![
                     checkbox(true).size(14),
-                    text(crate::t!("Enable dimension input fields")).size(11),
+                    text(crate::t!("Enable dimension input fields")).size(typography::small()),
                 ]
                 .spacing(7)
                 .align_y(iced::Center),
@@ -582,7 +583,7 @@ pub fn view_window<'a>(
                 text(crate::t!(
                     "Show command prompting and command input near crosshairs"
                 ))
-                .size(11),
+                .size(typography::small()),
             ]
             .spacing(7)
             .align_y(iced::Center),]
@@ -612,13 +613,13 @@ pub fn view_window<'a>(
             column![
                 row![
                     checkbox(true).size(14),
-                    text(crate::t!("Cursor-dependent position")).size(11),
+                    text(crate::t!("Cursor-dependent position")).size(typography::small()),
                 ]
                 .spacing(7)
                 .align_y(iced::Center),
                 row![
                     checkbox(false).size(14),
-                    text(crate::t!("Static quadrant location")).size(11),
+                    text(crate::t!("Static quadrant location")).size(typography::small()),
                 ]
                 .spacing(7)
                 .align_y(iced::Center),
@@ -644,13 +645,13 @@ pub fn view_window<'a>(
             column![
                 row![
                     checkbox(true).size(14),
-                    text(crate::t!("Show cycling badge when objects overlap")).size(11),
+                    text(crate::t!("Show cycling badge when objects overlap")).size(typography::small()),
                 ]
                 .spacing(7)
                 .align_y(iced::Center),
                 row![
                     checkbox(true).size(14),
-                    text(crate::t!("Display selection candidate list box on click")).size(11),
+                    text(crate::t!("Display selection candidate list box on click")).size(typography::small()),
                 ]
                 .spacing(7)
                 .align_y(iced::Center),

@@ -11,6 +11,7 @@ use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{button_style, dialog_button, field_style};
+use crate::ui::typography;
 use crate::ui::window::pdf_dialogs::{accent_text, card_style};
 
 /// Where the chosen field goes.
@@ -843,7 +844,7 @@ fn msg(m: FieldDialogMsg) -> Message {
 fn card<'a>(title: String, content: impl Into<Element<'a, Message>>) -> Element<'a, Message> {
     container(
         column![
-            text(title.to_uppercase()).size(10).style(accent_text),
+            text(title.to_uppercase()).size(typography::caption()).style(accent_text),
             content.into()
         ]
         .spacing(8),
@@ -857,7 +858,7 @@ fn card<'a>(title: String, content: impl Into<Element<'a, Message>>) -> Element<
 /// A selectable list: one row per item, the chosen one highlighted.
 fn list<'a>(rows: Vec<(String, bool, FieldDialogMsg)>, height: f32) -> Element<'a, Message> {
     let rows = rows.into_iter().map(|(label, on, m)| {
-        button(text(label).size(12))
+        button(text(label).size(typography::body()))
             .on_press(msg(m))
             .style(button_style(on))
             .padding([3, 8])
@@ -888,7 +889,7 @@ impl IntoContainer for text_input::Style {
 }
 
 fn table_button<'a>(label: String, function: &'static str) -> Element<'a, Message> {
-    button(text(label).size(12))
+    button(text(label).size(typography::body()))
         .on_press(msg(FieldDialogMsg::TableFunction(function)))
         .style(button_style(false))
         .padding([5, 10])
@@ -917,16 +918,16 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
     match kind_of(state.name) {
         FieldKind::Date => column![
             row![
-                text(t!("Date format")).size(12).width(Length::Fixed(96.0)),
+                text(t!("Date format")).size(typography::body()).width(Length::Fixed(96.0)),
                 text_input("", &state.date_format)
-                    .size(12)
+                    .size(typography::body())
                     .padding([5, 8])
                     .style(field_style)
                     .on_input(|v| msg(FieldDialogMsg::DateFormat(v))),
             ]
             .spacing(8)
             .align_y(iced::Center),
-            text(t!("Examples")).size(12),
+            text(t!("Examples")).size(typography::body()),
             list(
                 examples
                     .iter()
@@ -942,20 +943,20 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
         ]
         .spacing(8)
         .into(),
-        FieldKind::Text => column![text(t!("Format")).size(12), case_list(state)]
+        FieldKind::Text => column![text(t!("Format")).size(typography::body()), case_list(state)]
             .spacing(8)
             .into(),
         FieldKind::Filename => {
             let part = |label: &str, bits: u8| {
                 checkbox(state.file_parts == bits)
                     .label(t!(label).into_owned())
-                    .text_size(12)
+                    .text_size(typography::body())
                     .size(14)
                     .on_toggle(move |_| msg(FieldDialogMsg::FileParts(bits)))
             };
             let mut ext = checkbox(state.file_extension)
                 .label(t!("Display file extension").into_owned())
-                .text_size(12)
+                .text_size(typography::body())
                 .size(14);
             if state.file_parts & 2 != 0 {
                 ext = ext.on_toggle(|v| msg(FieldDialogMsg::FileExtension(v)));
@@ -965,14 +966,14 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                 part("Path only", 1),
                 part("Path and filename", 3),
                 ext,
-                text(t!("Format")).size(12),
+                text(t!("Format")).size(typography::body()),
                 case_list(state),
             ]
             .spacing(8)
             .into()
         }
         FieldKind::Filesize => column![
-            text(t!("Format")).size(12),
+            text(t!("Format")).size(typography::body()),
             list(
                 SIZE_UNITS
                     .iter()
@@ -989,7 +990,7 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
         .spacing(8)
         .into(),
         FieldKind::SystemVariable => column![
-            text(t!("System variable")).size(12),
+            text(t!("System variable")).size(typography::body()),
             list(
                 crate::entities::field::SYSVARS
                     .iter()
@@ -1005,9 +1006,9 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
         .spacing(8)
         .into(),
         FieldKind::Diesel => column![
-            text(t!("Diesel expression")).size(12),
+            text(t!("Diesel expression")).size(typography::body()),
             text_input("$(getvar,dwgname)", &state.diesel)
-                .size(12)
+                .size(typography::body())
                 .padding([5, 8])
                 .style(field_style)
                 .on_input(|v| msg(FieldDialogMsg::Diesel(v))),
@@ -1017,7 +1018,7 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
         FieldKind::NamedObject => column![
             row![
                 text(t!("Named object type"))
-                    .size(12)
+                    .size(typography::body())
                     .width(Length::Fixed(120.0)),
                 pick_list(
                     Some(Pick(
@@ -1032,13 +1033,13 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                     |p: &Pick| p.1.clone(),
                 )
                 .on_select(|p| msg(FieldDialogMsg::NamedType(p.0)))
-                .text_size(12)
+                .text_size(typography::body())
                 .padding([5, 8])
                 .width(Fill),
             ]
             .spacing(8)
             .align_y(iced::Center),
-            text(t!("Name")).size(12),
+            text(t!("Name")).size(typography::body()),
             list(
                 state
                     .named_names
@@ -1052,7 +1053,7 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                     .collect(),
                 150.0,
             ),
-            text(t!("Format")).size(12),
+            text(t!("Format")).size(typography::body()),
             case_list(state),
         ]
         .spacing(8)
@@ -1070,28 +1071,28 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                 .collect();
             column![
                 row![
-                    text(t!("Format")).size(12).width(Length::Fixed(80.0)),
+                    text(t!("Format")).size(typography::body()).width(Length::Fixed(80.0)),
                     pick_list(
                         Some(formats[state.formula_format].clone()),
                         formats.clone(),
                         |p: &Pick| p.1.clone()
                     )
                     .on_select(|p| msg(FieldDialogMsg::FormulaFormat(p.0)))
-                    .text_size(12)
+                    .text_size(typography::body())
                     .padding([5, 8])
                     .width(Fill),
                 ]
                 .spacing(8)
                 .align_y(iced::Center),
                 row![
-                    text(t!("Precision")).size(12).width(Length::Fixed(80.0)),
+                    text(t!("Precision")).size(typography::body()).width(Length::Fixed(80.0)),
                     pick_list(
                         Some(precisions[state.formula_precision].clone()),
                         precisions.clone(),
                         |p: &Pick| p.1.clone(),
                     )
                     .on_select(|p| msg(FieldDialogMsg::FormulaPrecision(p.0)))
-                    .text_size(12)
+                    .text_size(typography::body())
                     .padding([5, 8])
                     .width(Fill),
                 ]
@@ -1104,10 +1105,10 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
         FieldKind::Hyperlink => column![
             row![
                 text(t!("Text to display"))
-                    .size(12)
+                    .size(typography::body())
                     .width(Length::Fixed(120.0)),
                 text_input("", &state.hyperlink_text)
-                    .size(12)
+                    .size(typography::body())
                     .padding([5, 8])
                     .style(field_style)
                     .on_input(|v| msg(FieldDialogMsg::HyperlinkText(v))),
@@ -1115,14 +1116,14 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
             .spacing(8)
             .align_y(iced::Center),
             row![
-                text(t!("Address")).size(12).width(Length::Fixed(120.0)),
+                text(t!("Address")).size(typography::body()).width(Length::Fixed(120.0)),
                 text_input("https://", &state.hyperlink_url)
-                    .size(12)
+                    .size(typography::body())
                     .padding([5, 8])
                     .font(iced::Font::MONOSPACE)
                     .style(field_style)
                     .on_input(|v| msg(FieldDialogMsg::HyperlinkUrl(v))),
-                button(text("...").size(12))
+                button(text("...").size(typography::body()))
                     .on_press(msg(FieldDialogMsg::BrowseHyperlink))
                     .style(button_style(false))
                     .padding([5, 10]),
@@ -1134,7 +1135,7 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
         .into(),
         FieldKind::BlockPlaceholder => match &state.placeholder_block {
             None => column![text(t!("Only accessible in the block editor"))
-                .size(12)
+                .size(typography::body())
                 .style(muted_style)]
             .into(),
             Some(block) => {
@@ -1142,14 +1143,14 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                     codec::fields::BLOCK_PLACEHOLDER_PROPERTIES[state.placeholder_property];
                 let mut panel = column![
                     row![
-                        text(t!("Block name")).size(12).width(Length::Fixed(110.0)),
-                        container(text(block.clone()).size(12).style(muted_style))
+                        text(t!("Block name")).size(typography::body()).width(Length::Fixed(110.0)),
+                        container(text(block.clone()).size(typography::body()).style(muted_style))
                             .padding([5, 8])
                             .width(Fill),
                     ]
                     .spacing(8)
                     .align_y(iced::Center),
-                    text(t!("Block reference property")).size(12),
+                    text(t!("Block reference property")).size(typography::body()),
                     list(
                         codec::fields::BLOCK_PLACEHOLDER_PROPERTIES
                             .iter()
@@ -1168,14 +1169,14 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                 .spacing(8);
                 if format == "%tc4" {
                     panel = panel
-                        .push(text(t!("Format")).size(12))
+                        .push(text(t!("Format")).size(typography::body()))
                         .push(case_list(state));
                 }
                 panel.into()
             }
         },
         FieldKind::PlotScale => column![
-            text(t!("Format")).size(12),
+            text(t!("Format")).size(typography::body()),
             list(
                 codec::fields::PLOT_SCALE_FORMATS
                     .iter()
@@ -1192,7 +1193,7 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
         .spacing(8)
         .into(),
         FieldKind::Count => column![].into(),
-        FieldKind::SheetSet => column![text(t!("Format")).size(12), case_list(state)]
+        FieldKind::SheetSet => column![text(t!("Format")).size(typography::body()), case_list(state)]
             .spacing(8)
             .into(),
         FieldKind::SheetSetCustom => {
@@ -1202,16 +1203,16 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                 &state.ss_set_custom
             };
             column![
-                text(t!("Format")).size(12),
+                text(t!("Format")).size(typography::body()),
                 case_list(state),
-                text(t!("Custom property name")).size(12),
+                text(t!("Custom property name")).size(typography::body()),
                 pick_list(
                     (!state.ss_custom.is_empty()).then(|| state.ss_custom.clone()),
                     names.clone(),
                     |s: &String| s.clone(),
                 )
                 .on_select(|s| msg(FieldDialogMsg::SsCustom(s)))
-                .text_size(12)
+                .text_size(typography::body())
                 .padding([5, 8])
                 .width(Fill),
             ]
@@ -1253,21 +1254,21 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                 case_list(state)
             };
             let mut col = column![
-                text(t!("Placeholder type")).size(12),
+                text(t!("Placeholder type")).size(typography::body()),
                 types,
-                text(t!("Format")).size(12),
+                text(t!("Format")).size(typography::body()),
                 format
             ]
             .spacing(8);
             if kind == "Custom" {
-                col = col.push(text(t!("Custom property name")).size(12)).push(
+                col = col.push(text(t!("Custom property name")).size(typography::body())).push(
                     pick_list(
                         (!state.ss_custom.is_empty()).then(|| state.ss_custom.clone()),
                         state.ss_sheet_custom.clone(),
                         |s: &String| s.clone(),
                     )
                     .on_select(|s| msg(FieldDialogMsg::SsCustom(s)))
-                    .text_size(12)
+                    .text_size(typography::body())
                     .padding([5, 8])
                     .width(Fill),
                 );
@@ -1285,10 +1286,10 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
             let set_row = row![
                 pick_list(current, picks, |p: &Pick| p.1.clone())
                     .on_select(|p: Pick| msg(FieldDialogMsg::SsSet(p.0)))
-                    .text_size(12)
+                    .text_size(typography::body())
                     .padding([5, 8])
                     .width(Fill),
-                button(text("...").size(12))
+                button(text("...").size(typography::body()))
                     .on_press(msg(FieldDialogMsg::SsBrowse))
                     .style(button_style(false))
                     .padding([5, 10]),
@@ -1329,7 +1330,7 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                 && state.ss_prop != "ViewportScale";
             let mut href = checkbox(state.ss_href && linkable)
                 .label(t!("Associate hyperlink").into_owned())
-                .text_size(12)
+                .text_size(typography::body())
                 .size(14);
             if linkable {
                 href = href.on_toggle(|v| msg(FieldDialogMsg::SsHref(v)));
@@ -1353,13 +1354,13 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                 case_list(state)
             };
             column![
-                text(t!("Sheet set")).size(12),
+                text(t!("Sheet set")).size(typography::body()),
                 set_row,
-                text(t!("Sheet navigation tree")).size(12),
+                text(t!("Sheet navigation tree")).size(typography::body()),
                 tree,
-                text(t!("Property")).size(12),
+                text(t!("Property")).size(typography::body()),
                 prop_list,
-                text(t!("Format")).size(12),
+                text(t!("Format")).size(typography::body()),
                 format,
                 href,
             ]
@@ -1368,7 +1369,7 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
         }
         FieldKind::Object => column![
             row![
-                text(t!("Object type")).size(12).width(Length::Fixed(96.0)),
+                text(t!("Object type")).size(typography::body()).width(Length::Fixed(96.0)),
                 container(
                     text(
                         state
@@ -1377,19 +1378,19 @@ fn format_panel<'a>(state: &'a FieldDialogState) -> Element<'a, Message> {
                             .map(|(_, t)| t.clone())
                             .unwrap_or_default()
                     )
-                    .size(12)
+                    .size(typography::body())
                     .style(muted_style)
                 )
                 .padding([5, 8])
                 .width(Fill),
-                button(text(t!("Select object")).size(12))
+                button(text(t!("Select object")).size(typography::body()))
                     .on_press(msg(FieldDialogMsg::SelectObject))
                     .style(button_style(false))
                     .padding([5, 10]),
             ]
             .spacing(8)
             .align_y(iced::Center),
-            text(t!("Property")).size(12),
+            text(t!("Property")).size(typography::body()),
             list(
                 state
                     .object_props
@@ -1421,14 +1422,14 @@ pub fn view<'a>(
         t!("Field").into_owned(),
         column![
             row![
-                text(t!("Category")).size(12).width(Length::Fixed(70.0)),
+                text(t!("Category")).size(typography::body()).width(Length::Fixed(70.0)),
                 pick_list(
                     Some(categories[state.category].clone()),
                     categories.clone(),
                     |p: &Pick| p.1.clone()
                 )
                 .on_select(|p| msg(FieldDialogMsg::Category(p.0)))
-                .text_size(12)
+                .text_size(typography::body())
                 .padding([5, 8])
                 .width(Fill),
             ]
@@ -1452,7 +1453,7 @@ pub fn view<'a>(
             } else {
                 state.preview.clone()
             })
-            .size(15),
+            .size(typography::heading()),
         )
         .padding([6, 8])
         .width(Fill),
@@ -1463,7 +1464,7 @@ pub fn view<'a>(
                 t!("Formula").into_owned(),
                 column![
                     text_input("(12+3)*2", &state.formula)
-                        .size(12)
+                        .size(typography::body())
                         .padding([8, 8])
                         .font(iced::Font::MONOSPACE)
                         .style(field_style)
@@ -1474,7 +1475,7 @@ pub fn view<'a>(
                         table_button(t!("Count").into_owned(), "Count"),
                         table_button(t!("Cell").into_owned(), "Cell"),
                         Space::new().width(Fill),
-                        button(text(t!("Evaluate")).size(12))
+                        button(text(t!("Evaluate")).size(typography::body()))
                             .on_press(msg(FieldDialogMsg::Evaluate))
                             .style(button_style(false))
                             .padding([5, 14]),
@@ -1497,17 +1498,17 @@ pub fn view<'a>(
                 t!("Expression").into_owned(),
                 column![
                     text_input("", &state.count_expression)
-                        .size(12)
+                        .size(typography::body())
                         .padding([8, 8])
                         .font(iced::Font::MONOSPACE)
                         .style(field_style)
                         .on_input(|v| msg(FieldDialogMsg::CountExpression(v))),
                     row![
-                        button(text(t!("Evaluate")).size(12))
+                        button(text(t!("Evaluate")).size(typography::body()))
                             .on_press(msg(FieldDialogMsg::Evaluate))
                             .style(button_style(false))
                             .padding([5, 14]),
-                        button(text(t!("Show Count Instances")).size(12))
+                        button(text(t!("Show Count Instances")).size(typography::body()))
                             .on_press(msg(FieldDialogMsg::ShowCountInstances))
                             .style(button_style(false))
                             .padding([5, 14]),
@@ -1537,10 +1538,10 @@ pub fn view<'a>(
     };
     let (code, _) = state.code();
     let expression = column![
-        text(t!("Field expression")).size(12),
+        text(t!("Field expression")).size(typography::body()),
         container(
             text(format!("%<{code}>%"))
-                .size(12)
+                .size(typography::body())
                 .font(iced::Font::MONOSPACE)
                 .style(muted_style)
         )
@@ -1551,14 +1552,14 @@ pub fn view<'a>(
         ),
     ]
     .spacing(4);
-    let mut insert = button(text(t!("Insert")).size(12))
+    let mut insert = button(text(t!("Insert")).size(typography::body()))
         .style(button_style(true))
         .padding([6, 16]);
     if state.complete() {
         insert = insert.on_press(msg(FieldDialogMsg::Ok));
     }
     let footer = row![
-        button(text("?").size(12))
+        button(text("?").size(typography::body()))
             .on_press(msg(FieldDialogMsg::Help))
             .style(button_style(false))
             .padding([5, 11]),

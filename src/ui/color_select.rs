@@ -7,6 +7,7 @@ use crate::app::Message;
 use crate::t;
 use crate::ui::properties::acad_color_display;
 use crate::ui::ROW_H;
+use crate::ui::typography;
 use codec::types::Color as AcadColor;
 use iced::widget::{button, column, container, row, text};
 use iced::{Background, Border, Color, Element, Length, Theme};
@@ -168,7 +169,7 @@ pub fn color_selector_varies<'a>(
     on_toggle: Message,
     on_more: Message,
 ) -> Element<'a, Message> {
-    let indicator = container(text(crate::t!("?")).size(10))
+    let indicator = container(text(crate::t!("?")).size(typography::caption()))
         .style(|theme: &Theme| {
             let palette = theme.palette();
             container::Style {
@@ -213,7 +214,7 @@ fn color_selector_with_indicator<'a>(
     let head = button(
         row![
             indicator,
-            text(name).size(11),
+            text(name).size(typography::small()),
             iced::widget::Space::new().width(Length::Fill),
             crate::ui::icons::themed_arrow_toggle(open, 9.0),
         ]
@@ -283,7 +284,7 @@ pub fn color_list<'a>(
     let named_row = |color: AcadColor| -> Element<'a, Message> {
         let (bg, name) = acad_color_display(color);
         button(
-            row![swatch(bg), text(t!(name)).size(11)]
+            row![swatch(bg), text(t!(name)).size(typography::small())]
                 .spacing(5)
                 .align_y(iced::Center),
         )
@@ -297,7 +298,7 @@ pub fn color_list<'a>(
     let logical_row = |color: AcadColor, label: &'static str| -> Element<'a, Message> {
         let (bg, _) = acad_color_display(color);
         button(
-            row![swatch(bg), text(t!(label)).size(11)]
+            row![swatch(bg), text(t!(label)).size(typography::small())]
                 .spacing(5)
                 .align_y(iced::Center),
         )
@@ -325,7 +326,7 @@ pub fn color_list<'a>(
         list = list.push(named_row(AcadColor::Index(i)));
     }
     list = list.push(
-        button(text(t!("Select Color...")).size(11))
+        button(text(t!("Select Color...")).size(typography::small()))
             .on_press(on_more)
             .style(list_row_style)
             .padding([2, 4])
@@ -433,7 +434,7 @@ pub fn index_color_page<'a>(
 
     let recent: Element<'a, Message> = if recent_colors.is_empty() {
         text(crate::t!("No recent colors yet"))
-            .size(10)
+            .size(typography::caption())
             .style(|theme: &Theme| iced::widget::text::Style {
                 color: Some(theme.palette().background.base.text.scale_alpha(0.55)),
             })
@@ -460,10 +461,10 @@ pub fn index_color_page<'a>(
     };
 
     let tabs = row![
-        button(text(crate::t!("Index Color")).size(12))
+        button(text(crate::t!("Index Color")).size(typography::body()))
             .style(button::primary)
             .padding([5, 14]),
-        button(text(crate::t!("True Color")).size(12))
+        button(text(crate::t!("True Color")).size(typography::body()))
             .on_press(Message::ColorPickerTabChanged(
                 crate::app::ColorPickerTab::TrueColor
             ))
@@ -474,11 +475,11 @@ pub fn index_color_page<'a>(
 
     let actions = container(
         row![
-            button(text(crate::t!("Cancel")).size(11))
+            button(text(crate::t!("Cancel")).size(typography::small()))
                 .on_press(Message::CloseColorPicker)
                 .style(button::secondary)
                 .padding([5, 14]),
-            button(text(crate::t!("OK")).size(11))
+            button(text(crate::t!("OK")).size(typography::small()))
                 .on_press(Message::ColorWindowPick(current))
                 .style(button::primary)
                 .padding([5, 18]),
@@ -491,11 +492,11 @@ pub fn index_color_page<'a>(
     container(
         column![
             tabs,
-            text(crate::t!("Standard colors")).size(11),
+            text(crate::t!("Standard colors")).size(typography::small()),
             standard,
-            text(crate::t!("CAD Color Index (ACI) 10–249")).size(11),
+            text(crate::t!("CAD Color Index (ACI) 10–249")).size(typography::small()),
             text(crate::t!("Color family  →    ·    Shade / intensity  ↓"))
-                .size(9)
+                .size(typography::tiny())
                 .style(|theme: &Theme| iced::widget::text::Style {
                     color: Some(theme.palette().background.base.text.scale_alpha(0.65)),
                 }),
@@ -510,11 +511,11 @@ pub fn index_color_page<'a>(
                     },
                     ..Default::default()
                 }),
-            text(crate::t!("Grayscale 250–255")).size(11),
+            text(crate::t!("Grayscale 250–255")).size(typography::small()),
             grayscale,
-            text(crate::t!("Recently used")).size(11),
+            text(crate::t!("Recently used")).size(typography::small()),
             recent,
-            text(selected_text).size(11),
+            text(selected_text).size(typography::small()),
             actions,
         ]
         .spacing(9),

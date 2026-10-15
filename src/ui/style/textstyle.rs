@@ -3,6 +3,7 @@
 use crate::app::{Message, StyleKind};
 use crate::t;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{
     button, canvas, checkbox, column, container, row, scrollable, text, text_input,
 };
@@ -201,7 +202,8 @@ impl canvas::Program<Message> for TextPreviewCanvas {
             content: format!("{}  ·  {} {:.3}", font_label, mode, self.height),
             position: Point::new(10.0, bounds.height - 9.0),
             color: ink.scale_alpha(0.65),
-            size: iced::Pixels(10.0),
+            size: iced::Pixels(typography::caption()),
+            font: typography::font(),
             align_y: iced::alignment::Vertical::Center,
             ..Default::default()
         });
@@ -222,11 +224,11 @@ fn input_row<'a>(
         text_input(placeholder.as_ref(), value)
             .on_input(move |value| Message::TextStyleEdit { field, value })
             .style(field_style)
-            .size(11)
+            .size(typography::small())
             .width(180)
             .into()
     };
-    row![text(label).size(11).style(muted_style).width(150), control]
+    row![text(label).size(typography::small()).style(muted_style).width(150), control]
         .spacing(8)
         .align_y(iced::Center)
         .into()
@@ -238,7 +240,7 @@ fn toggle<'a>(
     field: &'static str,
     read_only: bool,
 ) -> Element<'a, Message> {
-    let checkbox = checkbox(value).label(label).size(14).text_size(11);
+    let checkbox = checkbox(value).label(label).size(14).text_size(typography::small());
     if read_only {
         checkbox.into()
     } else {
@@ -259,7 +261,7 @@ fn font_list<'a>(
         .into_iter()
         .map(|font| {
             let active = selected.eq_ignore_ascii_case(&font);
-            let button = button(text(font.clone()).size(10))
+            let button = button(text(font.clone()).size(typography::caption()))
                 .style(list_item(active))
                 .padding([3, 8])
                 .width(Length::Fill);
@@ -279,7 +281,7 @@ fn font_list<'a>(
         .collect();
     container(
         column![
-            text(title).size(10).style(muted_style),
+            text(title).size(typography::caption()).style(muted_style),
             scrollable(column(items).spacing(1)).height(250)
         ]
         .spacing(5),
@@ -364,7 +366,7 @@ pub fn view_window<'a>(
             .into()
         }
         _ => column![
-            text(t!("Size")).size(11).style(primary_style),
+            text(t!("Size")).size(typography::small()).style(primary_style),
             input_row(
                 if v.annotative {
                     t!("Paper text height")
@@ -376,7 +378,7 @@ pub fn view_window<'a>(
                 "height",
                 v.read_only,
             ),
-            text(t!("Effects")).size(11).style(primary_style),
+            text(t!("Effects")).size(typography::small()).style(primary_style),
             input_row(
                 t!("Width factor"),
                 "1.0".into(),

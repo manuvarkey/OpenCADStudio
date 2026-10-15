@@ -16,6 +16,7 @@ use iced::{Border, Element, Fill, Length, Theme};
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::form::{dialog_button, dialog_button_styled_opt, form_radio};
+use crate::ui::typography;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum TableSource {
@@ -432,7 +433,7 @@ fn muted(theme: &Theme) -> iced::widget::text::Style {
 }
 
 fn group<'a>(title: impl Into<String>, body: Element<'a, Message>) -> Element<'a, Message> {
-    container(column![text(title.into()).size(11).style(muted), body].spacing(7))
+    container(column![text(title.into()).size(typography::small()).style(muted), body].spacing(7))
         .padding(9)
         .width(Fill)
         .style(|theme: &Theme| container::Style {
@@ -452,11 +453,11 @@ fn labeled_input<'a>(
     msg: fn(String) -> Message,
 ) -> Element<'a, Message> {
     row![
-        text(label.into()).size(11).style(muted).width(118),
+        text(label.into()).size(typography::small()).style(muted).width(118),
         text_input("", value)
             .on_input(msg)
             .padding([4, 7])
-            .size(12)
+            .size(typography::body())
             .width(Fill)
     ]
     .spacing(8)
@@ -470,7 +471,7 @@ fn cell_style_picker<'a>(
     msg: fn(String) -> Message,
 ) -> Element<'a, Message> {
     row![
-        text(label.into()).size(11).style(muted).width(118),
+        text(label.into()).size(typography::small()).style(muted).width(118),
         pick_list(
             Some(selected.to_string()),
             vec![
@@ -482,7 +483,7 @@ fn cell_style_picker<'a>(
         )
         .on_select(msg)
         .padding([3, 6])
-        .text_size(12)
+        .text_size(typography::body())
         .width(Fill),
     ]
     .spacing(8)
@@ -501,7 +502,7 @@ fn radio_button<'a>(
 fn preview_grid<'a>(rows: &'a [Vec<String>]) -> Element<'a, Message> {
     if rows.is_empty() {
         return text(t!("No preview available."))
-            .size(11)
+            .size(typography::small())
             .style(muted)
             .into();
     }
@@ -511,7 +512,7 @@ fn preview_grid<'a>(rows: &'a [Vec<String>]) -> Element<'a, Message> {
         .map(|row| row.join("  |  "))
         .collect::<Vec<_>>()
         .join("\n");
-    container(text(lines).size(11))
+    container(text(lines).size(typography::small()))
         .padding(6)
         .width(Fill)
         .into()
@@ -526,7 +527,7 @@ pub fn table_insert_view(
     })
     .on_select(Message::TableInsertStyle)
     .padding([3, 6])
-    .text_size(12)
+    .text_size(typography::body())
     .width(Fill);
     let source = column![
         radio_button(
@@ -548,14 +549,14 @@ pub fn table_insert_view(
     .spacing(1);
     let link_picker: Element<'_, Message> = if state.source == TableSource::DataLink {
         row![
-            text(t!("Data link")).size(11).style(muted).width(118),
+            text(t!("Data link")).size(typography::small()).style(muted).width(118),
             pick_list(state.link.clone(), state.links.clone(), |value| value
                 .to_string())
             .on_select(|value| Message::TableInsertField(TableInsertField::Link(value)))
             .padding([3, 6])
-            .text_size(12)
+            .text_size(typography::body())
             .width(Fill),
-            button(text(t!("Manage…")).size(11))
+            button(text(t!("Manage…")).size(typography::small()))
                 .on_press(Message::DataLinkManagerOpen)
                 .padding([4, 8]),
         ]
@@ -622,7 +623,7 @@ pub fn table_insert_view(
             .label(t!("Preview"))
             .on_toggle(|v| Message::TableInsertField(TableInsertField::Preview(v)))
             .size(14),
-        text(&state.error).size(11),
+        text(&state.error).size(typography::small()),
         row![
             Space::new().width(Fill),
             dialog_button(t!("Cancel"), Message::CloseModal, false),
@@ -641,9 +642,9 @@ pub fn data_link_view(
     state: &DataLinkManagerState,
     sizing: crate::ui::modal::ModalSizing,
 ) -> Element<'_, Message> {
-    let mut links = column![text(t!("Spreadsheet Links")).size(11).style(muted)].spacing(2);
+    let mut links = column![text(t!("Spreadsheet Links")).size(typography::small()).style(muted)].spacing(2);
     links = links.push(
-        button(text(t!("Create a New Data Link")).size(12))
+        button(text(t!("Create a New Data Link")).size(typography::body()))
             .on_press(Message::DataLinkNew)
             .padding([5, 7])
             .style(button::text)
@@ -660,7 +661,7 @@ pub fn data_link_view(
             format!("  {link}")
         };
         links = links.push(
-            button(text(label).size(12))
+            button(text(label).size(typography::body()))
                 .on_press(Message::DataLinkSelect(link.handle))
                 .padding([5, 7])
                 .style(button::text)
@@ -677,11 +678,11 @@ pub fn data_link_view(
                 Message::DataLinkField(DataLinkField::Name(v))
             }),
             row![
-                text(t!("File")).size(11).style(muted).width(118),
+                text(t!("File")).size(typography::small()).style(muted).width(118),
                 text_input("", &state.path)
                     .on_input(|v| Message::DataLinkField(DataLinkField::Path(v)))
                     .padding([4, 7])
-                    .size(12)
+                    .size(typography::body())
                     .width(Fill),
                 button(text("…"))
                     .on_press(Message::DataLinkBrowse)
@@ -690,7 +691,7 @@ pub fn data_link_view(
             .spacing(6)
             .align_y(iced::Center),
             row![
-                text(t!("Path type")).size(11).style(muted).width(118),
+                text(t!("Path type")).size(typography::small()).style(muted).width(118),
                 pick_list(
                     Some(state.path_type),
                     vec![
@@ -706,7 +707,7 @@ pub fn data_link_view(
             ]
             .spacing(8),
             row![
-                text(t!("Link option")).size(11).style(muted).width(118),
+                text(t!("Link option")).size(typography::small()).style(muted).width(118),
                 pick_list(
                     Some(state.range_kind),
                     vec![
@@ -726,7 +727,7 @@ pub fn data_link_view(
         if !state.sheets.is_empty() && state.range_kind != LinkRange::NamedRange {
             editor = editor.push(
                 row![
-                    text(t!("Sheet")).size(11).style(muted).width(118),
+                    text(t!("Sheet")).size(typography::small()).style(muted).width(118),
                     pick_list(Some(state.sheet.clone()), state.sheets.clone(), |value| {
                         value.clone()
                     })
@@ -740,7 +741,7 @@ pub fn data_link_view(
         if state.range_kind == LinkRange::NamedRange && !state.named_ranges.is_empty() {
             editor = editor.push(
                 row![
-                    text(t!("Named range")).size(11).style(muted).width(118),
+                    text(t!("Named range")).size(typography::small()).style(muted).width(118),
                     pick_list(
                         Some(state.range.clone()),
                         state.named_ranges.clone(),
@@ -800,14 +801,14 @@ pub fn data_link_view(
             group(
                 t!("Details"),
                 column![
-                    text(format!("{}: {}", t!("Name"), link.name)).size(11),
-                    text(format!("{}: {}", t!("File"), link.path)).size(11),
+                    text(format!("{}: {}", t!("Name"), link.name)).size(typography::small()),
+                    text(format!("{}: {}", t!("File"), link.path)).size(typography::small()),
                     text(if link.valid {
                         t!("Status: Linked")
                     } else {
                         t!("Status: Source not found")
                     })
-                    .size(11)
+                    .size(typography::small())
                 ]
                 .spacing(5)
                 .into()
@@ -820,7 +821,7 @@ pub fn data_link_view(
         group(
             t!("Details"),
             text(t!("Select a data link or create a new one."))
-                .size(11)
+                .size(typography::small())
                 .style(muted)
                 .into(),
         )
@@ -856,7 +857,7 @@ pub fn data_link_view(
         row![tree, container(right).width(Fill).height(Fill)]
             .spacing(8)
             .height(Fill),
-        text(&state.status).size(11),
+        text(&state.status).size(typography::small()),
         actions
     ]
     .spacing(7)
@@ -896,7 +897,7 @@ pub fn data_extraction_view(
     state: &DataExtractionState,
     sizing: crate::ui::modal::ModalSizing,
 ) -> Element<'_, Message> {
-    let add_folder = button(text(t!("Add folder…")).size(12)).padding([5, 10]);
+    let add_folder = button(text(t!("Add folder…")).size(typography::body())).padding([5, 10]);
     #[cfg(not(target_arch = "wasm32"))]
     let add_folder = add_folder.on_press(Message::DataExtractionAddFolder);
     // The web has no folder picker and no directory to walk, so the button
@@ -904,7 +905,7 @@ pub fn data_extraction_view(
     #[cfg(target_arch = "wasm32")]
     let add_folder = iced::widget::tooltip(
         add_folder,
-        container(text(t!("Adding folders is not available in the browser. Add drawing files instead.")).size(11))
+        container(text(t!("Adding folders is not available in the browser. Add drawing files instead.")).size(typography::small()))
             .padding([3, 6])
             .style(container::bordered_box),
         iced::widget::tooltip::Position::Top,
@@ -934,7 +935,7 @@ pub fn data_extraction_view(
                 ),
                 row![
                     text(t!("Extraction settings"))
-                        .size(11)
+                        .size(typography::small())
                         .style(muted)
                         .width(118),
                     text_input("", &state.settings_path)
@@ -942,7 +943,7 @@ pub fn data_extraction_view(
                             DataExtractionField::SettingsPath(v)
                         ))
                         .padding([4, 7])
-                        .size(12)
+                        .size(typography::body())
                         .width(Fill),
                     button(text("…"))
                         .on_press(Message::DataExtractionBrowseSettings)
@@ -991,16 +992,16 @@ pub fn data_extraction_view(
                     ))
                     .size(14),
                 row![
-                    button(text(t!("Add drawings…")).size(12))
+                    button(text(t!("Add drawings…")).size(typography::body()))
                         .on_press(Message::DataExtractionAddDrawings)
                         .padding([5, 10]),
                     add_folder,
-                    button(text(t!("Clear")).size(12))
+                    button(text(t!("Clear")).size(typography::body()))
                         .on_press(Message::DataExtractionClearSources)
                         .padding([5, 10]),
                 ]
                 .spacing(6),
-                text(state.source_files.join("\n")).size(10),
+                text(state.source_files.join("\n")).size(typography::caption()),
             ]
             .spacing(6)
             .into(),
@@ -1100,13 +1101,13 @@ pub fn data_extraction_view(
                     .on_toggle(|v| Message::DataExtractionField(DataExtractionField::OutputFile(v)))
                     .size(14),
                 row![
-                    text(t!("Output file")).size(11).style(muted).width(118),
+                    text(t!("Output file")).size(typography::small()).style(muted).width(118),
                     text_input("", &state.output_path)
                         .on_input(|v| Message::DataExtractionField(
                             DataExtractionField::OutputPath(v)
                         ))
                         .padding([4, 7])
-                        .size(12)
+                        .size(typography::body())
                         .width(Fill),
                     button(text("…"))
                         .on_press(Message::DataExtractionBrowseOutput)
@@ -1122,7 +1123,7 @@ pub fn data_extraction_view(
             t!("Table style"),
             column![
                 row![
-                    text(t!("Style")).size(11).style(muted).width(118),
+                    text(t!("Style")).size(typography::small()).style(muted).width(118),
                     pick_list(
                         Some(state.table_style.clone()),
                         state.table_styles.clone(),
@@ -1146,13 +1147,13 @@ pub fn data_extraction_view(
         ExtractionPage::Finish => group(
             t!("Finish"),
             column![
-                text(t!("The selected drawing data is ready to be extracted.")).size(12),
+                text(t!("The selected drawing data is ready to be extracted.")).size(typography::body()),
                 text(format!(
                     "{}: {}",
                     t!("Rows"),
                     state.preview.len().saturating_sub(1)
                 ))
-                .size(11),
+                .size(typography::small()),
                 text(format!(
                     "{}: {}{}",
                     t!("Output"),
@@ -1167,7 +1168,7 @@ pub fn data_extraction_view(
                         String::new()
                     }
                 ))
-                .size(11)
+                .size(typography::small())
             ]
             .spacing(7)
             .into(),
@@ -1179,9 +1180,9 @@ pub fn data_extraction_view(
             t!("Data Extraction"),
             state.page.number()
         ))
-        .size(13),
+        .size(typography::body_large()),
         container(body).height(Fill).width(Fill),
-        text(&state.error).size(11),
+        text(&state.error).size(typography::small()),
         wizard_nav(state),
     ]
     .spacing(8)

@@ -7,6 +7,7 @@
 use crate::app::Message;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::dialog_button;
+use crate::ui::typography;
 use iced::widget::{column, container, row, text, Space};
 use iced::{Background, Element, Fill, Length, Theme};
 
@@ -19,7 +20,7 @@ pub fn view_window(sizing: crate::ui::modal::ModalSizing) -> Element<'static, Me
     // toolbar, which is what made the dropdown unreadable.
     let body_w = Length::Fixed(460.0);
     let para =
-        |label: String| -> Element<'static, Message> { text(label).size(12).width(Fill).into() };
+        |label: String| -> Element<'static, Message> { text(label).size(typography::body()).width(Fill).into() };
 
     let intro = para(crate::t!("How the Reference Manager works on web").into_owned());
     let list = para(
@@ -54,9 +55,9 @@ pub fn view_window(sizing: crate::ui::modal::ModalSizing) -> Element<'static, Me
             .into();
 
     let content = column![
-        text(crate::t!("Reference Manager — Web").into_owned()).size(14),
+        text(crate::t!("Reference Manager — Web").into_owned()).size(typography::subheading()),
         text(crate::t!("EXTERNALREFERENCES on the web build").into_owned())
-            .size(11)
+            .size(typography::small())
             .style(muted_style),
         intro,
         list,

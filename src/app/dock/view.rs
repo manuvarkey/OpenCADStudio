@@ -5,6 +5,7 @@ use crate::app::document::DocumentTab;
 use crate::app::{Message, OpenCADStudio};
 use crate::t;
 use crate::ui::dock::DOCK_DIVIDER_W;
+use crate::ui::typography;
 use iced::widget::{button, canvas, column, container, mouse_area, row, stack, text, Space};
 use iced::{Background, Border, Color, Element, Fill, Length, Theme};
 
@@ -613,7 +614,7 @@ impl OpenCADStudio {
             Space::new().width(12).height(12).into()
         };
         let docking =
-            row![text(t!("Allow docking")).size(12).width(Fill), check].align_y(iced::Center);
+            row![text(t!("Allow docking")).size(typography::body()).width(Fill), check].align_y(iced::Center);
         let separator = container(Space::new())
             .width(Fill)
             .height(Length::Fixed(1.0))
@@ -625,11 +626,11 @@ impl OpenCADStudio {
             item(docking.into(), DockMsg::FloatDockingToggle(id)),
             container(separator).padding([3, 4]),
             item(
-                text(t!("Dock left")).size(12).into(),
+                text(t!("Dock left")).size(typography::body()).into(),
                 DockMsg::DockTo(id, DockSide::Left)
             ),
             item(
-                text(t!("Dock right")).size(12).into(),
+                text(t!("Dock right")).size(typography::body()).into(),
                 DockMsg::DockTo(id, DockSide::Right)
             ),
         ]
@@ -791,7 +792,7 @@ impl OpenCADStudio {
                     (y - 2.0).max(0.0),
                 ));
                 const BADGE_W: f32 = 96.0;
-                let badge = container(text(format!("+ {}", t!("New group"))).size(10))
+                let badge = container(text(format!("+ {}", t!("New group"))).size(typography::caption()))
                     .width(Length::Fixed(BADGE_W))
                     .center_x(Length::Fixed(BADGE_W))
                     .padding([2, 6])
@@ -911,7 +912,8 @@ impl canvas::Program<Message> for VBarLabel {
                 content: self.text.clone(),
                 position: iced::Point::new(-bounds.height / 2.0, 0.0),
                 color: theme.palette().background.base.text.scale_alpha(0.72),
-                size: iced::Pixels(13.0),
+                size: iced::Pixels(typography::body_large()),
+                font: typography::font(),
                 align_x: iced::advanced::text::Alignment::Left,
                 align_y: iced::alignment::Vertical::Center,
                 shaping: iced::advanced::text::Shaping::Advanced,
@@ -1058,7 +1060,7 @@ fn dock_edge_menu(
             button(
                 row![
                     crate::ui::icons::themed(id.icon(), 16.0),
-                    text(t!(id.title())).size(12).width(Fill),
+                    text(t!(id.title())).size(typography::body()).width(Fill),
                     check,
                 ]
                 .spacing(8)
@@ -1144,7 +1146,7 @@ fn dock_splitter(
 fn dock_ghost(id: crate::ui::dock::PanelId, w: f32, h: f32) -> Element<'static, Message> {
     let header = container(
         text(t!(id.title()))
-            .size(12)
+            .size(typography::body())
             .wrapping(iced::widget::text::Wrapping::None)
             .ellipsis(iced::advanced::text::Ellipsis::End),
     )

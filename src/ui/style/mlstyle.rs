@@ -3,6 +3,7 @@
 use crate::app::Message;
 use crate::t;
 use crate::ui::style::common::muted_style;
+use crate::ui::typography;
 use iced::widget::{button, canvas, checkbox, column, container, row, text, text_input};
 use iced::{mouse, Color, Element, Length, Point, Rectangle, Theme};
 use std::borrow::Cow;
@@ -39,10 +40,10 @@ fn input_row<'a>(
     field: &'static str,
 ) -> Element<'a, Message> {
     row![
-        text(label).size(11).style(muted_style).width(165),
+        text(label).size(typography::small()).style(muted_style).width(165),
         text_input(placeholder, value)
             .on_input(move |value| Message::MlStyleEdit { field, value })
-            .size(11)
+            .size(typography::small())
             .width(190),
     ]
     .spacing(8)
@@ -55,7 +56,7 @@ fn toggle<'a>(label: Cow<'static, str>, value: bool, field: &'static str) -> Ele
         .label(label)
         .on_toggle(move |_| Message::MlStyleToggle(field))
         .size(14)
-        .text_size(11)
+        .text_size(typography::small())
         .into()
 }
 
@@ -269,7 +270,8 @@ impl canvas::Program<Message> for MLinePreviewCanvas {
             ),
             position: Point::new(10.0, bounds.height - 9.0),
             color: ink.scale_alpha(0.62),
-            size: iced::Pixels(10.0),
+            size: iced::Pixels(typography::caption()),
+            font: typography::font(),
             align_y: iced::alignment::Vertical::Center,
             ..Default::default()
         });
@@ -283,13 +285,13 @@ pub fn view_window<'a>(
 ) -> Element<'a, Message> {
     let style = v.style;
     let content: Element<'a, Message> = match (v.tab, style) {
-        (_, None) => text(t!("Select a style to view details.")).size(11).into(),
+        (_, None) => text(t!("Select a style to view details.")).size(typography::small()).into(),
         (0, Some(_)) => {
             let mut items = column![row![
-                text(t!("Offset")).size(10).style(muted_style).width(110),
-                text(t!("Color")).size(10).style(muted_style).width(100),
-                text(t!("Line type")).size(10).style(muted_style).width(170),
-                button(text(t!("Add")).size(10))
+                text(t!("Offset")).size(typography::caption()).style(muted_style).width(110),
+                text(t!("Color")).size(typography::caption()).style(muted_style).width(100),
+                text(t!("Line type")).size(typography::caption()).style(muted_style).width(170),
+                button(text(t!("Add")).size(typography::caption()))
                     .on_press(Message::MlStyleElementAdd)
                     .padding([4, 12]),
             ]
@@ -305,7 +307,7 @@ pub fn view_window<'a>(
                                 field: "offset",
                                 value
                             })
-                            .size(11)
+                            .size(typography::small())
                             .width(110),
                         text_input("256", &element[1])
                             .on_input(move |value| Message::MlStyleElementEdit {
@@ -313,7 +315,7 @@ pub fn view_window<'a>(
                                 field: "color",
                                 value
                             })
-                            .size(11)
+                            .size(typography::small())
                             .width(100),
                         text_input("ByLayer", &element[2])
                             .on_input(move |value| Message::MlStyleElementEdit {
@@ -321,9 +323,9 @@ pub fn view_window<'a>(
                                 field: "linetype",
                                 value
                             })
-                            .size(11)
+                            .size(typography::small())
                             .width(170),
-                        button(text(t!("Delete")).size(10))
+                        button(text(t!("Delete")).size(typography::caption()))
                             .on_press(Message::MlStyleElementDelete(index))
                             .padding([4, 10]),
                     ]
@@ -335,14 +337,14 @@ pub fn view_window<'a>(
         }
         (_, Some(style)) => column![
             input_row(t!("Description"), "", v.description, "description"),
-            text(t!("Fill and joints")).size(11).style(primary_style),
+            text(t!("Fill and joints")).size(typography::small()).style(primary_style),
             row![
                 toggle(t!("Fill enabled"), style.flags.fill_on, "fill"),
                 toggle(t!("Display joints"), style.flags.display_joints, "joints"),
             ]
             .spacing(18),
             input_row(t!("Fill color"), "256", v.fill_color, "fill_color"),
-            text(t!("Start caps")).size(11).style(primary_style),
+            text(t!("Start caps")).size(typography::small()).style(primary_style),
             row![
                 toggle(t!("Line"), style.flags.start_square_cap, "start_square"),
                 toggle(
@@ -354,7 +356,7 @@ pub fn view_window<'a>(
             ]
             .spacing(18),
             input_row(t!("Start angle"), "90", v.start_angle, "start_angle"),
-            text(t!("End caps")).size(11).style(primary_style),
+            text(t!("End caps")).size(typography::small()).style(primary_style),
             row![
                 toggle(t!("Line"), style.flags.end_square_cap, "end_square"),
                 toggle(

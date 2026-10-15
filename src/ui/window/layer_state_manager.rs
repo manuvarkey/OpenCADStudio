@@ -3,6 +3,7 @@
 use crate::app::{LayerStateLayerFlag, LayerStateProperty, Message};
 use crate::t;
 use crate::ui::properties::{lw_options, LwItem};
+use crate::ui::typography;
 use codec::{LayerState, LayerStateMask};
 use iced::widget::{button, checkbox, column, container, row, scrollable, text, text_input, Space};
 use iced::{Background, Border, Element, Fill, Length, Theme};
@@ -127,8 +128,8 @@ pub fn view_window<'a>(
             };
             button(
                 column![
-                    text(state.name.clone()).size(12),
-                    text(subtitle).size(10).style(muted),
+                    text(state.name.clone()).size(typography::body()),
+                    text(subtitle).size(typography::caption()).style(muted),
                 ]
                 .spacing(2),
             )
@@ -147,10 +148,10 @@ pub fn view_window<'a>(
             } else {
                 t!("No matching layer states")
             })
-            .size(11)
+            .size(typography::small())
             .style(muted),
             text(t!("Choose New to capture the current layer settings."))
-                .size(10)
+                .size(typography::caption())
                 .style(muted),
         ]
         .spacing(4),
@@ -170,7 +171,7 @@ pub fn view_window<'a>(
         column![
             text_input(t!("Search layer states…").as_ref(), filter)
                 .on_input(Message::LayerStateManagerFilter)
-                .size(11)
+                .size(typography::small())
                 .padding([5, 8]),
             container(state_list)
                 .width(sizing.width)
@@ -199,64 +200,64 @@ pub fn view_window<'a>(
 
     let details = if let Some(state) = selected_state {
         column![
-            text(t!("Saved state details")).size(13),
+            text(t!("Saved state details")).size(typography::body_large()),
             row![
-                text(t!("Layers")).size(10).style(muted).width(92),
-                text(state.layers.len().to_string()).size(11),
+                text(t!("Layers")).size(typography::caption()).style(muted).width(92),
+                text(state.layers.len().to_string()).size(typography::small()),
             ]
             .spacing(8),
             row![
-                text(t!("Current layer")).size(10).style(muted).width(92),
+                text(t!("Current layer")).size(typography::caption()).style(muted).width(92),
                 text(if state.current_layer.is_empty() {
                     "—".to_string()
                 } else {
                     state.current_layer.clone()
                 })
-                .size(11),
+                .size(typography::small()),
             ]
             .spacing(8),
-            text(t!("Restored properties")).size(10).style(muted),
-            text(mask_summary(state.mask)).size(11),
+            text(t!("Restored properties")).size(typography::caption()).style(muted),
+            text(mask_summary(state.mask)).size(typography::small()),
         ]
         .spacing(7)
     } else {
         column![
-            text(t!("New layer state")).size(13),
+            text(t!("New layer state")).size(typography::body_large()),
             text(t!(
                 "Save captures the current settings of every layer in the drawing."
             ))
-            .size(11)
+            .size(typography::small())
             .style(muted),
         ]
         .spacing(7)
     };
 
     let restore = if selected_state.is_some() {
-        button(text(t!("Restore")).size(11))
+        button(text(t!("Restore")).size(typography::small()))
             .on_press(Message::LayerStateManagerRestore)
             .style(button_style(true))
     } else {
-        button(text(t!("Restore")).size(11)).style(button_style(true))
+        button(text(t!("Restore")).size(typography::small())).style(button_style(true))
     };
     let delete = if selected_state.is_some() {
-        button(text(t!("Delete")).size(11))
+        button(text(t!("Delete")).size(typography::small()))
             .on_press(Message::LayerStateManagerDelete)
             .style(button::danger)
     } else {
-        button(text(t!("Delete")).size(11)).style(button::danger)
+        button(text(t!("Delete")).size(typography::small())).style(button::danger)
     };
     let edit = if selected_state.is_some() {
-        button(text(t!("Edit")).size(11))
+        button(text(t!("Edit")).size(typography::small()))
             .on_press(Message::LayerStateManagerEdit)
             .style(button_style(false))
     } else {
-        button(text(t!("Edit")).size(11)).style(button_style(false))
+        button(text(t!("Edit")).size(typography::small())).style(button_style(false))
     };
 
     let right = container(
         column![
             row![
-                button(text(t!("New")).size(11))
+                button(text(t!("New")).size(typography::small()))
                     .on_press(Message::LayerStateManagerNew)
                     .style(button_style(false))
                     .padding([5, 12]),
@@ -268,29 +269,29 @@ pub fn view_window<'a>(
             .spacing(6)
             .align_y(iced::Center),
             divider(sizing.width),
-            text(t!("Name")).size(10).style(muted),
+            text(t!("Name")).size(typography::caption()).style(muted),
             text_input(t!("Layer state name").as_ref(), name)
                 .on_input(Message::LayerStateManagerName)
                 .on_submit(Message::LayerStateManagerSave)
-                .size(11)
+                .size(typography::small())
                 .padding([5, 8]),
-            text(t!("Description")).size(10).style(muted),
+            text(t!("Description")).size(typography::caption()).style(muted),
             text_input(t!("Optional description").as_ref(), description)
                 .on_input(Message::LayerStateManagerDescription)
-                .size(11)
+                .size(typography::small())
                 .padding([5, 8]),
             Space::new().height(8),
             details,
             Space::new().height(sizing.height),
             text(t!("Layer states are stored inside the drawing and remain available after reopening it."))
-                .size(10)
+                .size(typography::caption())
                 .style(muted),
             button(text(if selected_state.is_some() {
                 t!("Update from Drawing")
             } else {
                 t!("Save New State")
             })
-            .size(11))
+            .size(typography::small()))
             .on_press(Message::LayerStateManagerSave)
             .style(button_style(true))
             .padding([6, 14]),
@@ -331,8 +332,8 @@ fn mask_button<'a>(
     let enabled = state.mask.contains(mask_for(property));
     button(
         row![
-            text(if enabled { "✓" } else { " " }).size(10),
-            text(label).size(10),
+            text(if enabled { "✓" } else { " " }).size(typography::caption()),
+            text(label).size(typography::caption()),
         ]
         .spacing(4)
         .align_y(iced::Center),
@@ -363,47 +364,47 @@ fn editor_header<'a>() -> Element<'a, Message> {
     container(
         row![
             text(t!("Layer"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(170.0)),
             text(t!("On"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(44.0)),
             text(t!("Freeze"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(54.0)),
             text(t!("Lock"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(44.0)),
             text(t!("Plot"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(44.0)),
             text(t!("New VP"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(54.0)),
             text(t!("Color"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(135.0)),
             text(t!("Linetype"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(150.0)),
             text(t!("Lineweight"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(115.0)),
             text(t!("Plot style"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(135.0)),
             text(t!("Transparency"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted)
                 .width(Length::Fixed(105.0)),
         ]
@@ -448,7 +449,7 @@ fn editor_layer_row<'a>(
     container(
         row![
             text(layer.layer_name.as_str())
-                .size(11)
+                .size(typography::small())
                 .width(Length::Fixed(170.0)),
             bool_cell(!layer.off, index, LayerStateLayerFlag::On, 44.0),
             bool_cell(layer.frozen, index, LayerStateLayerFlag::Frozen, 54.0),
@@ -463,19 +464,19 @@ fn editor_layer_row<'a>(
             container(color).width(Length::Fixed(135.0)),
             iced::widget::pick_list(current_linetype, linetypes, |value| value.to_string(),)
                 .on_select(move |value| Message::LayerStateEditorLayerLinetype(index, value))
-                .text_size(11)
+                .text_size(typography::small())
                 .padding([3, 5])
                 .width(Length::Fixed(150.0)),
             iced::widget::pick_list(current_lineweight, lw_options(), |value| value.to_string(),)
                 .on_select(move |item: LwItem| {
                     Message::LayerStateEditorLayerLineweight(index, item.0)
                 })
-                .text_size(11)
+                .text_size(typography::small())
                 .padding([3, 5])
                 .width(Length::Fixed(115.0)),
             text_input(t!("Default").as_ref(), &layer.plot_style)
                 .on_input(move |value| Message::LayerStateEditorLayerPlotStyle(index, value))
-                .size(11)
+                .size(typography::small())
                 .padding([3, 5])
                 .width(Length::Fixed(135.0)),
             iced::widget::pick_list(
@@ -484,7 +485,7 @@ fn editor_layer_row<'a>(
                 |value| value.to_string(),
             )
             .on_select(move |item| Message::LayerStateEditorLayerTransparency(index, item.0))
-            .text_size(11)
+            .text_size(typography::small())
             .padding([3, 5])
             .width(Length::Fixed(105.0)),
         ]
@@ -555,16 +556,16 @@ pub fn view_editor<'a>(
     container(
         column![
             row![
-                text(t!("Name")).size(10).style(muted),
+                text(t!("Name")).size(typography::caption()).style(muted),
                 text_input(t!("Layer state name").as_ref(), &state.name)
                     .on_input(Message::LayerStateEditorName)
-                    .size(11)
+                    .size(typography::small())
                     .padding([3, 6])
                     .width(Length::Fixed(220.0)),
-                text(t!("Description")).size(10).style(muted),
+                text(t!("Description")).size(typography::caption()).style(muted),
                 text_input(t!("Optional description").as_ref(), &state.description)
                     .on_input(Message::LayerStateEditorDescription)
-                    .size(11)
+                    .size(typography::small())
                     .padding([3, 6])
                     .width(sizing.width),
             ]
@@ -572,15 +573,15 @@ pub fn view_editor<'a>(
             .align_y(iced::Center),
             row![
                 text(t!("%{n} saved layers", n = state.layers.len()))
-                    .size(10)
+                    .size(typography::caption())
                     .style(muted),
                 Space::new().width(sizing.width),
-                text(t!("Current layer")).size(10).style(muted),
+                text(t!("Current layer")).size(typography::caption()).style(muted),
                 iced::widget::pick_list(Some(state.current_layer.clone()), layer_names, |value| {
                     value.to_string()
                 },)
                 .on_select(Message::LayerStateEditorCurrentLayer)
-                .text_size(11)
+                .text_size(typography::small())
                 .padding([3, 6])
                 .width(Length::Fixed(180.0)),
             ]
@@ -588,15 +589,15 @@ pub fn view_editor<'a>(
             .align_y(iced::Center),
             divider(sizing.width),
             text(t!("Properties restored by this state"))
-                .size(10)
+                .size(typography::caption())
                 .style(muted),
             mask_controls,
             row![
-                text(t!("Saved layer values")).size(12),
+                text(t!("Saved layer values")).size(typography::body()),
                 Space::new().width(sizing.width),
                 text_input(t!("Search layers…").as_ref(), filter)
                     .on_input(Message::LayerStateEditorFilter)
-                    .size(11)
+                    .size(typography::small())
                     .padding([4, 7])
                     .width(Length::Fixed(190.0)),
             ]
@@ -619,14 +620,14 @@ pub fn view_editor<'a>(
                 text(t!(
                     "Changes affect the saved state only; the drawing is unchanged until Restore."
                 ))
-                .size(10)
+                .size(typography::caption())
                 .style(muted),
                 Space::new().width(sizing.width),
-                button(text(t!("Cancel")).size(11))
+                button(text(t!("Cancel")).size(typography::small()))
                     .on_press(Message::LayerStateEditorCancel)
                     .style(button_style(false))
                     .padding([5, 12]),
-                button(text(t!("Save Changes")).size(11))
+                button(text(t!("Save Changes")).size(typography::small()))
                     .on_press(Message::LayerStateEditorSave)
                     .style(button_style(true))
                     .padding([5, 12]),

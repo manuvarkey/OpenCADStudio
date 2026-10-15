@@ -7,6 +7,7 @@ use crate::app::Message;
 use crate::ui::dock::PanelId;
 use crate::ui::style::common::muted_style;
 use crate::ui::style::form::{button_style, field_style};
+use crate::ui::typography;
 use codec::count::{BlockInstance, CountKey};
 use codec::{CadDocument, Handle};
 use iced::widget::{
@@ -311,7 +312,7 @@ fn small_icon<'a>(bytes: &'static [u8], size: f32) -> Element<'a, Message> {
 
 fn row_menu(name: String, key: CountKey, expandable: bool) -> Element<'static, Message> {
     let entry = |label: String, action: RowAction| -> Element<'static, Message> {
-        button(text(label).size(12))
+        button(text(label).size(typography::body()))
             .width(Fill)
             .padding([5, 12])
             .on_press(msg(CountMsg::Menu(name.clone(), key.clone(), action)))
@@ -350,7 +351,7 @@ fn row_menu(name: String, key: CountKey, expandable: bool) -> Element<'static, M
                     }),
             )
             .push(
-                container(text(crate::t!("EXPAND BY")).size(10).style(muted_style))
+                container(text(crate::t!("EXPAND BY")).size(typography::caption()).style(muted_style))
                     .padding([3, 12]),
             )
             .push(entry(crate::t!("Layer").into_owned(), RowAction::Expand(0)))
@@ -407,13 +408,13 @@ fn list_row<'a>(
     if depth == 0 {
         cells = cells.push(small_icon(BLOCK_ICON, 14.0));
     }
-    cells = cells.push(text(label).size(12).width(Fill));
+    cells = cells.push(text(label).size(typography::body()).width(Fill));
     if errors {
         cells = cells.push(crate::ui::icons::themed_warning(WARNING_ICON, 12.0));
     }
     // An expanded row shows its counts on the rows below it.
     cells = cells.push(match count {
-        Some(n) => Element::from(text(n.to_string()).size(12)),
+        Some(n) => Element::from(text(n.to_string()).size(typography::body())),
         None => crate::ui::icons::themed(crate::ui::icons::MORE, 12.0),
     });
     let body = container(cells.spacing(6).align_y(iced::Center))
@@ -432,7 +433,7 @@ fn header_button<'a>(
     descending: bool,
     m: CountMsg,
 ) -> Element<'a, Message> {
-    let mut content = row![text(label).size(11)].spacing(3).align_y(iced::Center);
+    let mut content = row![text(label).size(typography::small())].spacing(3).align_y(iced::Center);
     if active {
         content = content.push(crate::ui::icons::themed_arrow_toggle(!descending, 8.0));
     }
@@ -448,7 +449,7 @@ fn list_view<'a>(palette: &'a CountPalette, instances: &[BlockInstance]) -> Elem
     let search = text_input(&crate::t!("Search"), &palette.search)
         .on_input(|v| msg(CountMsg::Search(v)))
         .padding([4, 8])
-        .size(12)
+        .size(typography::body())
         .style(field_style);
     let top = row![
         search.width(Fill),
@@ -509,7 +510,7 @@ fn list_view<'a>(palette: &'a CountPalette, instances: &[BlockInstance]) -> Elem
     let footer: Element<'a, Message> = match &palette.table {
         None => row![
             Space::new().width(Fill),
-            button(text(crate::t!("Create Table")).size(12))
+            button(text(crate::t!("Create Table")).size(typography::body()))
                 .on_press(msg(CountMsg::CreateTable))
                 .style(button_style(false))
                 .padding([5, 12]),
@@ -521,7 +522,7 @@ fn list_view<'a>(palette: &'a CountPalette, instances: &[BlockInstance]) -> Elem
                 && all
                     .iter()
                     .all(|r| checked.contains(&r.name.to_ascii_uppercase()));
-            let mut insert = button(text(crate::t!("Insert")).size(12))
+            let mut insert = button(text(crate::t!("Insert")).size(typography::body()))
                 .style(button_style(true))
                 .padding([5, 12]);
             if !checked.is_empty() {
@@ -532,7 +533,7 @@ fn list_view<'a>(palette: &'a CountPalette, instances: &[BlockInstance]) -> Elem
                     .size(14)
                     .on_toggle(|v| msg(CountMsg::TableAll(v))),
                 Space::new().width(Fill),
-                button(text(crate::t!("Cancel")).size(12))
+                button(text(crate::t!("Cancel")).size(typography::body()))
                     .on_press(msg(CountMsg::TableCancel))
                     .style(button_style(false))
                     .padding([5, 12]),
@@ -576,7 +577,7 @@ fn mode_view<'a>(
     let back = button(
         row![
             crate::ui::icons::themed_arrow_left(10.0),
-            text(crate::t!("Back to List")).size(12)
+            text(crate::t!("Back to List")).size(typography::body())
         ]
         .spacing(4)
         .align_y(iced::Center),
@@ -595,7 +596,7 @@ fn mode_view<'a>(
                         crate::tf!("Geometries: {}", mode.count(doc)).into_owned(),
                     _ => format!("{name}: {}", mode.count(doc)),
                 })
-                .size(12)
+                .size(typography::body())
                 .width(Fill),
             ]
             .spacing(6)
@@ -615,7 +616,7 @@ fn mode_view<'a>(
                 details = details.push(
                     checkbox(matching[k])
                         .label(crate::t!(*label).into_owned())
-                        .text_size(12)
+                        .text_size(typography::body())
                         .size(14)
                         .on_toggle(move |v| msg(CountMsg::Match(k, v))),
                 );
@@ -628,7 +629,7 @@ fn mode_view<'a>(
             row![
                 crate::ui::icons::themed_warning(WARNING_ICON, 12.0),
                 text(crate::tf!("Count Error Report: {}", result.errors.len()))
-                    .size(12)
+                    .size(typography::body())
                     .width(Fill),
             ]
             .spacing(6)
@@ -641,7 +642,7 @@ fn mode_view<'a>(
         if !palette.errors_closed {
             for h in &result.errors {
                 report = report.push(
-                    button(text(crate::t!("Overlapping object")).size(12))
+                    button(text(crate::t!("Overlapping object")).size(typography::body()))
                         .on_press(msg(CountMsg::ShowError(*h)))
                         .style(button::text)
                         .padding([2, 18]),
@@ -694,7 +695,7 @@ fn bar_button<'a>(
     if let Some(m) = m {
         b = b.on_press(msg(m));
     }
-    tooltip(b, text(tip).size(10), tooltip::Position::Bottom)
+    tooltip(b, text(tip).size(typography::caption()), tooltip::Position::Bottom)
         .gap(4)
         .into()
 }
@@ -725,7 +726,7 @@ pub fn toolbar<'a>(mode: &CountMode, doc: &CadDocument) -> Element<'a, Message> 
         }
     };
     let bar = row![
-        text(crate::tf!("Count: {}", count)).size(13),
+        text(crate::tf!("Count: {}", count)).size(typography::body_large()),
         status,
         bar_button(
             crate::ui::icons::themed_arrow_left(12.0),
@@ -809,8 +810,8 @@ pub fn invalid_area_view<'a>(
             row![
                 crate::ui::icons::themed_primary(crate::ui::icons::ARROW_LONG_RIGHT, 16.0),
                 column![
-                    text(title).size(13),
-                    text(detail).size(11).style(muted_style)
+                    text(title).size(typography::body_large()),
+                    text(detail).size(typography::small()).style(muted_style)
                 ]
                 .spacing(2),
             ]
@@ -827,7 +828,7 @@ pub fn invalid_area_view<'a>(
         row![
             crate::ui::icons::themed_warning(WARNING_ICON, 20.0),
             text(crate::t!("The changes to count boundary have resulted to an invalid count area. What do you want to do?"))
-                .size(14)
+                .size(typography::subheading())
                 .width(Fill),
         ]
         .spacing(12)
@@ -845,7 +846,7 @@ pub fn invalid_area_view<'a>(
         row![
             checkbox(palette.invalid_always)
                 .label(crate::t!("Always perform my current choice").into_owned())
-                .text_size(12)
+                .text_size(typography::body())
                 .size(14)
                 .on_toggle(|v| msg(CountMsg::InvalidAlways(v))),
             Space::new().width(Fill),
